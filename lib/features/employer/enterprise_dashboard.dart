@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../shared/theme.dart';
 
 class EnterpriseDashboard extends StatelessWidget {
@@ -8,26 +9,40 @@ class EnterpriseDashboard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: HireIQTheme.background,
-      appBar: AppBar(
-        title: const Text('Enterprise Hub'),
-        backgroundColor: HireIQTheme.surface,
-        elevation: 0,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildWelcomeHeader(),
-            const SizedBox(height: 25),
-            _buildQuickInsights(),
-            const SizedBox(height: 30),
-            _buildActiveRoles(),
-            const SizedBox(height: 30),
-            _buildTeamActivity(),
-            const SizedBox(height: 30),
-          ],
-        ),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            pinned: true,
+            backgroundColor: HireIQTheme.primaryNavy,
+            foregroundColor: Colors.white,
+            centerTitle: true,
+            title: Text(
+              'Enterprise Hub',
+              style: GoogleFonts.inter(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white),
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildWelcomeHeader(),
+                  const SizedBox(height: 24),
+                  _buildQuickInsights(),
+                  const SizedBox(height: 28),
+                  _buildActiveRoles(),
+                  const SizedBox(height: 28),
+                  _buildTeamActivity(),
+                  const SizedBox(height: 40),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -36,10 +51,21 @@ class EnterpriseDashboard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('FinCorp South Africa',
-            style: TextStyle(
-                fontWeight: FontWeight.bold, color: HireIQTheme.textSecondary)),
-        Text('Hiring Performance', style: HireIQTheme.titleStyle),
+        Text(
+          'FinCorp South Africa',
+          style: GoogleFonts.inter(
+              fontWeight: FontWeight.w500,
+              color: HireIQTheme.textSecondary,
+              fontSize: 13),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'Hiring Performance',
+          style: GoogleFonts.inter(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: HireIQTheme.textPrimary),
+        ),
       ],
     );
   }
@@ -48,30 +74,45 @@ class EnterpriseDashboard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: HireIQTheme.primary.withAlpha(25),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: HireIQTheme.primary.withAlpha(76)),
+        color: HireIQTheme.primaryNavy.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
+        border: Border.all(
+            color: HireIQTheme.primaryNavy.withValues(alpha: 0.15)),
       ),
       child: Row(
         children: [
-          const Icon(Icons.analytics_outlined,
-              color: HireIQTheme.primary, size: 32),
-          const SizedBox(width: 20),
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: HireIQTheme.primaryNavy.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.analytics_outlined,
+                color: HireIQTheme.primaryNavy, size: 24),
+          ),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('SignalIQ Report Ready',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
+                Text(
+                  'SignalIQ Report Ready',
+                  style: GoogleFonts.inter(
+                      fontWeight: FontWeight.w600,
+                      color: HireIQTheme.textPrimary),
+                ),
+                const SizedBox(height: 2),
                 Text(
                   'Q3 Enterprise Hiring Insights are ready for review.',
-                  style: HireIQTheme.bodyStyle
-                      .copyWith(fontSize: 12, color: HireIQTheme.textSecondary),
+                  style: GoogleFonts.inter(
+                      fontSize: 12,
+                      color: HireIQTheme.textSecondary),
                 ),
               ],
             ),
           ),
-          const Icon(Icons.chevron_right, color: HireIQTheme.primary),
+          const Icon(Icons.chevron_right,
+              color: HireIQTheme.primaryNavy),
         ],
       ),
     );
@@ -84,26 +125,52 @@ class EnterpriseDashboard extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Active Roles', style: HireIQTheme.subtitleStyle),
-            TextButton(onPressed: () {}, child: const Text('See all')),
+            Text(
+              'Active Roles',
+              style: GoogleFonts.inter(
+                  fontSize: 17,
+                  fontWeight: FontWeight.bold,
+                  color: HireIQTheme.textPrimary),
+            ),
+            GestureDetector(
+              onTap: () {},
+              child: Text(
+                'See all',
+                style: GoogleFonts.inter(
+                    color: HireIQTheme.primaryTeal,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 13),
+              ),
+            ),
           ],
         ),
-        const SizedBox(height: 10),
-        _buildRoleCard('Head of Engineering', 'Johannesburg • Remote', '42'),
-        _buildRoleCard('Senior Data Scientist', 'Cape Town • Hybrid', '18'),
-        _buildRoleCard('Flutter Developer', 'Durban • Full-time', '65'),
+        const SizedBox(height: 12),
+        _buildRoleCard(
+            'Head of Engineering', 'Johannesburg • Remote', '42'),
+        _buildRoleCard(
+            'Senior Data Scientist', 'Cape Town • Hybrid', '18'),
+        _buildRoleCard(
+            'Flutter Developer', 'Durban • Full-time', '65'),
       ],
     );
   }
 
-  Widget _buildRoleCard(String title, String location, String appCount) {
+  Widget _buildRoleCard(
+      String title, String location, String appCount) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(15),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: HireIQTheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: HireIQTheme.border),
+        color: HireIQTheme.surfaceWhite,
+        borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
+        border: Border.all(color: HireIQTheme.borderLight),
+        boxShadow: [
+          BoxShadow(
+            color: HireIQTheme.primaryNavy.withValues(alpha: 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -111,22 +178,38 @@ class EnterpriseDashboard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title,
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
-                Text(location,
-                    style: const TextStyle(
-                        fontSize: 12, color: HireIQTheme.textSecondary)),
+                Text(
+                  title,
+                  style: GoogleFonts.inter(
+                      fontWeight: FontWeight.w600,
+                      color: HireIQTheme.textPrimary),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  location,
+                  style: GoogleFonts.inter(
+                      fontSize: 12,
+                      color: HireIQTheme.textSecondary),
+                ),
               ],
             ),
           ),
           Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text(appCount,
-                  style: HireIQTheme.subtitleStyle
-                      .copyWith(color: HireIQTheme.primary)),
-              const Text('Apps',
-                  style: TextStyle(
-                      fontSize: 10, color: HireIQTheme.textSecondary)),
+              Text(
+                appCount,
+                style: GoogleFonts.inter(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                    color: HireIQTheme.primaryNavy),
+              ),
+              Text(
+                'Apps',
+                style: GoogleFonts.inter(
+                    fontSize: 11,
+                    color: HireIQTheme.textSecondary),
+              ),
             ],
           ),
         ],
@@ -138,11 +221,18 @@ class EnterpriseDashboard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Team Activity', style: HireIQTheme.subtitleStyle),
-        const SizedBox(height: 15),
+        Text(
+          'Team Activity',
+          style: GoogleFonts.inter(
+              fontSize: 17,
+              fontWeight: FontWeight.bold,
+              color: HireIQTheme.textPrimary),
+        ),
+        const SizedBox(height: 14),
         _buildActivityItem(
             'Sarah M. shortlisted 3 candidates for Head of Eng.'),
-        _buildActivityItem('David K. moved an offer to Approved state.'),
+        _buildActivityItem(
+            'David K. moved an offer to Approved state.'),
       ],
     );
   }
@@ -155,12 +245,21 @@ class EnterpriseDashboard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: const BoxDecoration(
-                color: HireIQTheme.border, shape: BoxShape.circle),
+              color: HireIQTheme.borderLight,
+              shape: BoxShape.circle,
+            ),
             child: const Icon(Icons.history,
-                size: 16, color: HireIQTheme.textSecondary),
+                size: 16,
+                color: HireIQTheme.textSecondary),
           ),
-          const SizedBox(width: 15),
-          Expanded(child: Text(text, style: const TextStyle(fontSize: 13))),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Text(
+              text,
+              style: GoogleFonts.inter(
+                  fontSize: 13, color: HireIQTheme.textPrimary),
+            ),
+          ),
         ],
       ),
     );

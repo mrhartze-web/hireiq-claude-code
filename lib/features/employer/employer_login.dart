@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hireiq/shared/theme.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../shared/theme.dart';
 import 'package:go_router/go_router.dart';
 
 class EmployerLogin extends StatelessWidget {
@@ -17,94 +18,130 @@ class EmployerLogin extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const Spacer(),
-              const Icon(Icons.business,
-                  color: HireIQTheme.primaryTeal, size: 80),
+              Container(
+                width: 88,
+                height: 88,
+                decoration: BoxDecoration(
+                  color: HireIQTheme.primaryTeal.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                alignment: Alignment.center,
+                child: const Icon(Icons.business,
+                    color: HireIQTheme.primaryTeal, size: 44),
+              ),
               const SizedBox(height: 24),
-              const Text(
+              Text(
                 'HireIQ for Employers',
-                style: TextStyle(
-                    fontSize: 28,
+                style: GoogleFonts.inter(
+                    fontSize: 26,
                     fontWeight: FontWeight.bold,
                     color: Colors.white),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
-              const Text(
+              Text(
                 'Access top pre-vetted talent.',
-                style: TextStyle(color: Colors.white70, fontSize: 16),
+                style: GoogleFonts.inter(
+                    color: Colors.white70, fontSize: 15),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 64),
+              const SizedBox(height: 56),
               TextField(
+                style: GoogleFonts.inter(color: Colors.white),
                 decoration: InputDecoration(
                   hintText: 'Work Email',
-                  hintStyle: const TextStyle(color: Colors.white54),
+                  hintStyle: GoogleFonts.inter(color: Colors.white54),
                   filled: true,
-                  fillColor: Colors.white.withAlpha(25),
-                  prefixIcon:
-                      const Icon(Icons.email_outlined, color: Colors.white70),
+                  fillColor: Colors.white.withValues(alpha: 0.1),
+                  prefixIcon: const Icon(Icons.email_outlined,
+                      color: Colors.white70),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius:
+                        BorderRadius.circular(HireIQTheme.radiusMd),
                     borderSide: BorderSide.none,
                   ),
                 ),
-                style: const TextStyle(color: Colors.white),
               ),
               const SizedBox(height: 16),
               TextField(
                 obscureText: true,
+                style: GoogleFonts.inter(color: Colors.white),
                 decoration: InputDecoration(
                   hintText: 'Password',
-                  hintStyle: const TextStyle(color: Colors.white54),
+                  hintStyle: GoogleFonts.inter(color: Colors.white54),
                   filled: true,
-                  fillColor: Colors.white.withAlpha(25),
-                  prefixIcon:
-                      const Icon(Icons.lock_outline, color: Colors.white70),
+                  fillColor: Colors.white.withValues(alpha: 0.1),
+                  prefixIcon: const Icon(Icons.lock_outline,
+                      color: Colors.white70),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius:
+                        BorderRadius.circular(HireIQTheme.radiusMd),
                     borderSide: BorderSide.none,
                   ),
                 ),
-                style: const TextStyle(color: Colors.white),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
               Align(
                 alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () {},
-                  child: const Text('Forgot Password?',
-                      style: TextStyle(color: HireIQTheme.primaryTeal)),
+                child: GestureDetector(
+                  onTap: () {},
+                  child: Text(
+                    'Forgot Password?',
+                    style: GoogleFonts.inter(
+                        color: HireIQTheme.primaryTeal,
+                        fontWeight: FontWeight.w500),
+                  ),
                 ),
               ),
-              const SizedBox(height: 32),
-              ElevatedButton(
-                onPressed: () => context.go('/employer-dashboard'),
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 55),
-                  backgroundColor: HireIQTheme.primaryTeal,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
+              const SizedBox(height: 28),
+              GestureDetector(
+                onTap: () => context.go('/employer-dashboard'),
+                child: Container(
+                  width: double.infinity,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [
+                        HireIQTheme.primaryTeal,
+                        Color(0xFF0A7A70),
+                      ],
+                    ),
+                    borderRadius:
+                        BorderRadius.circular(HireIQTheme.radiusMd),
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    'Sign In',
+                    style: GoogleFonts.inter(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                        color: Colors.white),
+                  ),
                 ),
-                child: const Text('Sign In',
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
               ),
               const Spacer(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text("Don't have an account?",
-                      style: TextStyle(color: Colors.white70)),
-                  TextButton(
-                    onPressed: () {},
-                    child: const Text('Sign Up',
-                        style: TextStyle(
+                  Text(
+                    "Don't have an account?",
+                    style: GoogleFonts.inter(color: Colors.white70),
+                  ),
+                  GestureDetector(
+                    onTap: () {},
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 4),
+                      child: Text(
+                        'Sign Up',
+                        style: GoogleFonts.inter(
                             color: HireIQTheme.primaryTeal,
-                            fontWeight: FontWeight.bold)),
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
                   ),
                 ],
               ),
+              const SizedBox(height: 8),
             ],
           ),
         ),

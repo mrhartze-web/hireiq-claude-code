@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../shared/theme.dart';
 import 'package:go_router/go_router.dart';
 
@@ -9,116 +10,243 @@ class EmployerDashboard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Employer Hub'),
-        actions: [
-          IconButton(
-              onPressed: () {}, icon: const Icon(Icons.notifications_none)),
-          IconButton(
-              onPressed: () {}, icon: const Icon(Icons.settings_outlined)),
-        ],
-      ),
+      backgroundColor: HireIQTheme.background,
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/employer/post-job'),
         backgroundColor: HireIQTheme.primaryNavy,
-        label: const Text('Post a Job', style: TextStyle(color: Colors.white)),
+        label: Text(
+          'Post a Job',
+          style: GoogleFonts.inter(
+              fontWeight: FontWeight.w600, color: Colors.white),
+        ),
         icon: const Icon(Icons.add, color: Colors.white),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Dashboard Overview',
-                style: Theme.of(context).textTheme.headlineMedium),
-            const SizedBox(height: 16),
-
-            // Stats Row
-            Row(
-              children: [
-                Expanded(
-                  child: _buildStatCard(context, 'Total Applications', '142',
-                      Icons.people_outline),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _buildStatCard(
-                      context, 'Active Jobs', '12', Icons.work_outline),
-                ),
-              ],
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            pinned: true,
+            backgroundColor: HireIQTheme.primaryNavy,
+            foregroundColor: Colors.white,
+            centerTitle: true,
+            title: Text(
+              'Employer Hub',
+              style: GoogleFonts.inter(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white),
             ),
-            const SizedBox(height: 24),
-
-            Text('Recent Activity',
-                style: Theme.of(context).textTheme.titleLarge),
-            const SizedBox(height: 12),
-
-            _buildActivityItem(
-                context, 'Senior Dev', '3 new applicants', '2 hrs ago'),
-            _buildActivityItem(
-                context, 'UI Designer', 'Interview scheduled', '5 hrs ago'),
-            _buildActivityItem(
-                context, 'DevOps Eng', 'Listing expired', '1 day ago'),
-
-            const SizedBox(height: 32),
-            Text('Active Listings',
-                style: Theme.of(context).textTheme.titleLarge),
-            const SizedBox(height: 12),
-
-            // Job list summary
-            ...List.generate(
-                3,
-                (index) => Card(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      child: ListTile(
-                        title: Text('Software Engineer $index'),
-                        subtitle: Text('Posted on Mar ${10 - index}, 2024'),
-                        trailing: const Icon(Icons.chevron_right),
-                        onTap: () => context.push('/employer/my-jobs'),
+            actions: [
+              IconButton(
+                onPressed: () {},
+                icon: const Icon(Icons.notifications_none, color: Colors.white),
+              ),
+              IconButton(
+                onPressed: () {},
+                icon:
+                    const Icon(Icons.settings_outlined, color: Colors.white),
+              ),
+            ],
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Dashboard Overview',
+                    style: GoogleFonts.inter(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: HireIQTheme.textPrimary),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildStatCard(
+                          'Total Applications',
+                          '142',
+                          Icons.people_outline,
+                          HireIQTheme.primaryTeal,
+                        ),
                       ),
-                    )),
-          ],
-        ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildStatCard(
+                          'Active Jobs',
+                          '12',
+                          Icons.work_outline,
+                          HireIQTheme.primaryNavy,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 28),
+                  Text(
+                    'Recent Activity',
+                    style: GoogleFonts.inter(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                        color: HireIQTheme.textPrimary),
+                  ),
+                  const SizedBox(height: 12),
+                  _buildActivityItem('Senior Dev', '3 new applicants', '2 hrs ago'),
+                  _buildActivityItem(
+                      'UI Designer', 'Interview scheduled', '5 hrs ago'),
+                  _buildActivityItem(
+                      'DevOps Eng', 'Listing expired', '1 day ago'),
+                  const SizedBox(height: 28),
+                  Text(
+                    'Active Listings',
+                    style: GoogleFonts.inter(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                        color: HireIQTheme.textPrimary),
+                  ),
+                  const SizedBox(height: 12),
+                  ...List.generate(
+                    3,
+                    (index) => GestureDetector(
+                      onTap: () => context.push('/employer/my-jobs'),
+                      child: Container(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: HireIQTheme.surfaceWhite,
+                          borderRadius:
+                              BorderRadius.circular(HireIQTheme.radiusLg),
+                          border: Border.all(color: HireIQTheme.borderLight),
+                          boxShadow: [
+                            BoxShadow(
+                              color: HireIQTheme.primaryNavy
+                                  .withValues(alpha: 0.04),
+                              blurRadius: 12,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Software Engineer $index',
+                                    style: GoogleFonts.inter(
+                                        fontWeight: FontWeight.w600,
+                                        color: HireIQTheme.textPrimary),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Posted on Mar ${10 - index}, 2024',
+                                    style: GoogleFonts.inter(
+                                        fontSize: 13,
+                                        color: HireIQTheme.textMuted),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const Icon(Icons.chevron_right,
+                                color: HireIQTheme.textMuted),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 80),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildStatCard(
-      BuildContext context, String label, String value, IconData icon) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(icon, color: HireIQTheme.primaryTeal, size: 20),
-            const SizedBox(height: 8),
-            Text(value, style: Theme.of(context).textTheme.displaySmall),
-            Text(label, style: Theme.of(context).textTheme.bodySmall),
-          ],
-        ),
+      String label, String value, IconData icon, Color iconColor) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: HireIQTheme.surfaceWhite,
+        borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
+        border: Border.all(color: HireIQTheme.borderLight),
+        boxShadow: [
+          BoxShadow(
+            color: HireIQTheme.primaryNavy.withValues(alpha: 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: iconColor.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(HireIQTheme.radiusSm),
+            ),
+            child: Icon(icon, color: iconColor, size: 20),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            value,
+            style: GoogleFonts.inter(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: HireIQTheme.textPrimary),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: GoogleFonts.inter(
+                fontSize: 12, color: HireIQTheme.textMuted),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildActivityItem(
-      BuildContext context, String title, String subtitle, String time) {
+      String title, String subtitle, String time) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12),
+      padding: const EdgeInsets.symmetric(vertical: 14),
       decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: HireIQTheme.borderLight)),
+        border:
+            Border(bottom: BorderSide(color: HireIQTheme.borderLight)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
-              Text(subtitle, style: Theme.of(context).textTheme.bodySmall),
-            ],
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.inter(
+                      fontWeight: FontWeight.w600,
+                      color: HireIQTheme.textPrimary),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  style: GoogleFonts.inter(
+                      fontSize: 13, color: HireIQTheme.textMuted),
+                ),
+              ],
+            ),
           ),
-          Text(time, style: Theme.of(context).textTheme.bodySmall),
+          Text(
+            time,
+            style: GoogleFonts.inter(
+                fontSize: 12, color: HireIQTheme.textLight),
+          ),
         ],
       ),
     );

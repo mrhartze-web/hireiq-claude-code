@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hireiq/shared/theme.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../shared/theme.dart';
 import 'package:go_router/go_router.dart';
 import '../../shared/components/candidate_card.dart';
 
@@ -10,32 +11,45 @@ class EmployerCandidates extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: HireIQTheme.background,
-      appBar: AppBar(
-        title: const Text('Candidate Pool'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.filter_list),
-            onPressed: () => context.push('/employer/candidate-search'),
-          ),
-        ],
-      ),
       body: CustomScrollView(
         slivers: [
+          SliverAppBar(
+            pinned: true,
+            backgroundColor: HireIQTheme.primaryNavy,
+            foregroundColor: Colors.white,
+            centerTitle: true,
+            title: Text(
+              'Candidate Pool',
+              style: GoogleFonts.inter(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white),
+            ),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.filter_list, color: Colors.white),
+                onPressed: () => context.push('/employer/candidate-search'),
+              ),
+            ],
+          ),
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Top MatchIQ Fits',
-                      style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: HireIQTheme.primaryNavy)),
+                  Text(
+                    'Top MatchIQ Fits',
+                    style: GoogleFonts.inter(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: HireIQTheme.primaryNavy),
+                  ),
                   const SizedBox(height: 8),
-                  const Text(
-                      'Candidates sorted by their relevance to your active briefs.',
-                      style: TextStyle(color: HireIQTheme.textMuted)),
+                  Text(
+                    'Candidates sorted by their relevance to your active briefs.',
+                    style: GoogleFonts.inter(color: HireIQTheme.textMuted),
+                  ),
                   const SizedBox(height: 24),
                   CandidateCard(
                     name: 'Alex T.',
@@ -55,6 +69,7 @@ class EmployerCandidates extends StatelessWidget {
                     matchIqScore: 85,
                     onActionPressed: () {},
                   ),
+                  const SizedBox(height: 40),
                 ],
               ),
             ),

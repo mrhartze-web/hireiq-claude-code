@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hireiq/shared/theme.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../shared/theme.dart';
 import 'package:go_router/go_router.dart';
 
 class EmployerCandidateSearch extends StatelessWidget {
@@ -9,90 +10,144 @@ class EmployerCandidateSearch extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: HireIQTheme.background,
-      appBar: AppBar(
-        title: const Text('Advanced Search'),
-        leading: IconButton(
-          icon: const Icon(Icons.close),
-          onPressed: () => context.pop(),
-        ),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Filter Candidates',
-              style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: HireIQTheme.primaryNavy),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            pinned: true,
+            backgroundColor: HireIQTheme.primaryNavy,
+            foregroundColor: Colors.white,
+            centerTitle: true,
+            title: Text(
+              'Advanced Search',
+              style: GoogleFonts.inter(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white),
             ),
-            const SizedBox(height: 16),
-            _buildTextField(
-                'Skills (comma separated)', 'e.g. Flutter, Dart, Firebase'),
-            const SizedBox(height: 20),
-            _buildTextField('Location', 'e.g. Remote, Johannesburg'),
-            const SizedBox(height: 20),
-            const Text('Minimum MatchIQ Score',
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: HireIQTheme.primaryNavy)),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Expanded(
-                  child: Slider(
-                    value: 80,
-                    min: 0,
-                    max: 100,
-                    divisions: 10,
-                    activeColor: HireIQTheme.primaryTeal,
-                    inactiveColor: HireIQTheme.borderLight,
-                    onChanged: (val) {},
-                  ),
-                ),
-                const Text('80%',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: HireIQTheme.primaryNavy)),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Container(
-              decoration: BoxDecoration(
-                color: HireIQTheme.surfaceWhite,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: HireIQTheme.borderLight),
-              ),
-              child: SwitchListTile(
-                title: const Text('PassportIQ Verified Only',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: HireIQTheme.primaryNavy)),
-                subtitle: const Text(
-                    'Only show candidates with verified identity and qualifications.',
-                    style: TextStyle(color: HireIQTheme.textMuted)),
-                value: true,
-                onChanged: (val) {},
-                activeThumbColor: HireIQTheme.primaryTeal,
-              ),
-            ),
-            const SizedBox(height: 48),
-            ElevatedButton(
+            leading: IconButton(
+              icon: const Icon(Icons.close, color: Colors.white),
               onPressed: () => context.pop(),
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 55),
-                backgroundColor: HireIQTheme.primaryNavy,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
-              ),
-              child: const Text('Apply Filters',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             ),
-          ],
-        ),
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Filter Candidates',
+                    style: GoogleFonts.inter(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: HireIQTheme.primaryNavy),
+                  ),
+                  const SizedBox(height: 20),
+                  _buildTextField(
+                      'Skills (comma separated)',
+                      'e.g. Flutter, Dart, Firebase'),
+                  const SizedBox(height: 20),
+                  _buildTextField(
+                      'Location', 'e.g. Remote, Johannesburg'),
+                  const SizedBox(height: 24),
+                  Text(
+                    'Minimum MatchIQ Score',
+                    style: GoogleFonts.inter(
+                        fontWeight: FontWeight.w600,
+                        color: HireIQTheme.primaryNavy),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: HireIQTheme.surfaceWhite,
+                      borderRadius:
+                          BorderRadius.circular(HireIQTheme.radiusMd),
+                      border:
+                          Border.all(color: HireIQTheme.borderLight),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Slider(
+                            value: 80,
+                            min: 0,
+                            max: 100,
+                            divisions: 10,
+                            activeColor: HireIQTheme.primaryTeal,
+                            inactiveColor: HireIQTheme.borderLight,
+                            onChanged: (val) {},
+                          ),
+                        ),
+                        Text(
+                          '80%',
+                          style: GoogleFonts.inter(
+                              fontWeight: FontWeight.w600,
+                              color: HireIQTheme.primaryNavy),
+                        ),
+                        const SizedBox(width: 8),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: HireIQTheme.surfaceWhite,
+                      borderRadius:
+                          BorderRadius.circular(HireIQTheme.radiusMd),
+                      border:
+                          Border.all(color: HireIQTheme.borderLight),
+                    ),
+                    child: SwitchListTile(
+                      title: Text(
+                        'PassportIQ Verified Only',
+                        style: GoogleFonts.inter(
+                            fontWeight: FontWeight.w600,
+                            color: HireIQTheme.primaryNavy),
+                      ),
+                      subtitle: Text(
+                        'Only show candidates with verified identity and qualifications.',
+                        style: GoogleFonts.inter(
+                            color: HireIQTheme.textMuted, fontSize: 13),
+                      ),
+                      value: true,
+                      onChanged: (val) {},
+                      activeThumbColor: HireIQTheme.primaryTeal,
+                    ),
+                  ),
+                  const SizedBox(height: 48),
+                  GestureDetector(
+                    onTap: () => context.pop(),
+                    child: Container(
+                      width: double.infinity,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [
+                            HireIQTheme.primaryNavy,
+                            Color(0xFF243659),
+                          ],
+                        ),
+                        borderRadius:
+                            BorderRadius.circular(HireIQTheme.radiusMd),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        'Apply Filters',
+                        style: GoogleFonts.inter(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                            color: Colors.white),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -101,23 +156,37 @@ class EmployerCandidateSearch extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label,
-            style: const TextStyle(
-                fontWeight: FontWeight.bold, color: HireIQTheme.primaryNavy)),
+        Text(
+          label,
+          style: GoogleFonts.inter(
+              fontWeight: FontWeight.w600,
+              color: HireIQTheme.primaryNavy),
+        ),
         const SizedBox(height: 8),
         TextField(
+          style: GoogleFonts.inter(color: HireIQTheme.textPrimary),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: const TextStyle(color: HireIQTheme.textMuted),
+            hintStyle: GoogleFonts.inter(color: HireIQTheme.textMuted),
             filled: true,
-            fillColor: Colors.white,
+            fillColor: HireIQTheme.surfaceWhite,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: HireIQTheme.borderLight),
+              borderRadius:
+                  BorderRadius.circular(HireIQTheme.radiusMd),
+              borderSide:
+                  const BorderSide(color: HireIQTheme.borderLight),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: HireIQTheme.borderLight),
+              borderRadius:
+                  BorderRadius.circular(HireIQTheme.radiusMd),
+              borderSide:
+                  const BorderSide(color: HireIQTheme.borderLight),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius:
+                  BorderRadius.circular(HireIQTheme.radiusMd),
+              borderSide:
+                  const BorderSide(color: HireIQTheme.primaryTeal),
             ),
           ),
         ),
