@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hireiq/shared/theme.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../shared/theme.dart';
 
 class CandidateSecuritySettings extends StatelessWidget {
   const CandidateSecuritySettings({super.key});
@@ -8,98 +9,200 @@ class CandidateSecuritySettings extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: HireIQTheme.background,
-      appBar: AppBar(
-        title: const Text('Security Settings'),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Change Password',
-              style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: HireIQTheme.primaryNavy),
-            ),
-            const SizedBox(height: 16),
-            _buildTextField('Current Password', obscureText: true),
-            const SizedBox(height: 16),
-            _buildTextField('New Password', obscureText: true),
-            const SizedBox(height: 16),
-            _buildTextField('Confirm New Password', obscureText: true),
-            const SizedBox(height: 24),
-            Align(
-              alignment: Alignment.centerRight,
-              child: ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: HireIQTheme.primaryNavy,
-                  foregroundColor: HireIQTheme.surfaceWhite,
-                ),
-                child: const Text('Update Password'),
+      body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
+        slivers: [
+          SliverAppBar(
+            pinned: true,
+            backgroundColor: HireIQTheme.primaryNavy,
+            foregroundColor: Colors.white,
+            centerTitle: true,
+            title: Text(
+              'Security Settings',
+              style: GoogleFonts.inter(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
               ),
             ),
-            const SizedBox(height: 48),
-            const Text(
-              'Two-Factor Authentication',
-              style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: HireIQTheme.primaryNavy),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Add an extra layer of security to your account.',
-              style: TextStyle(color: HireIQTheme.textMuted),
-            ),
-            const SizedBox(height: 16),
-            Container(
-              decoration: BoxDecoration(
-                color: HireIQTheme.surfaceWhite,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: HireIQTheme.borderLight),
+          ),
+
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 28, 20, 48),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // ── Change password ───────────────────────────────────
+                  Text(
+                    'Change Password',
+                    style: GoogleFonts.inter(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w700,
+                      color: HireIQTheme.primaryNavy,
+                      letterSpacing: -0.3,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  const _PasswordField(label: 'Current Password'),
+                  const SizedBox(height: 16),
+                  const _PasswordField(label: 'New Password'),
+                  const SizedBox(height: 16),
+                  const _PasswordField(label: 'Confirm New Password'),
+
+                  const SizedBox(height: 24),
+
+                  GestureDetector(
+                    onTap: () {},
+                    child: Container(
+                      height: 50,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [
+                            HireIQTheme.primaryNavy,
+                            Color(0xFF243659),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius:
+                            BorderRadius.circular(HireIQTheme.radiusMd),
+                        boxShadow: [
+                          BoxShadow(
+                            color: HireIQTheme.primaryNavy
+                                .withValues(alpha: 0.3),
+                            blurRadius: 14,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Update Password',
+                          style: GoogleFonts.inter(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 36),
+                  const Divider(color: HireIQTheme.borderLight),
+                  const SizedBox(height: 36),
+
+                  // ── Two-factor auth ───────────────────────────────────
+                  Text(
+                    'Two-Factor Authentication',
+                    style: GoogleFonts.inter(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w700,
+                      color: HireIQTheme.primaryNavy,
+                      letterSpacing: -0.3,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'Add an extra layer of security to your account.',
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      color: HireIQTheme.textMuted,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  Container(
+                    decoration: BoxDecoration(
+                      color: HireIQTheme.surfaceWhite,
+                      borderRadius:
+                          BorderRadius.circular(HireIQTheme.radiusLg),
+                      border: Border.all(color: HireIQTheme.borderLight),
+                      boxShadow: [
+                        BoxShadow(
+                          color: HireIQTheme.primaryNavy
+                              .withValues(alpha: 0.04),
+                          blurRadius: 10,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: SwitchListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 4),
+                      title: Text(
+                        'Enable 2FA',
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: HireIQTheme.primaryNavy,
+                        ),
+                      ),
+                      subtitle: Text(
+                        'Use an authenticator app for secure logins.',
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: HireIQTheme.textMuted,
+                          height: 1.4,
+                        ),
+                      ),
+                      value: false,
+                      onChanged: (val) {},
+                      activeThumbColor: HireIQTheme.primaryTeal,
+                    ),
+                  ),
+                ],
               ),
-              child: SwitchListTile(
-                title: const Text('Enable 2FA',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: HireIQTheme.primaryNavy)),
-                subtitle: const Text(
-                    'Use an authenticator app for secure logins.',
-                    style: TextStyle(color: HireIQTheme.textMuted)),
-                value: false,
-                onChanged: (val) {},
-                activeThumbColor: HireIQTheme.primaryTeal,
-              ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
+}
 
-  Widget _buildTextField(String label, {bool obscureText = false}) {
+// ── Password field ─────────────────────────────────────────────────────────────
+
+class _PasswordField extends StatelessWidget {
+  const _PasswordField({required this.label});
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label,
-            style: const TextStyle(
-                fontWeight: FontWeight.bold, color: HireIQTheme.primaryNavy)),
+        Text(
+          label,
+          style: GoogleFonts.inter(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: HireIQTheme.primaryNavy,
+          ),
+        ),
         const SizedBox(height: 8),
         TextField(
-          obscureText: obscureText,
+          obscureText: true,
+          style: GoogleFonts.inter(fontSize: 14, color: HireIQTheme.textPrimary),
           decoration: InputDecoration(
             filled: true,
-            fillColor: Colors.white,
+            fillColor: HireIQTheme.surfaceWhite,
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(HireIQTheme.radiusMd),
               borderSide: const BorderSide(color: HireIQTheme.borderLight),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(HireIQTheme.radiusMd),
               borderSide: const BorderSide(color: HireIQTheme.borderLight),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(HireIQTheme.radiusMd),
+              borderSide:
+                  const BorderSide(color: HireIQTheme.primaryTeal, width: 2),
             ),
           ),
         ),

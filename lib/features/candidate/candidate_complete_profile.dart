@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:hireiq/shared/theme.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../shared/theme.dart';
 
 class CandidateCompleteProfile extends StatelessWidget {
   const CandidateCompleteProfile({super.key});
@@ -9,114 +10,285 @@ class CandidateCompleteProfile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: HireIQTheme.background,
-      appBar: AppBar(
-        title: const Text('Complete Profile'),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: HireIQTheme.primaryNavy,
-                borderRadius: BorderRadius.circular(20),
+      body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
+        slivers: [
+          SliverAppBar(
+            pinned: true,
+            backgroundColor: HireIQTheme.primaryNavy,
+            foregroundColor: Colors.white,
+            centerTitle: true,
+            title: Text(
+              'Complete Profile',
+              style: GoogleFonts.inter(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
               ),
+            ),
+          ),
+
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 24, 20, 48),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('Profile Completion',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold)),
-                      Text('75%',
-                          style: TextStyle(
-                              color: HireIQTheme.primaryTeal.withAlpha(229),
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold)),
-                    ],
+                  // ── Progress banner ───────────────────────────────────
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [
+                          HireIQTheme.primaryNavy,
+                          Color(0xFF243659),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius:
+                          BorderRadius.circular(HireIQTheme.radiusXl),
+                      boxShadow: [
+                        BoxShadow(
+                          color: HireIQTheme.primaryNavy
+                              .withValues(alpha: 0.25),
+                          blurRadius: 20,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Profile Completion',
+                              style: GoogleFonts.inter(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                            Text(
+                              '75%',
+                              style: GoogleFonts.inter(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w800,
+                                color: HireIQTheme.primaryTeal,
+                                letterSpacing: -0.5,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 14),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(
+                              HireIQTheme.radiusFull),
+                          child: const LinearProgressIndicator(
+                            value: 0.75,
+                            minHeight: 8,
+                            backgroundColor: Color(0x33FFFFFF),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              HireIQTheme.primaryTeal,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'Complete the remaining steps to access MatchIQ and start applying.',
+                          style: GoogleFonts.inter(
+                            fontSize: 13,
+                            color: Colors.white.withValues(alpha: 0.65),
+                            height: 1.5,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 16),
-                  LinearProgressIndicator(
-                    value: 0.75,
-                    backgroundColor: Colors.white24,
-                    valueColor: const AlwaysStoppedAnimation<Color>(
-                        HireIQTheme.primaryTeal),
-                    minHeight: 8,
-                    borderRadius: BorderRadius.circular(4),
+
+                  const SizedBox(height: 28),
+
+                  // ── Remaining tasks ───────────────────────────────────
+                  Text(
+                    'Remaining Tasks',
+                    style: GoogleFonts.inter(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w700,
+                      color: HireIQTheme.primaryNavy,
+                      letterSpacing: -0.3,
+                    ),
                   ),
-                  const SizedBox(height: 16),
-                  const Text(
-                      'Complete the remaining steps to access MatchIQ and start applying.',
-                      style: TextStyle(color: Colors.white70)),
+                  const SizedBox(height: 14),
+
+                  _TaskTile(
+                    context: context,
+                    title: 'Verify PassportIQ',
+                    subtitle: 'Upload your ID and get verified',
+                    isCompleted: false,
+                    route: '/passport-iq',
+                  ),
+                  _TaskTile(
+                    context: context,
+                    title: 'Add References',
+                    subtitle: 'Build trust with employers',
+                    isCompleted: false,
+                    route: '/candidate/references',
+                  ),
+                  _TaskTile(
+                    context: context,
+                    title: 'Record Video Pitch',
+                    subtitle: 'Stand out from the crowd',
+                    isCompleted: false,
+                    route: '/candidate/video-pitch',
+                  ),
+
+                  const SizedBox(height: 28),
+
+                  // ── Completed ─────────────────────────────────────────
+                  Text(
+                    'Completed',
+                    style: GoogleFonts.inter(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w700,
+                      color: HireIQTheme.textMuted,
+                      letterSpacing: -0.3,
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+
+                  _TaskTile(
+                    context: context,
+                    title: 'Basic Details',
+                    subtitle: 'Name, contact, location',
+                    isCompleted: true,
+                    route: '',
+                  ),
+                  _TaskTile(
+                    context: context,
+                    title: 'Experience & Skills',
+                    subtitle: 'CV parsed successfully',
+                    isCompleted: true,
+                    route: '',
+                  ),
+                  _TaskTile(
+                    context: context,
+                    title: 'Career Goals',
+                    subtitle: 'Salary and role expectations',
+                    isCompleted: true,
+                    route: '',
+                    isLast: true,
+                  ),
                 ],
               ),
             ),
-            const SizedBox(height: 32),
-            const Text(
-              'Remaining Tasks',
-              style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: HireIQTheme.primaryNavy),
-            ),
-            const SizedBox(height: 16),
-            _buildTaskTile(context, 'Verify PassportIQ',
-                'Upload your ID and get verified', false, '/passport-iq'),
-            _buildTaskTile(context, 'Add References',
-                'Build trust with employers', false, '/candidate/references'),
-            _buildTaskTile(context, 'Record Video Pitch',
-                'Stand out from the crowd', false, '/candidate/video-pitch'),
-            const SizedBox(height: 32),
-            const Text(
-              'Completed',
-              style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: HireIQTheme.textMuted),
-            ),
-            const SizedBox(height: 16),
-            _buildTaskTile(
-                context, 'Basic Details', 'Name, contact, location', true, ''),
-            _buildTaskTile(context, 'Experience & Skills',
-                'CV parsed successfully', true, ''),
-            _buildTaskTile(context, 'Career Goals',
-                'Salary and role expectations', true, ''),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
+}
 
-  Widget _buildTaskTile(BuildContext context, String title, String subtitle,
-      bool isCompleted, String route) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: HireIQTheme.surfaceWhite,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: HireIQTheme.borderLight),
-      ),
-      child: ListTile(
-        leading: Icon(
-          isCompleted ? Icons.check_circle : Icons.radio_button_unchecked,
-          color: isCompleted ? HireIQTheme.primaryTeal : HireIQTheme.textMuted,
+// ── Task tile ──────────────────────────────────────────────────────────────────
+
+class _TaskTile extends StatelessWidget {
+  const _TaskTile({
+    required this.context,
+    required this.title,
+    required this.subtitle,
+    required this.isCompleted,
+    required this.route,
+    this.isLast = false,
+  });
+
+  final BuildContext context;
+  final String title;
+  final String subtitle;
+  final bool isCompleted;
+  final String route;
+  final bool isLast;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: isCompleted || route.isEmpty
+          ? null
+          : () => context.push(route),
+      child: Container(
+        margin: EdgeInsets.only(bottom: isLast ? 0 : 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: HireIQTheme.surfaceWhite,
+          borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
+          border: Border.all(
+            color: isCompleted
+                ? HireIQTheme.success.withValues(alpha: 0.3)
+                : HireIQTheme.borderLight,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: HireIQTheme.primaryNavy.withValues(alpha: 0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ],
         ),
-        title: Text(title,
-            style: TextStyle(
-                fontWeight: FontWeight.bold,
+        child: Row(
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
                 color: isCompleted
-                    ? HireIQTheme.textMuted
-                    : HireIQTheme.primaryNavy)),
-        subtitle: Text(subtitle,
-            style: const TextStyle(color: HireIQTheme.textMuted)),
-        trailing:
-            isCompleted ? null : const Icon(Icons.arrow_forward_ios, size: 16),
-        onTap: isCompleted || route.isEmpty ? null : () => context.push(route),
+                    ? HireIQTheme.success.withValues(alpha: 0.1)
+                    : HireIQTheme.backgroundLight,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                isCompleted
+                    ? Icons.check_circle_rounded
+                    : Icons.radio_button_unchecked_rounded,
+                color: isCompleted
+                    ? HireIQTheme.success
+                    : HireIQTheme.textLight,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: isCompleted
+                          ? HireIQTheme.textMuted
+                          : HireIQTheme.primaryNavy,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      color: HireIQTheme.textMuted,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (!isCompleted)
+              const Icon(
+                Icons.arrow_forward_ios_rounded,
+                size: 14,
+                color: HireIQTheme.textLight,
+              ),
+          ],
+        ),
       ),
     );
   }

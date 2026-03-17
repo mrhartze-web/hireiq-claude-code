@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../shared/theme.dart';
 
 class CareerRoadmap extends StatelessWidget {
@@ -8,168 +9,331 @@ class CareerRoadmap extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: HireIQTheme.background,
-      appBar: AppBar(
-        title: const Text('Career Roadmap'),
-        backgroundColor: HireIQTheme.surface,
-        elevation: 0,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildRoadmapHeader(),
-            const SizedBox(height: 30),
-            _buildSkillsSection(),
-            const SizedBox(height: 30),
-            _buildRecommendationCard(context),
-            const SizedBox(height: 30),
-          ],
-        ),
-      ),
-    );
-  }
+      body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
+        slivers: [
+          SliverAppBar(
+            pinned: true,
+            backgroundColor: HireIQTheme.primaryNavy,
+            foregroundColor: Colors.white,
+            centerTitle: true,
+            title: Text(
+              'Career Roadmap',
+              style: GoogleFonts.inter(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+            ),
+          ),
 
-  Widget _buildRoadmapHeader() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: HireIQTheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: HireIQTheme.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(Icons.map_outlined, color: HireIQTheme.primary),
-              const SizedBox(width: 10),
-              Text('Your Career Roadmap', style: HireIQTheme.subtitleStyle),
-            ],
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 28, 20, 48),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // ── Roadmap header card ───────────────────────────────
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: HireIQTheme.surfaceWhite,
+                      borderRadius:
+                          BorderRadius.circular(HireIQTheme.radiusXl),
+                      border: Border.all(color: HireIQTheme.borderLight),
+                      boxShadow: [
+                        BoxShadow(
+                          color: HireIQTheme.primaryNavy
+                              .withValues(alpha: 0.05),
+                          blurRadius: 16,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              width: 36,
+                              height: 36,
+                              decoration: BoxDecoration(
+                                color: HireIQTheme.primaryNavy
+                                    .withValues(alpha: 0.08),
+                                borderRadius: BorderRadius.circular(
+                                    HireIQTheme.radiusSm),
+                              ),
+                              child: const Icon(
+                                Icons.map_outlined,
+                                color: HireIQTheme.primaryNavy,
+                                size: 18,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Your Career Roadmap',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w700,
+                                    color: HireIQTheme.primaryNavy,
+                                    letterSpacing: -0.2,
+                                  ),
+                                ),
+                                Text(
+                                  'Based on Johannesburg market data',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 11,
+                                    color: HireIQTheme.textMuted,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 24),
+
+                        // Path steps
+                        const _PathStep(
+                          label: 'CURRENT',
+                          title: 'Mid Flutter Dev',
+                          dotColor: HireIQTheme.primaryNavy,
+                        ),
+                        const _PathConnector(),
+                        const _PathStep(
+                          label: 'TARGET',
+                          title: 'Lead Mobile Engineer',
+                          dotColor: HireIQTheme.primaryTeal,
+                          titleColor: HireIQTheme.primaryTeal,
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 28),
+
+                  // ── Skills to develop ─────────────────────────────────
+                  Text(
+                    'Skills to develop',
+                    style: GoogleFonts.inter(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w700,
+                      color: HireIQTheme.primaryNavy,
+                      letterSpacing: -0.3,
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+
+                  const _SkillItem(label: 'Clean Architecture'),
+                  const _SkillItem(label: 'System Design'),
+                  const _SkillItem(label: 'CI/CD Pipelines'),
+                  const _SkillItem(label: 'Team Leadership', isLast: true),
+
+                  const SizedBox(height: 28),
+
+                  // ── Recommendation card ───────────────────────────────
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [
+                          HireIQTheme.primaryNavy,
+                          Color(0xFF243659),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius:
+                          BorderRadius.circular(HireIQTheme.radiusXl),
+                      boxShadow: [
+                        BoxShadow(
+                          color: HireIQTheme.primaryNavy
+                              .withValues(alpha: 0.3),
+                          blurRadius: 20,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Recommended this week',
+                          style: GoogleFonts.inter(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white.withValues(alpha: 0.65),
+                            letterSpacing: 0.3,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          'Complete the Flutter Architecture course to boost your skill score by +15 points.',
+                          style: GoogleFonts.inter(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                            height: 1.45,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        GestureDetector(
+                          onTap: () {},
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 11),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(
+                                  HireIQTheme.radiusMd),
+                            ),
+                            child: Text(
+                              'Start Now →',
+                              style: GoogleFonts.inter(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                color: HireIQTheme.primaryNavy,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-          const SizedBox(height: 10),
-          Text(
-            'Based on your profile and Johannesburg market data',
-            style: HireIQTheme.bodyStyle
-                .copyWith(color: HireIQTheme.textSecondary, fontSize: 12),
-          ),
-          const SizedBox(height: 30),
-          _buildPathStep('Current', 'Mid Flutter Dev', isCurrent: true),
-          _buildPathConnector(),
-          _buildPathStep('Target', 'Lead Mobile Engineer', isTarget: true),
         ],
       ),
     );
   }
+}
 
-  Widget _buildPathStep(String label, String title,
-      {bool isCurrent = false, bool isTarget = false}) {
+// ── Path step ──────────────────────────────────────────────────────────────────
+
+class _PathStep extends StatelessWidget {
+  const _PathStep({
+    required this.label,
+    required this.title,
+    required this.dotColor,
+    this.titleColor = HireIQTheme.primaryNavy,
+  });
+
+  final String label;
+  final String title;
+  final Color dotColor;
+  final Color titleColor;
+
+  @override
+  Widget build(BuildContext context) {
     return Row(
       children: [
         Container(
           width: 12,
           height: 12,
           decoration: BoxDecoration(
-            color: isCurrent
-                ? HireIQTheme.primary
-                : (isTarget ? HireIQTheme.accent : HireIQTheme.border),
+            color: dotColor,
             shape: BoxShape.circle,
           ),
         ),
-        const SizedBox(width: 20),
+        const SizedBox(width: 16),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label,
-                style: const TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    color: HireIQTheme.textSecondary)),
-            Text(title,
-                style: HireIQTheme.bodyStyle
-                    .copyWith(fontWeight: FontWeight.bold)),
+            Text(
+              label,
+              style: GoogleFonts.inter(
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                color: HireIQTheme.textLight,
+                letterSpacing: 0.8,
+              ),
+            ),
+            Text(
+              title,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: titleColor,
+              ),
+            ),
           ],
         ),
       ],
     );
   }
+}
 
-  Widget _buildPathConnector() {
+// ── Path connector ─────────────────────────────────────────────────────────────
+
+class _PathConnector extends StatelessWidget {
+  const _PathConnector();
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(left: 5, top: 2, bottom: 2),
+      margin: const EdgeInsets.only(left: 5, top: 3, bottom: 3),
       width: 2,
-      height: 30,
-      color: HireIQTheme.border,
-    );
-  }
-
-  Widget _buildSkillsSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Skills to develop', style: HireIQTheme.subtitleStyle),
-        const SizedBox(height: 15),
-        _buildSkillChip('Clean Architecture'),
-        _buildSkillChip('System Design'),
-        _buildSkillChip('CI/CD Pipelines'),
-        _buildSkillChip('Team Leadership'),
-      ],
-    );
-  }
-
-  Widget _buildSkillChip(String label) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      height: 28,
       decoration: BoxDecoration(
-        color: HireIQTheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: HireIQTheme.border),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label, style: HireIQTheme.bodyStyle),
-          const Icon(Icons.chevron_right,
-              size: 18, color: HireIQTheme.textSecondary),
-        ],
+        color: HireIQTheme.borderLight,
+        borderRadius: BorderRadius.circular(1),
       ),
     );
   }
+}
 
-  Widget _buildRecommendationCard(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-            colors: [HireIQTheme.primary, HireIQTheme.primary.withAlpha(204)]),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Recommended this week',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 10),
-          const Text(
-            'Complete the Flutter Architecture course to boost your skill score by +15 points.',
-            style: TextStyle(color: Colors.white, height: 1.4),
-          ),
-          const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: HireIQTheme.primary,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8)),
+// ── Skill item ─────────────────────────────────────────────────────────────────
+
+class _SkillItem extends StatelessWidget {
+  const _SkillItem({required this.label, this.isLast = false});
+
+  final String label;
+  final bool isLast;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {},
+      child: Container(
+        margin: EdgeInsets.only(bottom: isLast ? 0 : 10),
+        padding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: HireIQTheme.surfaceWhite,
+          borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
+          border: Border.all(color: HireIQTheme.borderLight),
+          boxShadow: [
+            BoxShadow(
+              color: HireIQTheme.primaryNavy.withValues(alpha: 0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
             ),
-            child: const Text('Start Now →'),
-          ),
-        ],
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              label,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: HireIQTheme.textPrimary,
+              ),
+            ),
+            const Icon(
+              Icons.chevron_right_rounded,
+              size: 18,
+              color: HireIQTheme.textLight,
+            ),
+          ],
+        ),
       ),
     );
   }
