@@ -143,10 +143,13 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       if (isAuth &&
           (path == MobileRoutes.login || path == MobileRoutes.signup)) {
-        if (role == 'employer') return '/employer-dashboard';
-        if (role == 'recruiter') return '/recruiter-dashboard';
-        if (role == 'admin') return '/admin-dashboard';
-        return '/candidate-dashboard';
+        // If role is still loading, don't redirect — let explicit navigation handle it.
+        // Returning null here prevents a redirect to a non-existent path.
+        if (role == null) return null;
+        if (role == 'employer') return MobileRoutes.employerDashboard;
+        if (role == 'recruiter') return MobileRoutes.recruiterDashboard;
+        if (role == 'admin') return MobileRoutes.adminDashboard;
+        return MobileRoutes.candidateDashboard;
       }
 
       if (isAuth && role != null) {

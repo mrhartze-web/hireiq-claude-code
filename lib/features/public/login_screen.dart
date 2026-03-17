@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../shared/theme.dart';
 import '../../providers/auth_provider.dart';
+import '../mobile_screens.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -83,23 +84,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     super.dispose();
   }
 
-  Future<void> _navigateByRole() async {
-    final role = await ref
-        .read(authServiceProvider)
-        .getUserRole(ref.read(authStateProvider).value?.uid ?? '');
+  /// Navigate to the correct dashboard after sign-in.
+  /// [uid] comes directly from the UserCredential so we don't
+  /// depend on authStateProvider having propagated yet.
+  Future<void> _navigateByRole({String? uid}) async {
+    final effectiveUid = uid ?? ref.read(authStateProvider).value?.uid ?? '';
+    final role = effectiveUid.isNotEmpty
+        ? await ref.read(authServiceProvider).getUserRole(effectiveUid)
+        : null;
     if (!mounted) return;
     switch (role) {
       case 'employer':
-        context.go('/employer');
-        break;
+        context.go(MobileRoutes.employerDashboard);
       case 'recruiter':
-        context.go('/recruiter');
-        break;
+        context.go(MobileRoutes.recruiterDashboard);
       case 'admin':
-        context.go('/admin');
-        break;
+        context.go(MobileRoutes.adminDashboard);
       default:
-        context.go('/candidate');
+        // null role (Firestore doc missing or still loading) — default to candidate
+        context.go(MobileRoutes.candidateDashboard);
     }
   }
 
@@ -110,13 +113,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
       _error = null;
     });
     try {
-      await ref.read(authServiceProvider).signInWithEmail(
-            email: _emailController.text,
+      final cred = await ref.read(authServiceProvider).signInWithEmail(
+            email: _emailController.text.trim(),
             password: _passwordController.text,
           );
-      if (mounted) await _navigateByRole();
-    } catch (_) {
-      setState(() => _error = 'Invalid email or password. Please try again.');
+      if (mounted) await _navigateByRole(uid: cred.user?.uid);
+    } catch (e) {
+      final msg = e.toString().contains('wrong-password') ||
+              e.toString().contains('user-not-found') ||
+              e.toString().contains('invalid-credential') ||
+              e.toString().contains('INVALID_LOGIN_CREDENTIALS')
+          ? 'Invalid email or password. Please try again.'
+          : 'Sign in failed: ${e.toString().split(']').last.trim()}';
+      setState(() => _error = msg);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -128,8 +137,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
       _error = null;
     });
     try {
-      await ref.read(authServiceProvider).signInWithGoogle();
-      if (mounted) await _navigateByRole();
+      final cred = await ref.read(authServiceProvider).signInWithGoogle();
+      if (mounted) await _navigateByRole(uid: cred.user?.uid);
     } catch (e) {
       if (mounted) {
         final msg = e.toString().contains('cancelled')

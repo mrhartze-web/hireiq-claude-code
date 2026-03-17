@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../shared/theme.dart';
 import '../../providers/auth_provider.dart';
 
@@ -60,14 +61,74 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 48),
+              const SizedBox(height: 28),
+
+              // ── Logo mark ────────────────────────────────────────────────
+              Center(
+                child: Column(
+                  children: [
+                    Container(
+                      width: 56,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: const LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            HireIQTheme.primaryTeal,
+                            Color(0xFF0A7A70),
+                          ],
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: HireIQTheme.primaryTeal.withValues(alpha: 0.30),
+                            blurRadius: 16,
+                            offset: const Offset(0, 6),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.bolt_rounded,
+                        color: Colors.white,
+                        size: 28,
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    RichText(
+                      text: TextSpan(children: [
+                        TextSpan(
+                          text: 'Hire',
+                          style: GoogleFonts.inter(
+                            fontSize: 28,
+                            fontWeight: FontWeight.w800,
+                            color: HireIQTheme.primaryNavy,
+                            letterSpacing: -0.8,
+                          ),
+                        ),
+                        TextSpan(
+                          text: 'IQ',
+                          style: GoogleFonts.inter(
+                            fontSize: 28,
+                            fontWeight: FontWeight.w800,
+                            color: HireIQTheme.primaryTeal,
+                            letterSpacing: -0.8,
+                          ),
+                        ),
+                      ]),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 28),
               Text('Create account',
                   style: Theme.of(context).textTheme.displaySmall),
               const SizedBox(height: 8),
               Text('Join HireIQ today',
                   style: Theme.of(context).textTheme.bodyLarge
                       ?.copyWith(color: HireIQTheme.textMuted)),
-              const SizedBox(height: 40),
+              const SizedBox(height: 32),
               if (_error != null) ...[
                 Container(
                   padding: const EdgeInsets.all(12),
