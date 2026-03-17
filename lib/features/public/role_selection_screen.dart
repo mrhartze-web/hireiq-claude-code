@@ -15,6 +15,7 @@ class _Role {
     required this.title,
     required this.subtitle,
     required this.accent,
+    required this.chips,
   });
 
   final String key;
@@ -22,32 +23,41 @@ class _Role {
   final String title;
   final String subtitle;
   final Color accent;
+  final List<String> chips;
 }
 
 const _roles = <_Role>[
   _Role(
     key: 'candidate',
     icon: Icons.person_outline_rounded,
-    title: 'I am looking for work',
-    subtitle:
-        'Find jobs matched to your skills with AI-powered scoring.',
+    title: "I'm looking for work",
+    subtitle: 'AI-matched jobs with smart scoring and verified credentials.',
     accent: HireIQTheme.primaryTeal,
+    chips: ['MatchIQ', 'PassportIQ'],
   ),
   _Role(
     key: 'employer',
     icon: Icons.business_outlined,
-    title: 'I am hiring talent',
-    subtitle:
-        'Post jobs and find the best candidates with MatchIQ and WildcardIQ.',
+    title: "I'm hiring",
+    subtitle: 'Post jobs, screen candidates, and hire smarter with AI.',
     accent: HireIQTheme.primaryNavy,
+    chips: ['SignalIQ', 'WildcardIQ'],
   ),
   _Role(
     key: 'recruiter',
     icon: Icons.handshake_outlined,
-    title: 'I place candidates',
-    subtitle:
-        'Build briefs, manage pipelines, and earn with SignalIQ intelligence.',
+    title: "I'm a recruiter",
+    subtitle: 'Manage briefs, build your CV vault, and earn on placements.',
     accent: HireIQTheme.recruiterAccent,
+    chips: ['CRM Pipeline', 'CV Vault'],
+  ),
+  _Role(
+    key: 'gig',
+    icon: Icons.bolt_rounded,
+    title: 'I want gig work',
+    subtitle: 'Browse short-term contracts with secure escrow payments.',
+    accent: HireIQTheme.amber,
+    chips: ['Gig Marketplace', 'Escrow Payments'],
   ),
 ];
 
@@ -62,8 +72,6 @@ class RoleSelectionScreen extends StatefulWidget {
 
 class _RoleSelectionScreenState extends State<RoleSelectionScreen>
     with SingleTickerProviderStateMixin {
-  String? _selectedKey;
-
   late final AnimationController _entranceCtrl;
   late final Animation<double> _headerFade;
   late final Animation<Offset> _headerSlide;
@@ -76,36 +84,36 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen>
 
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
+      statusBarIconBrightness: Brightness.light,
     ));
 
     _entranceCtrl = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 750),
+      duration: const Duration(milliseconds: 780),
     );
 
     _headerFade = CurvedAnimation(
       parent: _entranceCtrl,
-      curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
+      curve: const Interval(0.0, 0.55, curve: Curves.easeOut),
     );
     _headerSlide = Tween<Offset>(
-      begin: const Offset(0, -0.12),
+      begin: const Offset(0, -0.1),
       end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: _entranceCtrl,
-      curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
+      curve: const Interval(0.0, 0.55, curve: Curves.easeOut),
     ));
 
     _cardsFade = CurvedAnimation(
       parent: _entranceCtrl,
-      curve: const Interval(0.2, 1.0, curve: Curves.easeOut),
+      curve: const Interval(0.25, 1.0, curve: Curves.easeOut),
     );
     _cardsSlide = Tween<Offset>(
-      begin: const Offset(0, 0.08),
+      begin: const Offset(0, 0.07),
       end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: _entranceCtrl,
-      curve: const Interval(0.2, 1.0, curve: Curves.easeOut),
+      curve: const Interval(0.25, 1.0, curve: Curves.easeOut),
     ));
 
     _entranceCtrl.forward();
@@ -117,166 +125,174 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen>
     super.dispose();
   }
 
-  void _select(String key) {
-    if (_selectedKey == key) return;
+  void _selectRole(_Role role) {
     HapticFeedback.selectionClick();
-    setState(() => _selectedKey = key);
-  }
-
-  void _continue() {
-    if (_selectedKey == null) return;
-    context.go(
-      MobileRoutes.signup,
-      extra: {'role': _selectedKey},
-    );
-  }
-
-  Color get _buttonColor {
-    if (_selectedKey == null) return HireIQTheme.borderMedium;
-    return _roles.firstWhere((r) => r.key == _selectedKey).accent;
+    context.go(MobileRoutes.signup, extra: {'role': role.key});
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: HireIQTheme.background,
+      backgroundColor: HireIQTheme.primaryNavy,
       body: Stack(
         children: [
-          // Subtle top wash
+          // Background radial glow
           Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 220,
-            child: DecoratedBox(
+            top: -80,
+            right: -60,
+            child: Container(
+              width: 300,
+              height: 300,
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    HireIQTheme.primaryNavy.withValues(alpha: 0.05),
-                    Colors.transparent,
-                  ],
-                ),
+                shape: BoxShape.circle,
+                color: HireIQTheme.primaryTeal.withValues(alpha: 0.08),
               ),
             ),
           ),
 
-          SafeArea(
-            child: Column(
-              children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    physics: const ClampingScrollPhysics(),
-                    padding: const EdgeInsets.fromLTRB(24, 32, 24, 0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // ── Wordmark ───────────────────────────────────
-                        SlideTransition(
-                          position: _headerSlide,
-                          child: FadeTransition(
-                            opacity: _headerFade,
-                            child: Center(
-                              child: RichText(
-                                text: TextSpan(children: [
-                                  TextSpan(
-                                    text: 'Hire',
-                                    style: GoogleFonts.inter(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.w800,
-                                      color: HireIQTheme.primaryNavy,
-                                      letterSpacing: -0.5,
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text: 'IQ',
-                                    style: GoogleFonts.inter(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.w800,
-                                      color: HireIQTheme.primaryTeal,
-                                      letterSpacing: -0.5,
-                                    ),
-                                  ),
-                                ]),
-                              ),
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 36),
-
-                        // ── Heading ────────────────────────────────────
-                        SlideTransition(
-                          position: _headerSlide,
-                          child: FadeTransition(
-                            opacity: _headerFade,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'I am joining as',
+          Column(
+            children: [
+              // ── Navy header bar ──────────────────────────────────────────
+              SafeArea(
+                bottom: false,
+                child: SlideTransition(
+                  position: _headerSlide,
+                  child: FadeTransition(
+                    opacity: _headerFade,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Wordmark
+                          Center(
+                            child: RichText(
+                              text: TextSpan(children: [
+                                TextSpan(
+                                  text: 'Hire',
                                   style: GoogleFonts.inter(
-                                    fontSize: 32,
+                                    fontSize: 22,
                                     fontWeight: FontWeight.w800,
-                                    color: HireIQTheme.textPrimary,
-                                    letterSpacing: -0.8,
-                                    height: 1.15,
+                                    color: Colors.white,
+                                    letterSpacing: -0.5,
                                   ),
                                 ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  'Choose your role to get a tailored experience.',
+                                TextSpan(
+                                  text: 'IQ',
                                   style: GoogleFonts.inter(
-                                    fontSize: 15,
-                                    color: HireIQTheme.textMuted,
-                                    height: 1.5,
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.w800,
+                                    color: HireIQTheme.primaryTeal,
+                                    letterSpacing: -0.5,
                                   ),
                                 ),
-                              ],
+                              ]),
                             ),
                           ),
-                        ),
 
-                        const SizedBox(height: 32),
+                          const SizedBox(height: 32),
 
-                        // ── Role cards ─────────────────────────────────
-                        SlideTransition(
-                          position: _cardsSlide,
-                          child: FadeTransition(
-                            opacity: _cardsFade,
-                            child: Column(
-                              children: _roles.map((role) {
-                                return Padding(
-                                  padding: const EdgeInsets.only(bottom: 14),
-                                  child: _RoleCard(
-                                    role: role,
-                                    isSelected: _selectedKey == role.key,
-                                    onTap: () => _select(role.key),
-                                  ),
-                                );
-                              }).toList(),
+                          Text(
+                            'How will you use\nHireIQ?',
+                            style: GoogleFonts.inter(
+                              fontSize: 34,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                              letterSpacing: -0.9,
+                              height: 1.15,
                             ),
                           ),
-                        ),
 
-                        const SizedBox(height: 8),
-                      ],
+                          const SizedBox(height: 10),
+
+                          Text(
+                            'Choose your role to get a tailored experience.',
+                            style: GoogleFonts.inter(
+                              fontSize: 15,
+                              color: Colors.white.withValues(alpha: 0.6),
+                              height: 1.5,
+                            ),
+                          ),
+
+                          const SizedBox(height: 28),
+                        ],
+                      ),
                     ),
                   ),
                 ),
+              ),
 
-                // ── Continue button ────────────────────────────────────
-                FadeTransition(
-                  opacity: _cardsFade,
-                  child: _ContinueButton(
-                    selectedKey: _selectedKey,
-                    buttonColor: _buttonColor,
-                    onTap: _continue,
+              // ── White card sheet ─────────────────────────────────────────
+              Expanded(
+                child: SlideTransition(
+                  position: _cardsSlide,
+                  child: FadeTransition(
+                    opacity: _cardsFade,
+                    child: Container(
+                      width: double.infinity,
+                      decoration: const BoxDecoration(
+                        color: HireIQTheme.background,
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(28),
+                        ),
+                      ),
+                      child: SingleChildScrollView(
+                        physics: const ClampingScrollPhysics(),
+                        padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+                        child: Column(
+                          children: [
+                            // Role cards
+                            ..._roles.map(
+                              (role) => Padding(
+                                padding: const EdgeInsets.only(bottom: 12),
+                                child: _RoleCard(
+                                  role: role,
+                                  onTap: () => _selectRole(role),
+                                ),
+                              ),
+                            ),
+
+                            const SizedBox(height: 28),
+
+                            // ── Sign in link ─────────────────────────────
+                            SafeArea(
+                              top: false,
+                              child: Padding(
+                                padding: const EdgeInsets.only(bottom: 8),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'Already have an account? ',
+                                      style: GoogleFonts.inter(
+                                        fontSize: 14,
+                                        color: HireIQTheme.textMuted,
+                                      ),
+                                    ),
+                                    GestureDetector(
+                                      onTap: () =>
+                                          context.go(MobileRoutes.login),
+                                      child: Text(
+                                        'Sign in',
+                                        style: GoogleFonts.inter(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w700,
+                                          color: HireIQTheme.primaryTeal,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ],
       ),
@@ -287,14 +303,9 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen>
 // ── Role card ─────────────────────────────────────────────────────────────────
 
 class _RoleCard extends StatefulWidget {
-  const _RoleCard({
-    required this.role,
-    required this.isSelected,
-    required this.onTap,
-  });
+  const _RoleCard({required this.role, required this.onTap});
 
   final _Role role;
-  final bool isSelected;
   final VoidCallback onTap;
 
   @override
@@ -328,7 +339,6 @@ class _RoleCardState extends State<_RoleCard>
   @override
   Widget build(BuildContext context) {
     final role = widget.role;
-    final selected = widget.isSelected;
 
     return GestureDetector(
       onTapDown: (_) => _pressCtrl.forward(),
@@ -339,79 +349,41 @@ class _RoleCardState extends State<_RoleCard>
       onTapCancel: () => _pressCtrl.reverse(),
       child: ScaleTransition(
         scale: _pressScale,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 280),
-          curve: Curves.easeOut,
+        child: Container(
           decoration: BoxDecoration(
-            color: selected
-                ? role.accent.withValues(alpha: 0.05)
-                : HireIQTheme.surfaceWhite,
+            color: HireIQTheme.surfaceWhite,
             borderRadius: BorderRadius.circular(16),
-            border: Border(
-              left: BorderSide(
-                color: selected ? role.accent : Colors.transparent,
-                width: 4,
+            border: Border.all(color: HireIQTheme.borderLight),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.04),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
               ),
-              top: BorderSide(
-                color: selected
-                    ? role.accent.withValues(alpha: 0.25)
-                    : HireIQTheme.borderLight,
-                width: 1,
-              ),
-              right: BorderSide(
-                color: selected
-                    ? role.accent.withValues(alpha: 0.25)
-                    : HireIQTheme.borderLight,
-                width: 1,
-              ),
-              bottom: BorderSide(
-                color: selected
-                    ? role.accent.withValues(alpha: 0.25)
-                    : HireIQTheme.borderLight,
-                width: 1,
-              ),
-            ),
-            boxShadow: selected
-                ? [
-                    BoxShadow(
-                      color: role.accent.withValues(alpha: 0.12),
-                      blurRadius: 20,
-                      offset: const Offset(0, 6),
-                    ),
-                  ]
-                : [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.04),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
+            ],
           ),
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(18),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // Icon bubble
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 280),
-                width: 52,
-                height: 52,
+              Container(
+                width: 50,
+                height: 50,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: selected
-                      ? role.accent.withValues(alpha: 0.12)
-                      : HireIQTheme.backgroundLight,
+                  color: role.accent.withValues(alpha: 0.1),
                 ),
                 child: Icon(
                   role.icon,
-                  size: 26,
-                  color: selected ? role.accent : HireIQTheme.textMuted,
+                  size: 24,
+                  color: role.accent,
                 ),
               ),
 
-              const SizedBox(width: 16),
+              const SizedBox(width: 14),
 
-              // Text
+              // Text + chips
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -419,57 +391,44 @@ class _RoleCardState extends State<_RoleCard>
                     Text(
                       role.title,
                       style: GoogleFonts.inter(
-                        fontSize: 16,
+                        fontSize: 15,
                         fontWeight: FontWeight.w700,
-                        color: selected
-                            ? role.accent
-                            : HireIQTheme.textPrimary,
+                        color: HireIQTheme.textPrimary,
                         height: 1.25,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 3),
                     Text(
                       role.subtitle,
                       style: GoogleFonts.inter(
-                        fontSize: 13,
+                        fontSize: 12,
                         color: HireIQTheme.textMuted,
-                        height: 1.5,
+                        height: 1.45,
                       ),
+                    ),
+                    const SizedBox(height: 8),
+                    // Feature chips
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 4,
+                      children: role.chips
+                          .map((chip) => _FeatureChip(
+                                label: chip,
+                                accent: role.accent,
+                              ))
+                          .toList(),
                     ),
                   ],
                 ),
               ),
 
-              const SizedBox(width: 12),
+              const SizedBox(width: 8),
 
-              // Check / chevron
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 220),
-                transitionBuilder: (child, anim) => ScaleTransition(
-                  scale: anim,
-                  child: FadeTransition(opacity: anim, child: child),
-                ),
-                child: selected
-                    ? Container(
-                        key: const ValueKey('check'),
-                        width: 28,
-                        height: 28,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: role.accent,
-                        ),
-                        child: const Icon(
-                          Icons.check_rounded,
-                          color: Colors.white,
-                          size: 16,
-                        ),
-                      )
-                    : const Icon(
-                        key: ValueKey('chevron'),
-                        Icons.chevron_right_rounded,
-                        color: HireIQTheme.textLight,
-                        size: 22,
-                      ),
+              // Chevron
+              const Icon(
+                Icons.chevron_right_rounded,
+                color: HireIQTheme.textLight,
+                size: 22,
               ),
             ],
           ),
@@ -479,119 +438,32 @@ class _RoleCardState extends State<_RoleCard>
   }
 }
 
-// ── Continue button ───────────────────────────────────────────────────────────
+// ── Feature chip ──────────────────────────────────────────────────────────────
 
-class _ContinueButton extends StatefulWidget {
-  const _ContinueButton({
-    required this.selectedKey,
-    required this.buttonColor,
-    required this.onTap,
-  });
+class _FeatureChip extends StatelessWidget {
+  const _FeatureChip({required this.label, required this.accent});
 
-  final String? selectedKey;
-  final Color buttonColor;
-  final VoidCallback onTap;
-
-  @override
-  State<_ContinueButton> createState() => _ContinueButtonState();
-}
-
-class _ContinueButtonState extends State<_ContinueButton>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _pressCtrl;
-  late final Animation<double> _pressScale;
-
-  @override
-  void initState() {
-    super.initState();
-    _pressCtrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 80),
-      reverseDuration: const Duration(milliseconds: 220),
-    );
-    _pressScale = Tween<double>(begin: 1.0, end: 0.97).animate(
-      CurvedAnimation(parent: _pressCtrl, curve: Curves.easeOut),
-    );
-  }
-
-  @override
-  void dispose() {
-    _pressCtrl.dispose();
-    super.dispose();
-  }
+  final String label;
+  final Color accent;
 
   @override
   Widget build(BuildContext context) {
-    final enabled = widget.selectedKey != null;
-
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 12, 24, 28),
-      child: GestureDetector(
-        onTapDown: enabled ? (_) => _pressCtrl.forward() : null,
-        onTapUp: enabled
-            ? (_) {
-                _pressCtrl.reverse();
-                widget.onTap();
-              }
-            : null,
-        onTapCancel: enabled ? () => _pressCtrl.reverse() : null,
-        child: ScaleTransition(
-          scale: _pressScale,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 350),
-            curve: Curves.easeOut,
-            width: double.infinity,
-            height: 56,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              color: enabled ? null : HireIQTheme.backgroundLight,
-              gradient: enabled
-                  ? LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        widget.buttonColor,
-                        widget.buttonColor.withValues(alpha: 0.8),
-                      ],
-                    )
-                  : null,
-              boxShadow: enabled
-                  ? [
-                      BoxShadow(
-                        color: widget.buttonColor.withValues(alpha: 0.38),
-                        blurRadius: 18,
-                        offset: const Offset(0, 6),
-                      ),
-                    ]
-                  : [],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                AnimatedDefaultTextStyle(
-                  duration: const Duration(milliseconds: 250),
-                  style: GoogleFonts.inter(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: enabled ? Colors.white : HireIQTheme.textLight,
-                  ),
-                  child: const Text('Continue'),
-                ),
-                AnimatedOpacity(
-                  opacity: enabled ? 1.0 : 0.0,
-                  duration: const Duration(milliseconds: 250),
-                  child: const Padding(
-                    padding: EdgeInsets.only(left: 8),
-                    child: Icon(
-                      Icons.arrow_forward_rounded,
-                      color: Colors.white,
-                      size: 18,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: accent.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(
+          color: accent.withValues(alpha: 0.2),
+        ),
+      ),
+      child: Text(
+        label,
+        style: GoogleFonts.inter(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          color: accent,
+          letterSpacing: 0.1,
         ),
       ),
     );

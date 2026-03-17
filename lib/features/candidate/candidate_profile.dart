@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/theme.dart';
 import '../../providers/auth_provider.dart';
@@ -17,7 +17,7 @@ class CandidateProfile extends ConsumerWidget {
       loading: () => const Scaffold(
         body: Center(child: SkeletonLoader()),
       ),
-      error: (e, _) => Scaffold(
+      error: (e, _) => const Scaffold(
         body: ErrorState(message: 'Could not load profile'),
       ),
       data: (user) {
@@ -31,7 +31,7 @@ class CandidateProfile extends ConsumerWidget {
           loading: () => const Scaffold(
             body: Center(child: SkeletonLoader()),
           ),
-          error: (e, _) => Scaffold(
+          error: (e, _) => const Scaffold(
             body: ErrorState(message: 'Could not load profile'),
           ),
           data: (profile) => Scaffold(
@@ -114,7 +114,7 @@ class CandidateProfile extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label,
-              style: TextStyle(
+              style: const TextStyle(
                   color: HireIQTheme.textMuted,
                   fontWeight: FontWeight.w500)),
           Text(value,

@@ -194,7 +194,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                         style: GoogleFonts.inter(
                           fontSize: 15,
                           fontWeight: FontWeight.w400,
-                          color: Colors.white.withOpacity(0.55),
+                          color: Colors.white.withValues(alpha: 0.55),
                           letterSpacing: 0.3,
                         ),
                       ),
@@ -225,7 +225,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                   style: GoogleFonts.inter(
                     fontSize: 12,
                     fontWeight: FontWeight.w400,
-                    color: Colors.white.withOpacity(0.25),
+                    color: Colors.white.withValues(alpha: 0.25),
                     letterSpacing: 0.8,
                   ),
                 ),
@@ -293,9 +293,9 @@ class _LogoMark extends StatelessWidget {
                 height: 88,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: HireIQTheme.primaryTeal.withOpacity(0.12),
+                  color: HireIQTheme.primaryTeal.withValues(alpha: 0.12),
                   border: Border.all(
-                    color: HireIQTheme.primaryTeal.withOpacity(0.35),
+                    color: HireIQTheme.primaryTeal.withValues(alpha: 0.35),
                     width: 1.5,
                   ),
                 ),
@@ -312,12 +312,12 @@ class _LogoMark extends StatelessWidget {
                     end: Alignment.bottomRight,
                     colors: [
                       HireIQTheme.primaryTeal,
-                      HireIQTheme.primaryTeal.withOpacity(0.75),
+                      HireIQTheme.primaryTeal.withValues(alpha: 0.75),
                     ],
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: HireIQTheme.primaryTeal.withOpacity(0.45),
+                      color: HireIQTheme.primaryTeal.withValues(alpha: 0.45),
                       blurRadius: 24,
                       spreadRadius: 2,
                     ),
@@ -377,7 +377,7 @@ class _DotLoader extends StatelessWidget {
             height: 7,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: HireIQTheme.primaryTeal.withOpacity(animation.value),
+              color: HireIQTheme.primaryTeal.withValues(alpha: animation.value),
             ),
           ),
         );
@@ -395,7 +395,7 @@ class _BackgroundPainter extends CustomPainter {
     final topGlow = Paint()
       ..shader = RadialGradient(
         colors: [
-          const Color(0xFF0D9488).withOpacity(0.18),
+          const Color(0xFF0D9488).withValues(alpha: 0.18),
           Colors.transparent,
         ],
         stops: const [0.0, 1.0],
@@ -415,7 +415,7 @@ class _BackgroundPainter extends CustomPainter {
     final bottomGlow = Paint()
       ..shader = RadialGradient(
         colors: [
-          const Color(0xFF0D9488).withOpacity(0.10),
+          const Color(0xFF0D9488).withValues(alpha: 0.10),
           Colors.transparent,
         ],
       ).createShader(

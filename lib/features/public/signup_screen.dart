@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../shared/theme.dart';
@@ -139,7 +139,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('Already have an account? ',
+                  const Text('Already have an account? ',
                       style: TextStyle(color: HireIQTheme.textMuted)),
                   TextButton(
                     onPressed: () => context.push('/login'),

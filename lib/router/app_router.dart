@@ -648,10 +648,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           path: '/web/admin/users',
           builder: (context, state) => const AdminUsersWeb()),
       GoRoute(
-          path: '/web/admin/management',
+          path: '/web/admin/employer-management',
           builder: (context, state) => const AdminEmployerManagementWeb()),
       GoRoute(
-          path: '/web/admin/management',
+          path: '/web/admin/recruiter-management',
           builder: (context, state) => const AdminRecruiterManagementWeb()),
       GoRoute(
           path: '/web/admin/content-moderation',

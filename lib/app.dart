@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'config/routes.dart';
-import 'theme/theme.dart';
+import 'router/app_router.dart';
+import 'shared/theme.dart';
 
 class HireIQApp extends ConsumerWidget {
   const HireIQApp({super.key});
@@ -11,7 +11,7 @@ class HireIQApp extends ConsumerWidget {
     final router = ref.watch(routerProvider);
     return MaterialApp.router(
       title: 'HireIQ',
-      theme: HireIQTheme.light(),
+      theme: HireIQTheme.lightTheme,
       routerConfig: router,
       debugShowCheckedModeBanner: false,
     );
