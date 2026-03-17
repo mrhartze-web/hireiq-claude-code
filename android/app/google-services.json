@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "206938404491",
+    "project_id": "project-name---hireiq-platform",
+    "storage_bucket": "project-name---hireiq-platform.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:206938404491:android:72491589ba8cb86027868e",
+        "android_client_info": {
+          "package_name": "com.hireiq.hireiq"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCBjB_4UvXT7mKwq0brIh5ATL195jY0YrM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

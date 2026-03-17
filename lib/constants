@@ -1,0 +1,66 @@
+class HireIQCollections {
+  static const users         = 'users';
+  static const candidates    = 'candidates';
+  static const employers     = 'employers';
+  static const jobs          = 'jobs';
+  static const applications  = 'applications';
+  static const gigs          = 'gigs';
+  static const proposals     = 'proposals';
+  static const milestones    = 'milestones';
+  static const assessments   = 'assessments';
+  static const placements    = 'placements';
+  static const notifications = 'notifications';
+  static const analytics     = 'analytics';
+}
+
+class HireIQRoutes {
+  static const splash        = '/';
+  static const roleSelect    = '/role';
+  static const login         = '/login';
+  static const signup        = '/signup';
+  static const forgotPassword = '/forgot-password';
+  static const candidateOnboarding = '/onboarding/candidate';
+  static const employerOnboarding  = '/onboarding/employer';
+  static const recruiterOnboarding = '/onboarding/recruiter';
+  static const jobFeed       = '/jobs';
+  static const jobDetail     = '/jobs/:id';
+  static const applyModal    = '/jobs/:id/apply';
+  static const tracker       = '/applications';
+  static const passport      = '/profile';
+  static const careerPath    = '/career';
+  static const assessments   = '/assessments';
+  static const employerDashboard = '/employer';
+  static const postJob       = '/employer/post';
+  static const myJobs        = '/employer/jobs';
+  static const shortlist     = '/employer/shortlist/:jobId';
+  static const analytics     = '/employer/analytics';
+  static const gigFeed       = '/gigs';
+  static const gigDetail     = '/gigs/:id';
+  static const recruiterDashboard = '/recruiter';
+  static const cvVault       = '/recruiter/vault';
+  static const notifications = '/notifications';
+  static const settings      = '/settings';
+}
+
+class HireIQRoles {
+  static const candidate = 'candidate';
+  static const employer  = 'employer';
+  static const recruiter = 'recruiter';
+  static const admin     = 'admin';
+}
+
+class HireIQStatus {
+  static const applied      = 'applied';
+  static const shortlisted  = 'shortlisted';
+  static const reviewed     = 'reviewed';
+  static const offered      = 'offered';
+  static const hired        = 'hired';
+  static const declined     = 'declined';
+  static const open         = 'open';
+  static const closed       = 'closed';
+  static const paused       = 'paused';
+  static const pending      = 'pending';
+  static const approved     = 'approved';
+  static const released     = 'released';
+  static const disputed     = 'disputed';
+}

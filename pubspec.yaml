@@ -1,0 +1,96 @@
+name: hireiq
+description: HireIQ - South Africa's Hiring Intelligence Platform
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Firebase
+  google_sign_in: ^6.2.1
+  firebase_core: ^2.27.0
+  firebase_auth: ^4.17.0
+  cloud_firestore: ^4.15.0
+  firebase_storage: ^11.6.0
+  cloud_functions: ^4.6.0
+  firebase_analytics: ^10.8.0
+  firebase_messaging: ^14.7.0
+  firebase_app_check: ^0.2.1+5
+  firebase_crashlytics: ^3.4.8
+
+  # State management
+  flutter_riverpod: ^2.5.1
+  riverpod_annotation: ^2.3.4
+
+  # Navigation
+  go_router: ^13.2.0
+
+  # UI
+  cached_network_image: ^3.3.1
+  flutter_svg: ^2.0.9
+  shimmer: ^3.0.0
+  lottie: ^3.1.0
+  percent_indicator: ^4.2.3
+  badges: ^3.1.2
+  animated_bottom_navigation_bar: ^1.3.3
+  google_fonts: ^8.0.2
+  flutter_animate: ^4.5.0
+  pinput: ^5.0.0
+  table_calendar: ^3.1.2
+
+  # Media
+  image_picker: ^1.0.7
+  file_picker: ^8.0.0+1
+  video_player: ^2.8.3
+  camera: ^0.10.5+9
+
+  # Utilities
+  intl: ^0.19.0
+  url_launcher: ^6.2.5
+  share_plus: ^9.0.0
+  path_provider: ^2.1.2
+  connectivity_plus: ^6.0.3
+  package_info_plus: ^8.0.0
+  uuid: ^4.3.3
+  equatable: ^2.0.5
+  freezed_annotation: ^2.4.1
+  json_annotation: ^4.8.1
+  http: ^1.2.1
+  crypto: ^3.0.3
+
+  # PDF
+  pdf: ^3.10.8
+  printing: ^5.12.0
+  open_file: ^3.3.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  build_runner: ^2.4.8
+  riverpod_generator: ^2.3.9
+  freezed: ^2.4.7
+  json_serializable: ^6.7.1
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/icons/
+    - assets/animations/
+    - assets/fonts/
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Inter-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Inter-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Inter-Bold.ttf
+          weight: 700

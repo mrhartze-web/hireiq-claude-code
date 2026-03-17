@@ -1,0 +1,25 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../screens/auth/splash_screen.dart';
+import '../screens/auth/role_select_screen.dart';
+import 'constants.dart';
+
+final routerProvider = Provider<GoRouter>((ref) {
+  return GoRouter(
+    initialLocation: HireIQRoutes.splash,
+    routes: [
+
+      GoRoute(
+        path: HireIQRoutes.splash,
+        builder: (context, state) => const SplashScreen(),
+      ),
+
+      GoRoute(
+        path: HireIQRoutes.roleSelect,
+        builder: (context, state) => const RoleSelectScreen(),
+      ),
+
+    ],
+  );
+});
