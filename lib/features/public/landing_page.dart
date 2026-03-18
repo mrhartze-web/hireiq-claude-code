@@ -27,6 +27,7 @@ class _LandingPageState extends State<LandingPage> {
           _HeroSection(),
           _StatsBar(),
           _EcosystemSection(),
+          _RecruiterSection(),
           _HowItWorksSection(),
           _CtaBanner(),
           WebFooter(),
@@ -528,6 +529,148 @@ class _IqCard extends StatelessWidget {
                 fontWeight: FontWeight.w600,
                 color: color,
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Recruiter section ──────────────────────────────────────────────────────────
+
+class _RecruiterSection extends StatelessWidget {
+  const _RecruiterSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: const Color(0xFFF5F3FF),
+      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 80),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1100),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Heading with purple accent bar
+              Row(
+                children: [
+                  Container(
+                    width: 4,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: HireIQTheme.recruiterAccent,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Text(
+                    'For Recruiters',
+                    style: GoogleFonts.inter(
+                      fontSize: 36,
+                      fontWeight: FontWeight.w800,
+                      color: HireIQTheme.primaryNavy,
+                      letterSpacing: -0.8,
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 16),
+
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 720),
+                child: Text(
+                  'Keep 80% of every placement fee. HireIQ charges no monthly fees — you only pay when you place. SignalIQ tells you exactly what the market is paying before you pitch.',
+                  style: GoogleFonts.inter(
+                    fontSize: 16,
+                    color: HireIQTheme.textMuted,
+                    height: 1.6,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 48),
+
+              const Row(
+                children: [
+                  Expanded(
+                    child: _RecruiterStatCard(
+                      value: '80% of fees',
+                      label: 'yours to keep',
+                    ),
+                  ),
+                  SizedBox(width: 24),
+                  Expanded(
+                    child: _RecruiterStatCard(
+                      value: '12% average',
+                      label: 'mid-level placement fee',
+                    ),
+                  ),
+                  SizedBox(width: 24),
+                  Expanded(
+                    child: _RecruiterStatCard(
+                      value: 'R28,800',
+                      label: 'average recruiter earn per placement',
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _RecruiterStatCard extends StatelessWidget {
+  const _RecruiterStatCard({
+    required this.value,
+    required this.label,
+  });
+
+  final String value;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: HireIQTheme.surfaceWhite,
+        borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
+        border: Border.all(
+          color: HireIQTheme.recruiterAccent.withValues(alpha: 0.2),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: HireIQTheme.recruiterAccent.withValues(alpha: 0.06),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            value,
+            style: GoogleFonts.inter(
+              fontSize: 24,
+              fontWeight: FontWeight.w800,
+              color: HireIQTheme.recruiterAccent,
+              letterSpacing: -0.5,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            label,
+            style: GoogleFonts.inter(
+              fontSize: 13,
+              color: HireIQTheme.textMuted,
+              height: 1.4,
             ),
           ),
         ],

@@ -32,6 +32,7 @@ class _PricingPageState extends State<PricingPage> {
             onToggle: (v) => setState(() => _isAnnual = v),
           ),
           _PricingCardsSection(isAnnual: _isAnnual),
+          const _WebRecruiterSection(),
           _WebFaqSection(
             expandedIndex: _expandedFaq,
             onToggle: (i) =>
@@ -643,6 +644,388 @@ class _WebPricingCard extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                 ),
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Web recruiter section ──────────────────────────────────────────────────────
+
+class _WebRecruiterSection extends StatelessWidget {
+  const _WebRecruiterSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: HireIQTheme.background,
+      padding: const EdgeInsets.fromLTRB(40, 0, 40, 80),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1200),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Section header
+              Row(
+                children: [
+                  Container(
+                    width: 4,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: HireIQTheme.recruiterAccent,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Text(
+                    'For Recruiters',
+                    style: GoogleFonts.inter(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w800,
+                      color: HireIQTheme.primaryNavy,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: HireIQTheme.recruiterAccent
+                          .withValues(alpha: 0.1),
+                      borderRadius:
+                          BorderRadius.circular(HireIQTheme.radiusFull),
+                    ),
+                    child: Text(
+                      'Commission-based · No monthly fee',
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: HireIQTheme.recruiterAccent,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 32),
+
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Left: fee table + disclosure
+                  Expanded(
+                    flex: 3,
+                    child: Container(
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: HireIQTheme.surfaceWhite,
+                        borderRadius:
+                            BorderRadius.circular(HireIQTheme.radiusLg),
+                        border: const Border(
+                          left: BorderSide(
+                              color: HireIQTheme.recruiterAccent, width: 4),
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: HireIQTheme.primaryNavy
+                                .withValues(alpha: 0.04),
+                            blurRadius: 12,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Fee table header
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 10),
+                            decoration: BoxDecoration(
+                              color: HireIQTheme.recruiterAccent
+                                  .withValues(alpha: 0.06),
+                              borderRadius: BorderRadius.circular(
+                                  HireIQTheme.radiusMd),
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  flex: 2,
+                                  child: Text(
+                                    'Level',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      color: HireIQTheme.recruiterAccent,
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Text(
+                                    'Fee %',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      color: HireIQTheme.recruiterAccent,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 2,
+                                  child: Text(
+                                    'Total Placement Fee',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      color: HireIQTheme.recruiterAccent,
+                                    ),
+                                    textAlign: TextAlign.right,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          const _WebFeeTierRow(
+                            level: 'Junior',
+                            fee: '10%',
+                            placement: 'R20,000',
+                            isShaded: false,
+                          ),
+                          const _WebFeeTierRow(
+                            level: 'Mid-level',
+                            fee: '12%',
+                            placement: 'R36,000',
+                            isShaded: true,
+                          ),
+                          const _WebFeeTierRow(
+                            level: 'Senior',
+                            fee: '15%',
+                            placement: 'R75,000',
+                            isShaded: false,
+                          ),
+                          const SizedBox(height: 16),
+                          // Disclosure
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Icon(
+                                Icons.info_outline_rounded,
+                                size: 15,
+                                color: HireIQTheme.recruiterAccent,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'HireIQ retains 20% of the placement fee as a platform charge. You keep 80%. No monthly fees, no upfront costs.',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 13,
+                                    fontStyle: FontStyle.italic,
+                                    color: HireIQTheme.textMuted,
+                                    height: 1.5,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(width: 32),
+
+                  // Right: earnings example
+                  const Expanded(
+                    flex: 2,
+                    child: _EarningsExampleCard(),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _WebFeeTierRow extends StatelessWidget {
+  const _WebFeeTierRow({
+    required this.level,
+    required this.fee,
+    required this.placement,
+    required this.isShaded,
+  });
+
+  final String level;
+  final String fee;
+  final String placement;
+  final bool isShaded;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: isShaded ? HireIQTheme.background : HireIQTheme.surfaceWhite,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 2,
+            child: Text(
+              level,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                color: HireIQTheme.textPrimary,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              fee,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                color: HireIQTheme.recruiterAccent,
+                fontWeight: FontWeight.w700,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: Text(
+              placement,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                color: HireIQTheme.textSecondary,
+                fontWeight: FontWeight.w500,
+              ),
+              textAlign: TextAlign.right,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Earnings example card (web) ────────────────────────────────────────────────
+
+class _EarningsExampleCard extends StatelessWidget {
+  const _EarningsExampleCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: HireIQTheme.surfaceWhite,
+        borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
+        border: Border.all(
+          color: HireIQTheme.recruiterAccent.withValues(alpha: 0.2),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: HireIQTheme.recruiterAccent.withValues(alpha: 0.06),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color:
+                      HireIQTheme.recruiterAccent.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.calculate_outlined,
+                  size: 16,
+                  color: HireIQTheme.recruiterAccent,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                'Example placement',
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: HireIQTheme.recruiterAccent,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          const _ExRow(label: 'Role', value: 'Senior Software Engineer'),
+          const _ExRow(label: 'Annual Salary', value: 'R300,000'),
+          const _ExRow(label: 'Placement Fee (12%)', value: 'R36,000'),
+          const Divider(height: 20, color: HireIQTheme.borderLight),
+          const _ExRow(label: 'HireIQ Platform Cut (20%)', value: 'R7,200'),
+          const _ExRow(
+            label: 'Your Earnings (80%)',
+            value: 'R28,800',
+            isHighlighted: true,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ExRow extends StatelessWidget {
+  const _ExRow({
+    required this.label,
+    required this.value,
+    this.isHighlighted = false,
+  });
+
+  final String label;
+  final String value;
+  final bool isHighlighted;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: GoogleFonts.inter(
+              fontSize: 13,
+              color: isHighlighted
+                  ? HireIQTheme.primaryTeal
+                  : HireIQTheme.textMuted,
+              fontWeight:
+                  isHighlighted ? FontWeight.w600 : FontWeight.normal,
+            ),
+          ),
+          Text(
+            value,
+            style: GoogleFonts.inter(
+              fontSize: 13,
+              fontWeight:
+                  isHighlighted ? FontWeight.w700 : FontWeight.w500,
+              color: isHighlighted
+                  ? HireIQTheme.primaryTeal
+                  : HireIQTheme.primaryNavy,
             ),
           ),
         ],

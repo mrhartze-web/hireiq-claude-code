@@ -765,6 +765,36 @@ class _RecruiterCard extends StatelessWidget {
                       placement: 'R75,000',
                       isShaded: false,
                     ),
+
+                    const SizedBox(height: 14),
+
+                    // Platform fee disclosure
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(
+                          Icons.info_outline_rounded,
+                          size: 14,
+                          color: HireIQTheme.recruiterAccent,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'HireIQ retains 20% of the placement fee as a platform charge. You keep 80%. No monthly fees, no upfront costs.',
+                            style: GoogleFonts.inter(
+                              fontSize: 12,
+                              fontStyle: FontStyle.italic,
+                              color: HireIQTheme.textMuted,
+                              height: 1.5,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 14),
+
+                    const _EarningsExampleCard(),
                   ],
                 ),
               ),
@@ -775,6 +805,97 @@ class _RecruiterCard extends StatelessWidget {
     );
   }
 }
+
+// ── Earnings example card ──────────────────────────────────────────────────────
+
+class _EarningsExampleCard extends StatelessWidget {
+  const _EarningsExampleCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: HireIQTheme.recruiterAccent.withValues(alpha: 0.04),
+        borderRadius: BorderRadius.circular(HireIQTheme.radiusMd),
+        border: Border.all(
+          color: HireIQTheme.recruiterAccent.withValues(alpha: 0.15),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Example placement',
+            style: GoogleFonts.inter(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: HireIQTheme.recruiterAccent,
+            ),
+          ),
+          const SizedBox(height: 10),
+          const _ExRow(label: 'Role', value: 'Senior Software Engineer'),
+          const _ExRow(label: 'Annual Salary', value: 'R300,000'),
+          const _ExRow(label: 'Placement Fee (12%)', value: 'R36,000'),
+          const _ExRow(label: 'HireIQ Platform Cut (20%)', value: 'R7,200'),
+          const _ExRow(
+            label: 'Your Earnings (80%)',
+            value: 'R28,800',
+            isHighlighted: true,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ExRow extends StatelessWidget {
+  const _ExRow({
+    required this.label,
+    required this.value,
+    this.isHighlighted = false,
+  });
+
+  final String label;
+  final String value;
+  final bool isHighlighted;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: GoogleFonts.inter(
+              fontSize: 12,
+              color: isHighlighted
+                  ? HireIQTheme.primaryTeal
+                  : HireIQTheme.textMuted,
+              fontWeight:
+                  isHighlighted ? FontWeight.w600 : FontWeight.normal,
+            ),
+          ),
+          Text(
+            value,
+            style: GoogleFonts.inter(
+              fontSize: 12,
+              fontWeight:
+                  isHighlighted ? FontWeight.w700 : FontWeight.w500,
+              color: isHighlighted
+                  ? HireIQTheme.primaryTeal
+                  : HireIQTheme.primaryNavy,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Fee tier row ───────────────────────────────────────────────────────────────
 
 class _FeeTierRow extends StatelessWidget {
   const _FeeTierRow({
