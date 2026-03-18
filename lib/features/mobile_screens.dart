@@ -11,7 +11,7 @@ class MobileRoutes {
   static const String forgotPassword = '/forgot-password';
   static const String passwordResetSuccess = '/password-reset-success';
   static const String roleSelection = '/role-selection';
-  static const String pricing = '/pricing';
+  static const String pricing = '/pricing-plans';
   static const String terms = '/terms';
   static const String privacy = '/privacy';
   static const String messages = '/messages';
@@ -179,4 +179,24 @@ class MobileRoutes {
   static const String adminRevenueDashboard = '/admin/admin-revenue';
   static const String adminSystemSettings = '/admin/admin-system-settings';
   static const String adminUsersManagement = '/admin/admin-users';
+
+  // ── Clean spec-compliant paths (added routing audit) ─────────────────────
+  static const String landingPage = '/landing';
+  static const String pricingPlans = '/pricing-plans';
+  static const String statusPage = '/status';
+  static const String thundafund = '/thundafund';
+  static const String thundafundRewards = '/thundafund/rewards';
+  static const String thundafundStory = '/thundafund/story';
+  static const String thundafundSocialProof = '/thundafund/social-proof';
+  static const String thundafundFaq = '/thundafund/faq';
+  static const String thundafundUpdates = '/thundafund/updates';
+
+  // Candidate clean paths
+  static const String candidateHome = '/candidate/home';
+  static const String candidateSavedJobsPath = '/candidate/saved-jobs';
+  static const String candidateSmartApplyPath = '/candidate/smart-apply';
+  static const String candidateCareerGoalsPath = '/candidate/career-goals';
+  static const String candidateSalaryGuidePath = '/candidate/salary-guide';
+  static const String candidateSubscriptionPath = '/candidate/subscription';
+  static const String candidateCVUploadPath = '/candidate/cv-upload';
 }

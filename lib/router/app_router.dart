@@ -53,6 +53,13 @@ import '../features/candidate/candidate_privacy_settings.dart';
 import '../features/candidate/candidate_public_profile.dart';
 import '../features/candidate/candidate_referral.dart';
 import '../features/candidate/candidate_security_settings.dart';
+import '../features/candidate/candidate_dashboard_home.dart';
+import '../features/candidate/candidate_career_goals.dart';
+import '../features/candidate/candidate_cv_upload.dart';
+import '../features/candidate/candidate_salary_guide.dart';
+import '../features/candidate/candidate_saved_jobs.dart';
+import '../features/candidate/candidate_smart_apply.dart';
+import '../features/candidate/candidate_subscription_upgrade.dart';
 
 // Import Employer Screens
 import '../features/employer/employer_dashboard.dart';
@@ -126,16 +133,29 @@ final routerProvider = Provider<GoRouter>((ref) {
         MobileRoutes.signup,
         MobileRoutes.forgotPassword,
         MobileRoutes.roleSelection,
+        MobileRoutes.emailVerification,
+        MobileRoutes.socialAuthLoading,
+        MobileRoutes.passwordResetSuccess,
+        MobileRoutes.phoneVerification,
+        MobileRoutes.terms,
+        MobileRoutes.privacy,
+        MobileRoutes.pricing,       // /pricing-plans
         '/onboarding',
         '/landing',
-        '/pricing',
+        '/pricing',                 // web pricing page
         '/about',
         '/contact',
         '/blog',
+        '/status',
+        '/system-status',
+        '/error-404',
+        '/notifications',
+        '/messages',
       ];
 
-      final isPublicRoute =
-          publicRoutes.contains(path) || path.startsWith('/thundafund');
+      final isPublicRoute = publicRoutes.contains(path) ||
+          path.startsWith('/thundafund') ||
+          path.startsWith('/web/');
 
       if (!isAuth && !isPublicRoute) {
         return MobileRoutes.login;
@@ -336,6 +356,29 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
               path: MobileRoutes.candidateSecuritySettings,
               builder: (context, state) => const CandidateSecuritySettings()),
+
+          // Routing-audit additions
+          GoRoute(
+              path: MobileRoutes.candidateHome,
+              builder: (context, state) => const CandidateDashboardHome()),
+          GoRoute(
+              path: MobileRoutes.candidateSavedJobsPath,
+              builder: (context, state) => const CandidateSavedJobs()),
+          GoRoute(
+              path: MobileRoutes.candidateSmartApplyPath,
+              builder: (context, state) => const CandidateSmartApply()),
+          GoRoute(
+              path: MobileRoutes.candidateCareerGoalsPath,
+              builder: (context, state) => const CandidateCareerGoals()),
+          GoRoute(
+              path: MobileRoutes.candidateSalaryGuidePath,
+              builder: (context, state) => const CandidateSalaryGuide()),
+          GoRoute(
+              path: MobileRoutes.candidateSubscriptionPath,
+              builder: (context, state) => const CandidateSubscriptionUpgrade()),
+          GoRoute(
+              path: MobileRoutes.candidateCVUploadPath,
+              builder: (context, state) => const CandidateCVUpload()),
         ],
       ),
 
@@ -669,7 +712,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
           path: '/web/admin/system-settings',
           builder: (context, state) => const AdminSystemSettingsWeb()),
-      GoRoute(path: '/', builder: (context, state) => const LandingPage()),
+      // ── Public web pages ────────────────────────────────────────────────────
+      GoRoute(
+          path: '/landing', builder: (context, state) => const LandingPage()),
       GoRoute(
           path: '/pricing', builder: (context, state) => const PricingPage()),
       GoRoute(path: '/about', builder: (context, state) => const AboutPage()),
@@ -680,8 +725,12 @@ final routerProvider = Provider<GoRouter>((ref) {
           path: '/system-status',
           builder: (context, state) => const SystemStatusPage()),
       GoRoute(
+          path: '/status',
+          builder: (context, state) => const SystemStatusPage()),
+      GoRoute(
           path: '/error-404',
           builder: (context, state) => const Error404Page()),
+      // Thundafund — legacy flat paths (kept for existing links)
       GoRoute(
           path: '/thundafund-landing',
           builder: (context, state) => const ThundafundLanding()),
@@ -699,6 +748,25 @@ final routerProvider = Provider<GoRouter>((ref) {
           builder: (context, state) => const ThundafundFaq()),
       GoRoute(
           path: '/thundafund-updates',
+          builder: (context, state) => const ThundafundUpdates()),
+      // Thundafund — clean spec paths
+      GoRoute(
+          path: '/thundafund',
+          builder: (context, state) => const ThundafundLanding()),
+      GoRoute(
+          path: '/thundafund/rewards',
+          builder: (context, state) => const ThundafundRewards()),
+      GoRoute(
+          path: '/thundafund/story',
+          builder: (context, state) => const ThundafundStory()),
+      GoRoute(
+          path: '/thundafund/social-proof',
+          builder: (context, state) => const ThundafundSocialProof()),
+      GoRoute(
+          path: '/thundafund/faq',
+          builder: (context, state) => const ThundafundFaq()),
+      GoRoute(
+          path: '/thundafund/updates',
           builder: (context, state) => const ThundafundUpdates()),
 
       // Shell 4: Admin
