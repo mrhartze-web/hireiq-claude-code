@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -121,29 +122,28 @@ final routerProvider = Provider<GoRouter>((ref) {
     initialLocation: MobileRoutes.splash,
     debugLogDiagnostics: true,
     redirect: (context, state) {
-      final user = ref.read(authStateProvider).value;
-      final role = ref.read(userRoleProvider).value;
-
-      final isAuth = user != null;
+      // ── Use synchronous currentUser — never null while stream warms up ───
+      final currentUser = FirebaseAuth.instance.currentUser;
+      final isAuth = currentUser != null;
       final path = state.uri.path;
 
-      // ── Public routes — never require authentication ──────────────────────
-      final publicRoutes = [
-        MobileRoutes.splash,       // /
+      // ── Routes that never require authentication ───────────────────────────
+      const publicRoutes = {
+        '/',                         // splash
         '/onboarding',
-        MobileRoutes.login,        // /login
-        MobileRoutes.signup,       // /signup
-        MobileRoutes.forgotPassword,
-        MobileRoutes.roleSelection,
-        MobileRoutes.emailVerification,
-        MobileRoutes.socialAuthLoading,
-        MobileRoutes.passwordResetSuccess,
-        MobileRoutes.phoneVerification,
-        MobileRoutes.terms,
-        MobileRoutes.privacy,
-        MobileRoutes.pricing,      // /pricing-plans
+        '/login',
+        '/signup',
+        '/forgot-password',
+        '/role-selection',
+        '/email-verification',
+        '/auth-loading',
+        '/password-reset-success',
+        '/verify-phone',
+        '/terms',
+        '/privacy',
+        '/pricing-plans',            // mobile pricing
         '/landing',
-        '/pricing',
+        '/pricing',                  // web pricing
         '/about',
         '/contact',
         '/blog',
@@ -152,9 +152,9 @@ final routerProvider = Provider<GoRouter>((ref) {
         '/error-404',
         '/notifications',
         '/messages',
-      ];
+      };
 
-      final isProtectedPrefix = path.startsWith('/candidate') ||
+      final isProtectedPath = path.startsWith('/candidate') ||
           path.startsWith('/employer') ||
           path.startsWith('/recruiter') ||
           path.startsWith('/admin');
@@ -163,38 +163,43 @@ final routerProvider = Provider<GoRouter>((ref) {
           path.startsWith('/thundafund') ||
           path.startsWith('/web/');
 
-      // ── Unauthenticated users blocked from protected routes ───────────────
-      if (!isAuth && (isProtectedPrefix || !isPublicRoute)) {
-        return MobileRoutes.login;
+      // ── Guard: unauthenticated user → /login ─────────────────────────────
+      if (!isAuth && (isProtectedPath || !isPublicRoute)) {
+        return '/login';
       }
 
-      // ── Authenticated users on auth screens → their dashboard ─────────────
-      if (isAuth &&
-          (path == MobileRoutes.splash ||
-              path == '/onboarding' ||
-              path == MobileRoutes.login ||
-              path == MobileRoutes.signup)) {
-        if (role == null) return null; // role still loading — stay put
-        if (role == 'employer') return MobileRoutes.employerDashboard;
-        if (role == 'recruiter') return MobileRoutes.recruiterDashboard;
-        if (role == 'admin') return MobileRoutes.adminDashboard;
-        return MobileRoutes.candidateDashboard;
-      }
+      // ── Authenticated user on auth/onboarding screens → role dashboard ───
+      // The splash screen handles initial routing; this redirect covers
+      // direct URL navigation and post-auth screen returns.
+      if (isAuth) {
+        final onAuthScreen = path == '/' ||
+            path == '/onboarding' ||
+            path == '/login' ||
+            path == '/signup' ||
+            path == '/role-selection';
 
-      // ── Cross-role protection (non-admin users stay in their own section) ──
-      // Admin is exempt — they use the View As feature to navigate anywhere.
-      if (isAuth && role != null && role != 'admin') {
-        if (role == 'candidate' && isProtectedPrefix &&
-            !path.startsWith('/candidate')) {
-          return MobileRoutes.candidateDashboard;
+        if (onAuthScreen) {
+          // Read the synchronous role cache set by the splash/login/signup
+          final cachedRole = ref.read(cachedRoleProvider);
+          if (cachedRole == null) return null; // cache not yet populated — stay
+          if (cachedRole == 'employer') return '/employer';
+          if (cachedRole == 'recruiter') return '/recruiter';
+          if (cachedRole == 'admin') return '/admin';
+          return '/candidate';
         }
-        if (role == 'employer' && isProtectedPrefix &&
-            !path.startsWith('/employer')) {
-          return MobileRoutes.employerDashboard;
-        }
-        if (role == 'recruiter' && isProtectedPrefix &&
-            !path.startsWith('/recruiter')) {
-          return MobileRoutes.recruiterDashboard;
+
+        // ── Cross-role protection (admin exempt — View As feature) ──────────
+        final cachedRole = ref.read(cachedRoleProvider);
+        if (cachedRole != null && cachedRole != 'admin' && isProtectedPath) {
+          if (cachedRole == 'candidate' && !path.startsWith('/candidate')) {
+            return '/candidate';
+          }
+          if (cachedRole == 'employer' && !path.startsWith('/employer')) {
+            return '/employer';
+          }
+          if (cachedRole == 'recruiter' && !path.startsWith('/recruiter')) {
+            return '/recruiter';
+          }
         }
       }
 

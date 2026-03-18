@@ -1,8 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../providers/auth_provider.dart';
 import '../../shared/theme.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
@@ -55,7 +57,37 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     _progressController.forward();
 
     await Future.delayed(const Duration(milliseconds: 3000));
-    if (mounted) context.go('/onboarding');
+    if (!mounted) return;
+
+    // ── Synchronous auth check ─────────────────────────────────────────────
+    final currentUser = FirebaseAuth.instance.currentUser;
+
+    if (currentUser == null) {
+      // No signed-in user → show onboarding intro
+      context.go('/onboarding');
+      return;
+    }
+
+    // Returning user — fetch role from Firestore and go straight to their
+    // dashboard, caching the role so the router can use it immediately.
+    final role = await ref
+        .read(authServiceProvider)
+        .getUserRole(currentUser.uid);
+    if (!mounted) return;
+
+    // Cache for router redirect
+    ref.read(cachedRoleProvider.notifier).state = role;
+
+    switch (role) {
+      case 'employer':
+        context.go('/employer');
+      case 'recruiter':
+        context.go('/recruiter');
+      case 'admin':
+        context.go('/admin');
+      default:
+        context.go('/candidate');
+    }
   }
 
   @override

@@ -57,6 +57,8 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
         role: _selectedRole,
       );
       debugPrint('[SignupScreen] signup complete — uid=${credential.user?.uid}, role=$_selectedRole');
+      // Cache role for the router redirect
+      ref.read(cachedRoleProvider.notifier).state = _selectedRole;
       if (mounted) {
         switch (_selectedRole) {
           case 'employer':

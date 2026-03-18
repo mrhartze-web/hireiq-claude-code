@@ -50,6 +50,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ? await ref.read(authServiceProvider).getUserRole(effectiveUid)
         : null;
     if (!mounted) return;
+    // Cache role so the router redirect can use it synchronously
+    ref.read(cachedRoleProvider.notifier).state = role;
     switch (role) {
       case 'employer':
         context.go(MobileRoutes.employerDashboard);
