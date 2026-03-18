@@ -6,6 +6,7 @@ import '../providers/auth_provider.dart';
 import '../features/mobile_screens.dart';
 import '../features/web_screens.dart';
 import '../shared/navigation/role_navigation_bar.dart';
+import '../shared/components/admin_mode_bar.dart';
 
 // Import Public & Common Screens
 import '../features/public/splash_screen.dart';
@@ -825,7 +826,7 @@ final routerProvider = Provider<GoRouter>((ref) {
 });
 
 /// A shared shell layout that wraps the child widget.
-class MainShell extends StatelessWidget {
+class MainShell extends ConsumerWidget {
   final Widget child;
   final String title;
   final UserRole role;
@@ -838,9 +839,22 @@ class MainShell extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isAdmin = ref.watch(cachedRoleProvider) == 'admin';
     return Scaffold(
-      body: child,
+      body: isAdmin
+          ? Stack(
+              children: [
+                child,
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: AdminModeBar(currentSection: role),
+                ),
+              ],
+            )
+          : child,
       bottomNavigationBar: RoleNavigationBar(role: role),
     );
   }
