@@ -69,7 +69,7 @@ class EmployerOnboardingSteps extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               GestureDetector(
-                onTap: () => context.go('/employer-dashboard'),
+                onTap: () => context.go('/employer'),
                 child: Container(
                   width: double.infinity,
                   height: 56,
