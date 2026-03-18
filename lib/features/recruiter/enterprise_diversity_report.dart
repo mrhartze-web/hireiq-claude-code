@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../shared/theme.dart';
 
 class EnterpriseDiversityReport extends StatelessWidget {
@@ -9,58 +10,72 @@ class EnterpriseDiversityReport extends StatelessWidget {
     return Scaffold(
       backgroundColor: HireIQTheme.background,
       appBar: AppBar(
-        title: const Text('Diversity Report'),
-        backgroundColor: HireIQTheme.surface,
-        elevation: 0,
+        backgroundColor: HireIQTheme.primaryNavy,
+        foregroundColor: Colors.white,
+        centerTitle: true,
+        title: Text(
+          'Diversity Report',
+          style: GoogleFonts.inter(
+              fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white),
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildPeriodSelector(),
-            const SizedBox(height: 25),
+            const SizedBox(height: 24),
             _buildWildcardInsight(),
-            const SizedBox(height: 25),
+            const SizedBox(height: 24),
             _buildSectionHeader('Gender Breakdown'),
             _buildStatsCard(
               title: 'Female Representation',
               value: '+12%',
               subtitle: 'Increase from last quarter',
               icon: Icons.people_outline,
-              color: Colors.pink,
+              color: const Color(0xFFEC4899),
             ),
-            const SizedBox(height: 25),
+            const SizedBox(height: 24),
             _buildSectionHeader('B-BBEE Pipeline'),
             _buildStatsCard(
               title: 'B-BBEE Level Compliance',
               value: 'Level 1',
               subtitle: 'Target reached ✓',
               icon: Icons.verified_user_outlined,
-              color: Colors.green,
+              color: HireIQTheme.success,
             ),
-            const SizedBox(height: 25),
+            const SizedBox(height: 24),
             _buildSectionHeader('Inclusion Metrics'),
             Row(
               children: [
                 Expanded(child: _buildMetricMiniCard('4%', 'Disability')),
-                const SizedBox(width: 10),
+                const SizedBox(width: 12),
                 Expanded(child: _buildMetricMiniCard('11%', 'Neurodiverse')),
-                const SizedBox(width: 10),
+                const SizedBox(width: 12),
                 Expanded(child: _buildMetricMiniCard('34%', 'First-gen')),
               ],
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 28),
             ElevatedButton.icon(
               onPressed: () {},
               icon: const Icon(Icons.download),
-              label: const Text('Download Full B-BBEE Report'),
+              label: Text(
+                'Download Full B-BBEE Report',
+                style:
+                    GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 14),
+              ),
               style: ElevatedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 50),
+                minimumSize: const Size(double.infinity, 52),
+                backgroundColor: HireIQTheme.primaryNavy,
+                foregroundColor: Colors.white,
+                elevation: 0,
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
+                    borderRadius:
+                        BorderRadius.circular(HireIQTheme.radiusMd)),
               ),
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 28),
           ],
         ),
       ),
@@ -83,16 +98,28 @@ class EnterpriseDiversityReport extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: isSelected ? HireIQTheme.primary : HireIQTheme.surface,
-        borderRadius: BorderRadius.circular(20),
+        color: isSelected ? HireIQTheme.primaryNavy : HireIQTheme.surfaceWhite,
+        borderRadius: BorderRadius.circular(HireIQTheme.radiusFull),
         border: Border.all(
-            color: isSelected ? HireIQTheme.primary : HireIQTheme.border),
+            color: isSelected
+                ? HireIQTheme.primaryNavy
+                : HireIQTheme.borderLight),
+        boxShadow: isSelected
+            ? []
+            : [
+                BoxShadow(
+                  color: HireIQTheme.primaryNavy.withValues(alpha: 0.04),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
       ),
       child: Text(
         label,
-        style: TextStyle(
-          color: isSelected ? Colors.white : HireIQTheme.textSecondary,
+        style: GoogleFonts.inter(
+          color: isSelected ? Colors.white : HireIQTheme.textMuted,
           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          fontSize: 13,
         ),
       ),
     );
@@ -102,9 +129,10 @@ class EnterpriseDiversityReport extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: HireIQTheme.accent.withAlpha(25),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: HireIQTheme.accent.withAlpha(76)),
+        color: HireIQTheme.primaryTeal.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
+        border: Border.all(
+            color: HireIQTheme.primaryTeal.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -112,22 +140,31 @@ class EnterpriseDiversityReport extends StatelessWidget {
           Row(
             children: [
               const Icon(Icons.auto_awesome,
-                  color: HireIQTheme.accent, size: 20),
+                  color: HireIQTheme.primaryTeal, size: 18),
               const SizedBox(width: 10),
-              Text('WildcardIQ Insight',
-                  style: HireIQTheme.subtitleStyle
-                      .copyWith(color: HireIQTheme.accent, fontSize: 14)),
+              Text(
+                'WildcardIQ Insight',
+                style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: HireIQTheme.primaryTeal),
+              ),
             ],
           ),
           const SizedBox(height: 12),
-          const Text(
+          Text(
             'Blind screening active — 247 candidates reviewed by skill score only.',
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: GoogleFonts.inter(
+                fontWeight: FontWeight.bold,
+                color: HireIQTheme.primaryNavy,
+                fontSize: 14),
           ),
-          const SizedBox(height: 5),
-          const Text('100% bias-free ✓',
-              style:
-                  TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 6),
+          Text(
+            '100% bias-free ✓',
+            style: GoogleFonts.inter(
+                color: HireIQTheme.success, fontWeight: FontWeight.bold),
+          ),
         ],
       ),
     );
@@ -135,8 +172,14 @@ class EnterpriseDiversityReport extends StatelessWidget {
 
   Widget _buildSectionHeader(String title) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 15),
-      child: Text(title, style: HireIQTheme.subtitleStyle),
+      padding: const EdgeInsets.only(bottom: 14),
+      child: Text(
+        title,
+        style: GoogleFonts.inter(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: HireIQTheme.primaryNavy),
+      ),
     );
   }
 
@@ -150,16 +193,23 @@ class EnterpriseDiversityReport extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: HireIQTheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: HireIQTheme.border),
+        color: HireIQTheme.surfaceWhite,
+        borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
+        border: Border.all(color: HireIQTheme.borderLight),
+        boxShadow: [
+          BoxShadow(
+            color: HireIQTheme.primaryNavy.withValues(alpha: 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: color.withAlpha(25),
+              color: color.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, color: color),
@@ -169,16 +219,27 @@ class EnterpriseDiversityReport extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title,
-                    style: HireIQTheme.bodyStyle
-                        .copyWith(color: HireIQTheme.textSecondary)),
+                Text(
+                  title,
+                  style: GoogleFonts.inter(
+                      fontSize: 13, color: HireIQTheme.textMuted),
+                ),
                 const SizedBox(height: 4),
-                Text(value,
-                    style: HireIQTheme.subtitleStyle.copyWith(fontSize: 24)),
+                Text(
+                  value,
+                  style: GoogleFonts.inter(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: HireIQTheme.primaryNavy),
+                ),
                 const SizedBox(height: 2),
-                Text(subtitle,
-                    style: HireIQTheme.bodyStyle
-                        .copyWith(fontSize: 12, color: Colors.green)),
+                Text(
+                  subtitle,
+                  style: GoogleFonts.inter(
+                      fontSize: 12,
+                      color: HireIQTheme.success,
+                      fontWeight: FontWeight.w500),
+                ),
               ],
             ),
           ),
@@ -189,19 +250,34 @@ class EnterpriseDiversityReport extends StatelessWidget {
 
   Widget _buildMetricMiniCard(String value, String label) {
     return Container(
-      padding: const EdgeInsets.all(15),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: HireIQTheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: HireIQTheme.border),
+        color: HireIQTheme.surfaceWhite,
+        borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
+        border: Border.all(color: HireIQTheme.borderLight),
+        boxShadow: [
+          BoxShadow(
+            color: HireIQTheme.primaryNavy.withValues(alpha: 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Column(
         children: [
-          Text(value, style: HireIQTheme.subtitleStyle.copyWith(fontSize: 20)),
-          const SizedBox(height: 5),
-          Text(label,
-              style: HireIQTheme.bodyStyle
-                  .copyWith(fontSize: 12, color: HireIQTheme.textSecondary)),
+          Text(
+            value,
+            style: GoogleFonts.inter(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: HireIQTheme.primaryNavy),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: GoogleFonts.inter(
+                fontSize: 12, color: HireIQTheme.textMuted),
+          ),
         ],
       ),
     );

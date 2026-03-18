@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../shared/theme.dart';
 
 class RecruiterShortlist extends StatelessWidget {
@@ -9,15 +10,20 @@ class RecruiterShortlist extends StatelessWidget {
     return Scaffold(
       backgroundColor: HireIQTheme.background,
       appBar: AppBar(
-        title: const Text('Candidate Shortlist'),
-        backgroundColor: HireIQTheme.surface,
-        elevation: 0,
+        backgroundColor: HireIQTheme.primaryNavy,
+        foregroundColor: Colors.white,
+        centerTitle: true,
+        title: Text(
+          'Candidate Shortlist',
+          style: GoogleFonts.inter(
+              fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white),
+        ),
       ),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
           _buildHeader(),
-          const SizedBox(height: 25),
+          const SizedBox(height: 24),
           _buildCandidateCard(
             name: 'Thabo Nkosi',
             experience: '5 yrs exp',
@@ -47,12 +53,19 @@ class RecruiterShortlist extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Head of Engineering — FinCorp SA',
-            style: HireIQTheme.subtitleStyle),
-        const SizedBox(height: 5),
-        Text('6 shortlisted candidates',
-            style: HireIQTheme.bodyStyle
-                .copyWith(color: HireIQTheme.textSecondary)),
+        Text(
+          'Head of Engineering — FinCorp SA',
+          style: GoogleFonts.inter(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: HireIQTheme.primaryNavy),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          '6 shortlisted candidates',
+          style: GoogleFonts.inter(
+              fontSize: 14, color: HireIQTheme.textMuted),
+        ),
       ],
     );
   }
@@ -64,72 +77,104 @@ class RecruiterShortlist extends StatelessWidget {
     required String wildcardIq,
   }) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 15),
-      padding: const EdgeInsets.all(15),
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: HireIQTheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: HireIQTheme.border),
+        color: HireIQTheme.surfaceWhite,
+        borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
+        border: Border.all(color: HireIQTheme.borderLight),
+        boxShadow: [
+          BoxShadow(
+            color: HireIQTheme.primaryNavy.withValues(alpha: 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Column(
         children: [
           Row(
             children: [
               CircleAvatar(
-                radius: 25,
-                backgroundColor: HireIQTheme.primary.withAlpha(25),
-                child: Text(name[0],
-                    style: const TextStyle(
-                        color: HireIQTheme.primary,
-                        fontWeight: FontWeight.bold)),
+                radius: 24,
+                backgroundColor:
+                    HireIQTheme.primaryTeal.withValues(alpha: 0.1),
+                child: Text(
+                  name[0],
+                  style: GoogleFonts.inter(
+                      color: HireIQTheme.primaryTeal,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16),
+                ),
               ),
-              const SizedBox(width: 15),
+              const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(name,
-                        style:
-                            HireIQTheme.subtitleStyle.copyWith(fontSize: 16)),
-                    const SizedBox(height: 4),
-                    Text(experience,
-                        style: HireIQTheme.bodyStyle.copyWith(
-                            color: HireIQTheme.textSecondary, fontSize: 13)),
+                    Text(
+                      name,
+                      style: GoogleFonts.inter(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: HireIQTheme.primaryNavy),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      experience,
+                      style: GoogleFonts.inter(
+                          fontSize: 13, color: HireIQTheme.textMuted),
+                    ),
                   ],
                 ),
               ),
               Container(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                 decoration: BoxDecoration(
-                  color: HireIQTheme.accent.withAlpha(25),
-                  borderRadius: BorderRadius.circular(20),
+                  color: HireIQTheme.primaryTeal.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(HireIQTheme.radiusFull),
+                  border: Border.all(
+                      color:
+                          HireIQTheme.primaryTeal.withValues(alpha: 0.3)),
                 ),
-                child: Text('MatchIQ $matchIq',
-                    style: const TextStyle(
-                        color: HireIQTheme.accent,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12)),
+                child: Text(
+                  'MatchIQ $matchIq',
+                  style: GoogleFonts.inter(
+                      color: HireIQTheme.primaryTeal,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12),
+                ),
               ),
             ],
           ),
-          const Divider(height: 30),
+          const Divider(height: 28, color: HireIQTheme.borderLight),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
                 children: [
                   const Icon(Icons.auto_awesome,
-                      color: HireIQTheme.primary, size: 18),
-                  const SizedBox(width: 8),
-                  Text('WildcardIQ: $wildcardIq',
-                      style: HireIQTheme.bodyStyle
-                          .copyWith(fontWeight: FontWeight.bold)),
+                      color: HireIQTheme.primaryNavy, size: 16),
+                  const SizedBox(width: 6),
+                  Text(
+                    'WildcardIQ: $wildcardIq',
+                    style: GoogleFonts.inter(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                        color: HireIQTheme.primaryNavy),
+                  ),
                 ],
               ),
-              TextButton(
-                onPressed: () {},
-                child: const Text('View Profile'),
+              GestureDetector(
+                onTap: () {},
+                child: Text(
+                  'View Profile',
+                  style: GoogleFonts.inter(
+                      color: HireIQTheme.primaryTeal,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14),
+                ),
               ),
             ],
           ),
@@ -140,28 +185,37 @@ class RecruiterShortlist extends StatelessWidget {
 
   Widget _buildInfoFooter() {
     return Container(
-      padding: const EdgeInsets.all(15),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: HireIQTheme.accent.withAlpha(12),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: HireIQTheme.accent.withAlpha(51)),
+        color: HireIQTheme.primaryTeal.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
+        border: Border.all(
+            color: HireIQTheme.primaryTeal.withValues(alpha: 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.info_outline, color: HireIQTheme.accent, size: 20),
-              SizedBox(width: 10),
-              Text('Placement fee on hire: R14,250–R18,000',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
+              const Icon(Icons.info_outline,
+                  color: HireIQTheme.primaryTeal, size: 18),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Placement fee on hire: R14,250–R18,000',
+                  style: GoogleFonts.inter(
+                      fontWeight: FontWeight.bold,
+                      color: HireIQTheme.primaryNavy,
+                      fontSize: 14),
+                ),
+              ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           Text(
             '(15% of first-year salary). 90-day guarantee included.',
-            style: HireIQTheme.bodyStyle
-                .copyWith(fontSize: 12, color: HireIQTheme.textSecondary),
+            style: GoogleFonts.inter(
+                fontSize: 12, color: HireIQTheme.textMuted, height: 1.4),
           ),
         ],
       ),

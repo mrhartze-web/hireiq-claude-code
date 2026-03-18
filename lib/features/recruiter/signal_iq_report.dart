@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../shared/theme.dart';
 
 class SignalIQReport extends StatelessWidget {
@@ -9,9 +10,14 @@ class SignalIQReport extends StatelessWidget {
     return Scaffold(
       backgroundColor: HireIQTheme.background,
       appBar: AppBar(
-        title: const Text('SignalIQ Deep Scan'),
-        backgroundColor: HireIQTheme.surface,
-        elevation: 0,
+        backgroundColor: HireIQTheme.primaryNavy,
+        foregroundColor: Colors.white,
+        centerTitle: true,
+        title: Text(
+          'SignalIQ Deep Scan',
+          style: GoogleFonts.inter(
+              fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white),
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -21,97 +27,140 @@ class SignalIQReport extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: HireIQTheme.accent.withAlpha(25),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: HireIQTheme.accent.withAlpha(76)),
+                color: HireIQTheme.primaryTeal.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
+                border: Border.all(
+                    color: HireIQTheme.primaryTeal.withValues(alpha: 0.3)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.insights, color: HireIQTheme.accent),
+                      const Icon(Icons.insights,
+                          color: HireIQTheme.primaryTeal),
                       const SizedBox(width: 10),
                       Text(
                         'Q2 2026 Talent Intelligence',
-                        style: HireIQTheme.subtitleStyle
-                            .copyWith(color: HireIQTheme.accent),
+                        style: GoogleFonts.inter(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: HireIQTheme.primaryTeal),
                       ),
                     ],
                   ),
                   const SizedBox(height: 10),
                   Text(
                     'Flutter & mobile engineering — Gauteng + Remote SA',
-                    style: HireIQTheme.bodyStyle
-                        .copyWith(fontWeight: FontWeight.bold),
+                    style: GoogleFonts.inter(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        color: HireIQTheme.primaryNavy),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 30),
-            Text('Supply vs Demand', style: HireIQTheme.subtitleStyle),
-            const SizedBox(height: 15),
+            const SizedBox(height: 28),
+            Text(
+              'Supply vs Demand',
+              style: GoogleFonts.inter(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: HireIQTheme.primaryNavy),
+            ),
+            const SizedBox(height: 14),
             _buildMetricCard(
               title: 'Candidate Availability',
               value: 'Low',
               trend: 'Decreasing',
-              color: Colors.orange,
+              color: HireIQTheme.amber,
             ),
             const SizedBox(height: 10),
             _buildMetricCard(
               title: 'Market Competition',
               value: 'High',
               trend: 'Increasing',
-              color: Colors.red,
+              color: HireIQTheme.error,
             ),
-            const SizedBox(height: 30),
-            Text('Salary Benchmarks — Gauteng 2026',
-                style: HireIQTheme.subtitleStyle),
-            const SizedBox(height: 15),
+            const SizedBox(height: 28),
+            Text(
+              'Salary Benchmarks — Gauteng 2026',
+              style: GoogleFonts.inter(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: HireIQTheme.primaryNavy),
+            ),
+            const SizedBox(height: 14),
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: HireIQTheme.surface,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: HireIQTheme.border),
+                color: HireIQTheme.surfaceWhite,
+                borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
+                border: Border.all(color: HireIQTheme.borderLight),
+                boxShadow: [
+                  BoxShadow(
+                    color: HireIQTheme.primaryNavy.withValues(alpha: 0.04),
+                    blurRadius: 12,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
               ),
               child: Column(
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Your Brief:', style: HireIQTheme.bodyStyle),
-                      Text('R95K-R120K',
-                          style: HireIQTheme.bodyStyle
-                              .copyWith(fontWeight: FontWeight.bold)),
+                      Text(
+                        'Your Brief:',
+                        style: GoogleFonts.inter(
+                            fontSize: 14, color: HireIQTheme.textMuted),
+                      ),
+                      Text(
+                        'R95K–R120K',
+                        style: GoogleFonts.inter(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: HireIQTheme.primaryNavy),
+                      ),
                     ],
                   ),
-                  const Divider(height: 30),
+                  const Divider(height: 28, color: HireIQTheme.borderLight),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Market Average:', style: HireIQTheme.bodyStyle),
-                      Text('R135K', style: HireIQTheme.subtitleStyle),
+                      Text(
+                        'Market Average:',
+                        style: GoogleFonts.inter(
+                            fontSize: 14, color: HireIQTheme.textMuted),
+                      ),
+                      Text(
+                        'R135K',
+                        style: GoogleFonts.inter(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: HireIQTheme.primaryNavy),
+                      ),
                     ],
                   ),
-                  const SizedBox(height: 15),
+                  const SizedBox(height: 14),
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 10),
                     decoration: BoxDecoration(
-                      color: Colors.orange.withAlpha(25),
-                      borderRadius: BorderRadius.circular(8),
+                      color: HireIQTheme.amber.withValues(alpha: 0.1),
+                      borderRadius:
+                          BorderRadius.circular(HireIQTheme.radiusMd),
                     ),
                     child: Row(
                       children: [
                         const Icon(Icons.warning_amber_rounded,
-                            color: Colors.orange, size: 20),
+                            color: HireIQTheme.amber, size: 18),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             'Below market — hiring probability: 34%',
-                            style: HireIQTheme.bodyStyle
-                                .copyWith(color: Colors.orange, fontSize: 12),
+                            style: GoogleFonts.inter(
+                                color: HireIQTheme.amber, fontSize: 13),
                           ),
                         ),
                       ],
@@ -120,72 +169,94 @@ class SignalIQReport extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 28),
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
+                gradient: const LinearGradient(
                   colors: [
-                    HireIQTheme.primary,
-                    HireIQTheme.primary.withAlpha(204)
+                    HireIQTheme.primaryNavy,
+                    Color(0xFF243B67),
                   ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
+                boxShadow: [
+                  BoxShadow(
+                    color: HireIQTheme.primaryNavy.withValues(alpha: 0.25),
+                    blurRadius: 16,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(
+                  Row(
                     children: [
-                      Icon(Icons.auto_awesome, color: Colors.white),
-                      SizedBox(width: 10),
+                      const Icon(Icons.auto_awesome, color: Colors.white),
+                      const SizedBox(width: 10),
                       Text(
                         'SignalIQ Recommends:',
-                        style: TextStyle(
+                        style: GoogleFonts.inter(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
                             fontSize: 16),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 15),
-                  const Text(
+                  const SizedBox(height: 14),
+                  Text(
                     'Increase Head of Engineering salary to R130K minimum and add remote option to compete.',
-                    style: TextStyle(color: Colors.white, height: 1.5),
+                    style: GoogleFonts.inter(
+                        color: Colors.white, height: 1.5, fontSize: 14),
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {},
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
-                      foregroundColor: HireIQTheme.primary,
-                      minimumSize: const Size(double.infinity, 45),
+                      foregroundColor: HireIQTheme.primaryNavy,
+                      minimumSize: const Size(double.infinity, 48),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
+                          borderRadius:
+                              BorderRadius.circular(HireIQTheme.radiusMd)),
                     ),
-                    child: const Text('Update Listing Brief'),
+                    child: Text(
+                      'Update Listing Brief',
+                      style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+                    ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 28),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildMetricCard(
-      {required String title,
-      required String value,
-      required String trend,
-      required Color color}) {
+  Widget _buildMetricCard({
+    required String title,
+    required String value,
+    required String trend,
+    required Color color,
+  }) {
     return Container(
-      padding: const EdgeInsets.all(15),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: HireIQTheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: HireIQTheme.border),
+        color: HireIQTheme.surfaceWhite,
+        borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
+        border: Border.all(color: HireIQTheme.borderLight),
+        boxShadow: [
+          BoxShadow(
+            color: HireIQTheme.primaryNavy.withValues(alpha: 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -193,15 +264,36 @@ class SignalIQReport extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title,
-                  style: HireIQTheme.bodyStyle
-                      .copyWith(color: HireIQTheme.textSecondary)),
-              const SizedBox(height: 5),
-              Text(value,
-                  style: HireIQTheme.subtitleStyle.copyWith(color: color)),
+              Text(
+                title,
+                style: GoogleFonts.inter(
+                    fontSize: 13, color: HireIQTheme.textMuted),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                value,
+                style: GoogleFonts.inter(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: color),
+              ),
             ],
           ),
-          Text(trend, style: HireIQTheme.bodyStyle.copyWith(fontSize: 12)),
+          Container(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(HireIQTheme.radiusFull),
+            ),
+            child: Text(
+              trend,
+              style: GoogleFonts.inter(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: color),
+            ),
+          ),
         ],
       ),
     );

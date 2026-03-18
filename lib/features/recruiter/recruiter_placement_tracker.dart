@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hireiq/shared/theme.dart';
 
 class RecruiterPlacementTracker extends StatelessWidget {
@@ -9,39 +10,49 @@ class RecruiterPlacementTracker extends StatelessWidget {
     return Scaffold(
       backgroundColor: HireIQTheme.background,
       appBar: AppBar(
-        title: const Text('Placement Pipeline'),
+        backgroundColor: HireIQTheme.primaryNavy,
+        foregroundColor: Colors.white,
+        centerTitle: true,
+        title: Text(
+          'Placement Pipeline',
+          style: GoogleFonts.inter(
+              fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white),
+        ),
         actions: [
-          IconButton(icon: const Icon(Icons.filter_list), onPressed: () {}),
+          IconButton(
+              icon: const Icon(Icons.filter_list, color: Colors.white),
+              onPressed: () {}),
         ],
       ),
-      body: CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Active Submissions',
-                      style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: HireIQTheme.primaryNavy)),
-                  const SizedBox(height: 16),
-                  _buildTrackerCard('Alice Johnson', 'Senior Developer',
-                      'Apex Digital', 'Interviewing', HireIQTheme.primaryTeal),
-                  _buildTrackerCard(
-                      'Bob Smith',
-                      'Backend Engineer',
-                      'FinTech Startup',
-                      'Submitted (Awaiting Review)',
-                      HireIQTheme.textMuted),
-                  _buildTrackerCard('Charlie Davis', 'UI/UX Designer',
-                      'Global Tech', 'Offer Extended', HireIQTheme.amber),
-                ],
-              ),
-            ),
+      body: ListView(
+        padding: const EdgeInsets.all(20),
+        children: [
+          Text(
+            'Active Submissions',
+            style: GoogleFonts.inter(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: HireIQTheme.primaryNavy),
           ),
+          const SizedBox(height: 16),
+          _buildTrackerCard(
+              'Alice Johnson',
+              'Senior Developer',
+              'Apex Digital',
+              'Interviewing',
+              HireIQTheme.primaryTeal),
+          _buildTrackerCard(
+              'Bob Smith',
+              'Backend Engineer',
+              'FinTech Startup',
+              'Submitted',
+              HireIQTheme.textMuted),
+          _buildTrackerCard(
+              'Charlie Davis',
+              'UI/UX Designer',
+              'Global Tech',
+              'Offer Extended',
+              HireIQTheme.amber),
         ],
       ),
     );
@@ -49,37 +60,70 @@ class RecruiterPlacementTracker extends StatelessWidget {
 
   Widget _buildTrackerCard(String candidate, String role, String client,
       String status, Color statusColor) {
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(16),
-        title: Text(candidate,
-            style: const TextStyle(
-                fontWeight: FontWeight.bold, color: HireIQTheme.primaryNavy)),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 4),
-            Text('$role at $client',
-                style: const TextStyle(color: HireIQTheme.textMuted)),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                  color: statusColor.withAlpha(25),
-                  borderRadius: BorderRadius.circular(8)),
-              child: Text(status,
-                  style: TextStyle(
-                      color: statusColor,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold)),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: HireIQTheme.surfaceWhite,
+        borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
+        border: Border.all(color: HireIQTheme.borderLight),
+        boxShadow: [
+          BoxShadow(
+            color: HireIQTheme.primaryNavy.withValues(alpha: 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(
+            backgroundColor:
+                HireIQTheme.primaryNavy.withValues(alpha: 0.08),
+            child: Text(
+              candidate[0],
+              style: GoogleFonts.inter(
+                  color: HireIQTheme.primaryNavy,
+                  fontWeight: FontWeight.bold),
             ),
-          ],
-        ),
-        trailing: const Icon(Icons.arrow_forward_ios,
-            size: 16, color: HireIQTheme.textMuted),
-        onTap: () {},
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(candidate,
+                    style: GoogleFonts.inter(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        color: HireIQTheme.primaryNavy)),
+                const SizedBox(height: 2),
+                Text('$role at $client',
+                    style: GoogleFonts.inter(
+                        color: HireIQTheme.textMuted, fontSize: 13)),
+                const SizedBox(height: 10),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: statusColor.withValues(alpha: 0.1),
+                    borderRadius:
+                        BorderRadius.circular(HireIQTheme.radiusFull),
+                  ),
+                  child: Text(
+                    status,
+                    style: GoogleFonts.inter(
+                        color: statusColor,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Icon(Icons.arrow_forward_ios,
+              size: 14, color: HireIQTheme.textMuted),
+        ],
       ),
     );
   }

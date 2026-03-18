@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hireiq/shared/theme.dart';
 
 class AdminSystemSettings extends StatelessWidget {
@@ -9,7 +10,14 @@ class AdminSystemSettings extends StatelessWidget {
     return Scaffold(
       backgroundColor: HireIQTheme.background,
       appBar: AppBar(
-        title: const Text('System Settings'),
+        backgroundColor: HireIQTheme.primaryNavy,
+        foregroundColor: Colors.white,
+        centerTitle: true,
+        title: Text(
+          'System Settings',
+          style: GoogleFonts.inter(
+              fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white),
+        ),
       ),
       body: ListView(
         padding: const EdgeInsets.all(20),
@@ -51,11 +59,16 @@ class AdminSystemSettings extends StatelessWidget {
               minimumSize: const Size(double.infinity, 55),
               backgroundColor: HireIQTheme.primaryNavy,
               foregroundColor: Colors.white,
+              elevation: 0,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
+                  borderRadius:
+                      BorderRadius.circular(HireIQTheme.radiusMd)),
             ),
-            child: const Text('Save Configuration',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            child: Text(
+              'Save Configuration',
+              style: GoogleFonts.inter(
+                  fontWeight: FontWeight.bold, fontSize: 15),
+            ),
           ),
         ],
       ),
@@ -67,7 +80,7 @@ class AdminSystemSettings extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 16),
       child: Text(
         title,
-        style: const TextStyle(
+        style: GoogleFonts.inter(
             fontWeight: FontWeight.bold,
             fontSize: 18,
             color: HireIQTheme.primaryNavy),
@@ -86,19 +99,33 @@ class AdminSystemSettings extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: HireIQTheme.surfaceWhite,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
         border: Border.all(color: HireIQTheme.borderLight),
+        boxShadow: [
+          BoxShadow(
+            color: HireIQTheme.primaryNavy.withValues(alpha: 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: SwitchListTile(
-        title: Text(title,
-            style: const TextStyle(
-                fontWeight: FontWeight.bold, color: HireIQTheme.primaryNavy)),
-        subtitle: Text(subtitle,
-            style: const TextStyle(color: HireIQTheme.textMuted, height: 1.4)),
+        title: Text(
+          title,
+          style: GoogleFonts.inter(
+              fontWeight: FontWeight.bold, color: HireIQTheme.primaryNavy),
+        ),
+        subtitle: Text(
+          subtitle,
+          style: GoogleFonts.inter(
+              color: HireIQTheme.textMuted, height: 1.4, fontSize: 13),
+        ),
         value: value,
         onChanged: onChanged,
-        activeThumbColor: activeColor,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        activeTrackColor: activeColor,
+        activeThumbColor: Colors.white,
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       ),
     );
   }
@@ -107,23 +134,48 @@ class AdminSystemSettings extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label,
-            style: const TextStyle(
-                fontWeight: FontWeight.bold, color: HireIQTheme.primaryNavy)),
+        Text(
+          label,
+          style: GoogleFonts.inter(
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+              color: HireIQTheme.primaryNavy),
+        ),
         const SizedBox(height: 8),
-        TextField(
-          decoration: InputDecoration(
-            hintText: hint,
-            hintStyle: const TextStyle(color: HireIQTheme.textMuted),
-            filled: true,
-            fillColor: Colors.white,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: HireIQTheme.borderLight),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: HireIQTheme.borderLight),
+        Container(
+          decoration: BoxDecoration(
+            color: HireIQTheme.surfaceWhite,
+            borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
+            border: Border.all(color: HireIQTheme.borderLight),
+            boxShadow: [
+              BoxShadow(
+                color: HireIQTheme.primaryNavy.withValues(alpha: 0.04),
+                blurRadius: 12,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: TextField(
+            style: GoogleFonts.inter(
+                fontSize: 14, color: HireIQTheme.textPrimary),
+            decoration: InputDecoration(
+              hintText: hint,
+              hintStyle: GoogleFonts.inter(
+                  color: HireIQTheme.textMuted, fontSize: 14),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
+                borderSide: BorderSide.none,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
+                borderSide: BorderSide.none,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
+                borderSide: const BorderSide(
+                    color: HireIQTheme.primaryTeal, width: 1.5),
+              ),
+              contentPadding: const EdgeInsets.all(16),
             ),
           ),
         ),

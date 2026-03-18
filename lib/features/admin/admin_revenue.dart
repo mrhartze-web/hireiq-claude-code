@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../shared/theme.dart';
 
 class AdminRevenueDashboard extends StatelessWidget {
@@ -7,8 +8,16 @@ class AdminRevenueDashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: HireIQTheme.background,
       appBar: AppBar(
-        title: const Text('Revenue \u0026 Billing'),
+        backgroundColor: HireIQTheme.primaryNavy,
+        foregroundColor: Colors.white,
+        centerTitle: true,
+        title: Text(
+          'Revenue & Billing',
+          style: GoogleFonts.inter(
+              fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white),
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
@@ -17,19 +26,22 @@ class AdminRevenueDashboard extends StatelessWidget {
           children: [
             _buildRevenueSummaryCard(),
             const SizedBox(height: 32),
-            const Text(
+            Text(
               'Recent Transactions',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: GoogleFonts.inter(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: HireIQTheme.primaryNavy),
             ),
             const SizedBox(height: 16),
             _buildTransactionItem(
-                'Pro Plan Monthly - TechFlow', '\$299.00', 'Success'),
+                'Pro Plan Monthly - TechFlow', 'R4,490.00', 'Success'),
             _buildTransactionItem(
-                'Enterprise License - DataScale', '\$1,499.00', 'Success'),
+                'Enterprise License - DataScale', 'R22,490.00', 'Success'),
             _buildTransactionItem(
-                'SkillIQ Verification - User #129', '\$25.00', 'Success'),
+                'SkillIQ Verification - User #129', 'R375.00', 'Success'),
             _buildTransactionItem(
-                'Pro Plan Yearly - Creative Labs', '\$2,999.00', 'Pending'),
+                'Pro Plan Yearly - Creative Labs', 'R44,990.00', 'Pending'),
           ],
         ),
       ),
@@ -41,31 +53,37 @@ class AdminRevenueDashboard extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: HireIQTheme.primaryNavy,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(HireIQTheme.radiusXl),
         boxShadow: [
           BoxShadow(
-              color: HireIQTheme.primaryNavy.withAlpha(76),
-              blurRadius: 20,
-              offset: const Offset(0, 10)),
+            color: HireIQTheme.primaryNavy.withValues(alpha: 0.3),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Total MRR',
-              style: TextStyle(color: Colors.white70, fontSize: 16)),
+          Text(
+            'Total MRR',
+            style: GoogleFonts.inter(color: Colors.white70, fontSize: 14),
+          ),
           const SizedBox(height: 8),
-          const Text('\$142,580.00',
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold)),
+          Text(
+            'R2,138,700.00',
+            style: GoogleFonts.inter(
+                color: Colors.white,
+                fontSize: 32,
+                fontWeight: FontWeight.bold),
+          ),
           const SizedBox(height: 24),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               _buildMiniStat('Growth', '+12.5%', Icons.trending_up),
-              _buildMiniStat('Active Subs', '1,240', Icons.subscriptions),
+              _buildMiniStat(
+                  'Active Subs', '1,240', Icons.subscriptions),
             ],
           ),
         ],
@@ -81,15 +99,20 @@ class AdminRevenueDashboard extends StatelessWidget {
           children: [
             Icon(icon, color: HireIQTheme.primaryTeal, size: 14),
             const SizedBox(width: 4),
-            Text(label,
-                style: const TextStyle(color: Colors.white70, fontSize: 12)),
+            Text(
+              label,
+              style: GoogleFonts.inter(color: Colors.white70, fontSize: 12),
+            ),
           ],
         ),
-        Text(value,
-            style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold)),
+        const SizedBox(height: 2),
+        Text(
+          value,
+          style: GoogleFonts.inter(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.bold),
+        ),
       ],
     );
   }
@@ -103,28 +126,63 @@ class AdminRevenueDashboard extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: HireIQTheme.surfaceWhite,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
         border: Border.all(color: HireIQTheme.borderLight),
+        boxShadow: [
+          BoxShadow(
+            color: HireIQTheme.primaryNavy.withValues(alpha: 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(description,
-                  style: const TextStyle(fontWeight: FontWeight.w600)),
-              Text(status,
-                  style: TextStyle(
-                      color: isSuccess
-                          ? HireIQTheme.primaryTeal
-                          : HireIQTheme.amber,
-                      fontSize: 12)),
-            ],
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  description,
+                  style: GoogleFonts.inter(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                      color: HireIQTheme.primaryNavy),
+                ),
+                const SizedBox(height: 4),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: (isSuccess
+                            ? HireIQTheme.primaryTeal
+                            : HireIQTheme.amber)
+                        .withValues(alpha: 0.1),
+                    borderRadius:
+                        BorderRadius.circular(HireIQTheme.radiusFull),
+                  ),
+                  child: Text(
+                    status,
+                    style: GoogleFonts.inter(
+                        color: isSuccess
+                            ? HireIQTheme.primaryTeal
+                            : HireIQTheme.amber,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
           ),
-          Text(amount,
-              style:
-                  const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          const SizedBox(width: 12),
+          Text(
+            amount,
+            style: GoogleFonts.inter(
+                fontWeight: FontWeight.bold,
+                fontSize: 15,
+                color: HireIQTheme.primaryNavy),
+          ),
         ],
       ),
     );

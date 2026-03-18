@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hireiq/shared/theme.dart';
 
 class AdminRecruiterManagement extends StatelessWidget {
@@ -9,9 +10,18 @@ class AdminRecruiterManagement extends StatelessWidget {
     return Scaffold(
       backgroundColor: HireIQTheme.background,
       appBar: AppBar(
-        title: const Text('Recruiter Network'),
+        backgroundColor: HireIQTheme.primaryNavy,
+        foregroundColor: Colors.white,
+        centerTitle: true,
+        title: Text(
+          'Recruiter Network',
+          style: GoogleFonts.inter(
+              fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white),
+        ),
         actions: [
-          IconButton(icon: const Icon(Icons.person_add), onPressed: () {}),
+          IconButton(
+              icon: const Icon(Icons.person_add, color: Colors.white),
+              onPressed: () {}),
         ],
       ),
       body: ListView(
@@ -30,57 +40,88 @@ class AdminRecruiterManagement extends StatelessWidget {
 
   Widget _buildRecruiterTile(String name, String tier, int placements,
       String earnings, Color tierColor) {
-    return Card(
-      elevation: 0,
+    return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: const BorderSide(color: HireIQTheme.borderLight)),
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(16),
-        leading: CircleAvatar(
-          radius: 24,
-          backgroundColor: tierColor.withAlpha(25),
-          child: Text(name[0],
-              style: TextStyle(
-                  color: tierColor, fontWeight: FontWeight.bold, fontSize: 20)),
-        ),
-        title: Text(name,
-            style: const TextStyle(
-                fontWeight: FontWeight.bold, color: HireIQTheme.primaryNavy)),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 4),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                  color: tierColor.withAlpha(25),
-                  borderRadius: BorderRadius.circular(8)),
-              child: Text(tier,
-                  style: TextStyle(
-                      color: tierColor,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold)),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: HireIQTheme.surfaceWhite,
+        borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
+        border: Border.all(color: HireIQTheme.borderLight),
+        boxShadow: [
+          BoxShadow(
+            color: HireIQTheme.primaryNavy.withValues(alpha: 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 24,
+            backgroundColor: tierColor.withValues(alpha: 0.1),
+            child: Text(
+              name[0],
+              style: GoogleFonts.inter(
+                  color: tierColor,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18),
             ),
-            const SizedBox(height: 8),
-            Row(
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('$placements Placements',
-                    style: const TextStyle(
-                        color: HireIQTheme.textMuted, fontSize: 13)),
-                const SizedBox(width: 16),
-                Text('YTD: $earnings',
-                    style: const TextStyle(
-                        color: HireIQTheme.primaryNavy,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 13)),
+                Text(
+                  name,
+                  style: GoogleFonts.inter(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                      color: HireIQTheme.primaryNavy),
+                ),
+                const SizedBox(height: 6),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 10, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: tierColor.withValues(alpha: 0.1),
+                    borderRadius:
+                        BorderRadius.circular(HireIQTheme.radiusFull),
+                  ),
+                  child: Text(
+                    tier,
+                    style: GoogleFonts.inter(
+                        color: tierColor,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Text(
+                      '$placements Placements',
+                      style: GoogleFonts.inter(
+                          color: HireIQTheme.textMuted, fontSize: 12),
+                    ),
+                    const SizedBox(width: 14),
+                    Text(
+                      'YTD: $earnings',
+                      style: GoogleFonts.inter(
+                          color: HireIQTheme.primaryNavy,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 12),
+                    ),
+                  ],
+                ),
               ],
             ),
-          ],
-        ),
-        trailing:
-            IconButton(icon: const Icon(Icons.more_vert), onPressed: () {}),
+          ),
+          IconButton(
+              icon: const Icon(Icons.more_vert, color: HireIQTheme.textMuted),
+              onPressed: () {}),
+        ],
       ),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../shared/theme.dart';
 import '../../shared/components/settings_tile.dart';
 
@@ -10,7 +11,14 @@ class RecruiterSettings extends StatelessWidget {
     return Scaffold(
       backgroundColor: HireIQTheme.background,
       appBar: AppBar(
-        title: const Text('Settings'),
+        backgroundColor: HireIQTheme.primaryNavy,
+        foregroundColor: Colors.white,
+        centerTitle: true,
+        title: Text(
+          'Settings',
+          style: GoogleFonts.inter(
+              fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white),
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -53,9 +61,11 @@ class RecruiterSettings extends StatelessWidget {
             const SizedBox(height: 32),
             TextButton(
               onPressed: () {},
-              child: const Text('Log Out',
-                  style: TextStyle(
-                      color: HireIQTheme.error, fontWeight: FontWeight.bold)),
+              child: Text(
+                'Log Out',
+                style: GoogleFonts.inter(
+                    color: HireIQTheme.error, fontWeight: FontWeight.bold),
+              ),
             ),
             const SizedBox(height: 32),
           ],
@@ -67,40 +77,57 @@ class RecruiterSettings extends StatelessWidget {
   Widget _buildProfileSection() {
     return Container(
       padding: const EdgeInsets.all(24),
-      color: HireIQTheme.surfaceWhite,
+      decoration: BoxDecoration(
+        color: HireIQTheme.surfaceWhite,
+        boxShadow: [
+          BoxShadow(
+            color: HireIQTheme.primaryNavy.withValues(alpha: 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: Row(
         children: [
           CircleAvatar(
             radius: 32,
-            backgroundColor: HireIQTheme.primaryNavy.withAlpha(25),
-            child: const Text('LM',
-                style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: HireIQTheme.primaryNavy)),
+            backgroundColor: HireIQTheme.primaryNavy.withValues(alpha: 0.1),
+            child: Text(
+              'LM',
+              style: GoogleFonts.inter(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: HireIQTheme.primaryNavy),
+            ),
           ),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Lerato Mokoena',
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: HireIQTheme.primaryNavy)),
-                const SizedBox(height: 4),
+                Text(
+                  'Lerato Mokoena',
+                  style: GoogleFonts.inter(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: HireIQTheme.primaryNavy),
+                ),
+                const SizedBox(height: 6),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                      color: HireIQTheme.primaryTeal.withAlpha(25),
-                      borderRadius: BorderRadius.circular(4)),
-                  child: const Text('Solo Recruiter Plan • R2,999/mo',
-                      style: TextStyle(
-                          color: HireIQTheme.primaryTeal,
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold)),
+                    color: HireIQTheme.primaryTeal.withValues(alpha: 0.1),
+                    borderRadius:
+                        BorderRadius.circular(HireIQTheme.radiusFull),
+                  ),
+                  child: Text(
+                    'Solo Recruiter Plan · R2,999/mo',
+                    style: GoogleFonts.inter(
+                        color: HireIQTheme.primaryTeal,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold),
+                  ),
                 ),
               ],
             ),
@@ -116,11 +143,18 @@ class RecruiterSettings extends StatelessWidget {
 
   Widget _buildSettingsGroup(List<Widget> tiles) {
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: HireIQTheme.surfaceWhite,
-        border: Border(
+        border: const Border(
             top: BorderSide(color: HireIQTheme.borderLight),
             bottom: BorderSide(color: HireIQTheme.borderLight)),
+        boxShadow: [
+          BoxShadow(
+            color: HireIQTheme.primaryNavy.withValues(alpha: 0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(children: tiles),
     );

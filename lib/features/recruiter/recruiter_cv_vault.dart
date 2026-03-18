@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../shared/theme.dart';
 
 class RecruiterCVVault extends StatelessWidget {
@@ -7,35 +8,72 @@ class RecruiterCVVault extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: HireIQTheme.background,
       appBar: AppBar(
-        title: const Text('CV Vault'),
+        backgroundColor: HireIQTheme.primaryNavy,
+        foregroundColor: Colors.white,
+        centerTitle: true,
+        title: Text(
+          'CV Vault',
+          style: GoogleFonts.inter(
+              fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white),
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.filter_list),
+            icon: const Icon(Icons.filter_list, color: Colors.white),
             onPressed: () {},
           ),
         ],
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: 'Search by skill, name or role...',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: const BorderSide(color: HireIQTheme.borderLight),
+          Container(
+            color: HireIQTheme.background,
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: Container(
+              decoration: BoxDecoration(
+                color: HireIQTheme.surfaceWhite,
+                borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
+                border: Border.all(color: HireIQTheme.borderLight),
+                boxShadow: [
+                  BoxShadow(
+                    color: HireIQTheme.primaryNavy.withValues(alpha: 0.04),
+                    blurRadius: 12,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: TextField(
+                style: GoogleFonts.inter(
+                    fontSize: 14, color: HireIQTheme.textPrimary),
+                decoration: InputDecoration(
+                  hintText: 'Search by skill, name or role...',
+                  hintStyle: GoogleFonts.inter(
+                      color: HireIQTheme.textMuted, fontSize: 14),
+                  prefixIcon: const Icon(Icons.search,
+                      color: HireIQTheme.primaryNavy),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
+                    borderSide: BorderSide.none,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
+                    borderSide: const BorderSide(
+                        color: HireIQTheme.primaryTeal, width: 1.5),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16, vertical: 14),
                 ),
-                filled: true,
-                fillColor: HireIQTheme.surfaceWhite,
               ),
             ),
           ),
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               children: [
                 _buildCvFile('alex_rivera_resume.pdf',
                     'Flutter, Firebase, Dart', 'Expert'),
@@ -43,8 +81,8 @@ class RecruiterCVVault extends StatelessWidget {
                     'Intermediate'),
                 _buildCvFile(
                     'james_bond_cv.pdf', 'Security, Cloud, DevOps', 'Expert'),
-                _buildCvFile(
-                    'lisa_wong_cv.pdf', 'Python, AI, Data Science', 'Expert'),
+                _buildCvFile('lisa_wong_cv.pdf', 'Python, AI, Data Science',
+                    'Expert'),
               ],
             ),
           ),
@@ -64,18 +102,26 @@ class RecruiterCVVault extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: HireIQTheme.surfaceWhite,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
         border: Border.all(color: HireIQTheme.borderLight),
+        boxShadow: [
+          BoxShadow(
+            color: HireIQTheme.primaryNavy.withValues(alpha: 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.red[50], // PDF icon background
-              borderRadius: BorderRadius.circular(8),
+              color: const Color(0xFFEF4444).withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(HireIQTheme.radiusMd),
             ),
-            child: const Icon(Icons.picture_as_pdf, color: Colors.red),
+            child: const Icon(Icons.picture_as_pdf,
+                color: Color(0xFFEF4444), size: 22),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -83,24 +129,33 @@ class RecruiterCVVault extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(filename,
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
+                    style: GoogleFonts.inter(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        color: HireIQTheme.textPrimary)),
+                const SizedBox(height: 2),
                 Text(skills,
-                    style: const TextStyle(
+                    style: GoogleFonts.inter(
                         fontSize: 12, color: HireIQTheme.textMuted)),
               ],
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
             decoration: BoxDecoration(
-              color: HireIQTheme.primaryTeal.withAlpha(25),
-              borderRadius: BorderRadius.circular(12),
+              color: HireIQTheme.primaryTeal.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(HireIQTheme.radiusFull),
+              border: Border.all(
+                  color: HireIQTheme.primaryTeal.withValues(alpha: 0.3)),
             ),
-            child: Text(level,
-                style: const TextStyle(
-                    color: HireIQTheme.primaryTeal,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold)),
+            child: Text(
+              level,
+              style: GoogleFonts.inter(
+                  color: HireIQTheme.primaryTeal,
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
