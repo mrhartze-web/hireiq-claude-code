@@ -1,47 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../shared/theme.dart';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Data models
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _Feature {
-  const _Feature(this.label, {this.highlight = false});
-  final String label;
-  final bool highlight;
-}
-
-class _PlanCard {
-  const _PlanCard({
-    required this.name,
-    required this.price,
-    required this.period,
-    required this.description,
-    required this.features,
-    required this.accent,
-    required this.cta,
-    this.badge,
-    this.isFeatured = false,
-  });
-
-  final String name;
-  final String price;
-  final String period;
-  final String description;
-  final List<_Feature> features;
-  final Color accent;
-  final String cta;
-  final String? badge;
-  final bool isFeatured;
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Screen
-// ─────────────────────────────────────────────────────────────────────────────
+// ── Mobile Pricing Screen ──────────────────────────────────────────────────────
 
 class PricingScreen extends StatefulWidget {
   const PricingScreen({super.key});
@@ -50,406 +13,405 @@ class PricingScreen extends StatefulWidget {
   State<PricingScreen> createState() => _PricingScreenState();
 }
 
-class _PricingScreenState extends State<PricingScreen>
-    with SingleTickerProviderStateMixin {
-  bool _candidatePro = false; // false = Free, true = Pro
-
-  late final AnimationController _entranceCtrl;
-  late final Animation<double> _fade;
-  late final Animation<Offset> _slide;
-
-  @override
-  void initState() {
-    super.initState();
-
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
-    ));
-
-    _entranceCtrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 700),
-    );
-    _fade = CurvedAnimation(
-      parent: _entranceCtrl,
-      curve: const Interval(0.0, 0.8, curve: Curves.easeOut),
-    );
-    _slide = Tween<Offset>(
-      begin: const Offset(0, 0.06),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _entranceCtrl,
-      curve: const Interval(0.0, 0.8, curve: Curves.easeOut),
-    ));
-
-    _entranceCtrl.forward();
-  }
-
-  @override
-  void dispose() {
-    _entranceCtrl.dispose();
-    super.dispose();
-  }
-
-  // ── Candidate plans ────────────────────────────────────────────────────────
-
-  _PlanCard get _candidateFree => const _PlanCard(
-        name: 'Free',
-        price: 'R0',
-        period: '',
-        description: 'Everything you need to start your job search.',
-        features: [
-          _Feature('CV upload & profile'),
-          _Feature('AI job matching'),
-          _Feature('5 applications per month'),
-          _Feature('Public candidate profile'),
-        ],
-        accent: HireIQTheme.primaryTeal,
-        cta: 'Get Started Free',
-      );
-
-  _PlanCard get _proCard => const _PlanCard(
-        name: 'Pro',
-        price: 'R49',
-        period: '/mo',
-        description: 'Unlock your full potential with AI-powered tools.',
-        features: [
-          _Feature('Everything in Free'),
-          _Feature('Unlimited applications', highlight: true),
-          _Feature('PassportIQ verification', highlight: true),
-          _Feature('ForgeIQ CV builder', highlight: true),
-          _Feature('UpliftIQ learning path', highlight: true),
-          _Feature('Priority job matching', highlight: true),
-        ],
-        accent: HireIQTheme.primaryTeal,
-        cta: 'Start Pro',
-        badge: 'Most Popular',
-        isFeatured: true,
-      );
-
-  // ── Employer plans ─────────────────────────────────────────────────────────
-
-  static const List<_PlanCard> _employerPlans = [
-    _PlanCard(
-      name: 'Starter',
-      price: 'R1,999',
-      period: '/mo',
-      description: 'For small teams making their first hires.',
-      features: [
-        _Feature('3 active job postings'),
-        _Feature('MatchIQ candidate scoring'),
-        _Feature('Basic analytics dashboard'),
-        _Feature('Email support'),
-      ],
-      accent: HireIQTheme.primaryNavy,
-      cta: 'Get Started',
-    ),
-    _PlanCard(
-      name: 'Growth',
-      price: 'R4,999',
-      period: '/mo',
-      description: 'For scaling teams that need serious hiring intelligence.',
-      features: [
-        _Feature('Everything in Starter'),
-        _Feature('Unlimited job postings', highlight: true),
-        _Feature('WildcardIQ blind screening', highlight: true),
-        _Feature('SignalIQ market intelligence', highlight: true),
-        _Feature('5 team seats', highlight: true),
-        _Feature('Priority support'),
-      ],
-      accent: HireIQTheme.primaryNavy,
-      cta: 'Start Growing',
-      badge: 'Best Value',
-      isFeatured: true,
-    ),
-    _PlanCard(
-      name: 'Enterprise',
-      price: 'Custom',
-      period: '',
-      description: 'For large organisations with complex hiring needs.',
-      features: [
-        _Feature('Everything in Growth'),
-        _Feature('Dedicated account manager'),
-        _Feature('B-BBEE reporting & compliance'),
-        _Feature('API access & integrations'),
-        _Feature('Custom team seats'),
-        _Feature('SLA guarantee'),
-      ],
-      accent: HireIQTheme.primaryNavy,
-      cta: 'Contact Sales',
-    ),
-  ];
+class _PricingScreenState extends State<PricingScreen> {
+  int? _expandedFaq;
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.sizeOf(context).width;
-    final isWide = width >= 800;
-
     return Scaffold(
       backgroundColor: HireIQTheme.background,
       appBar: AppBar(
-        backgroundColor: HireIQTheme.surfaceWhite,
+        backgroundColor: HireIQTheme.background,
         elevation: 0,
-        surfaceTintColor: Colors.transparent,
+        scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded,
-              color: HireIQTheme.textPrimary),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+          color: HireIQTheme.textPrimary,
           onPressed: () => context.pop(),
         ),
-        title: RichText(
-          text: TextSpan(children: [
-            TextSpan(
-              text: 'Hire',
-              style: GoogleFonts.inter(
-                fontSize: 18,
-                fontWeight: FontWeight.w800,
-                color: HireIQTheme.primaryNavy,
-              ),
-            ),
-            TextSpan(
-              text: 'IQ',
-              style: GoogleFonts.inter(
-                fontSize: 18,
-                fontWeight: FontWeight.w800,
-                color: HireIQTheme.primaryTeal,
-              ),
-            ),
-          ]),
-        ),
         centerTitle: true,
-        bottom: const PreferredSize(
-          preferredSize: Size.fromHeight(1),
-          child: Divider(
-              height: 1, thickness: 1, color: HireIQTheme.borderLight),
+        title: Text(
+          'Pricing',
+          style: GoogleFonts.inter(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: HireIQTheme.textPrimary,
+          ),
         ),
       ),
-      body: FadeTransition(
-        opacity: _fade,
-        child: SlideTransition(
-          position: _slide,
-          child: SingleChildScrollView(
-            physics: const ClampingScrollPhysics(),
-            padding: EdgeInsets.symmetric(
-              horizontal: isWide ? 40 : 20,
-              vertical: 36,
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 40),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ── Intro ────────────────────────────────────────────────────────
+            Text(
+              'Choose your plan',
+              style: GoogleFonts.inter(
+                fontSize: 26,
+                fontWeight: FontWeight.w800,
+                color: HireIQTheme.primaryNavy,
+                letterSpacing: -0.5,
+                height: 1.2,
+              ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                // ── Page heading ─────────────────────────────────────
-                Text(
-                  'Simple, transparent pricing',
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.inter(
-                    fontSize: isWide ? 36 : 28,
-                    fontWeight: FontWeight.w800,
-                    color: HireIQTheme.textPrimary,
-                    letterSpacing: -0.8,
-                    height: 1.2,
+            const SizedBox(height: 6),
+            Text(
+              'Simple, transparent pricing. Start free and scale as you grow.',
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                color: HireIQTheme.textMuted,
+                height: 1.5,
+              ),
+            ),
+
+            const SizedBox(height: 28),
+
+            // ── Candidate section ─────────────────────────────────────────────
+            const _SectionHeader(
+              label: 'For Candidates',
+              icon: Icons.person_outline_rounded,
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              height: 290,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                clipBehavior: Clip.none,
+                children: const [
+                  _CandidateCard(
+                    name: 'Free',
+                    price: 'R0',
+                    period: '/month',
+                    subtitle: 'Get started with AI job matching',
+                    features: [
+                      'Up to 5 job applications/month',
+                      'MatchIQ score visibility',
+                      'Basic candidate profile',
+                      'Job alert notifications',
+                    ],
+                    isHighlighted: false,
                   ),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  'No hidden fees. No lock-in contracts. Cancel anytime.',
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.inter(
-                    fontSize: 15,
-                    color: HireIQTheme.textMuted,
+                  SizedBox(width: 12),
+                  _CandidateCard(
+                    name: 'Pro',
+                    price: 'R99',
+                    period: '/month',
+                    subtitle: 'Unlock the full HireIQ edge',
+                    features: [
+                      'Unlimited job applications',
+                      'PassportIQ identity verification',
+                      'ForgeIQ AI CV builder',
+                      'UpliftIQ learning modules',
+                      'Priority matching score',
+                    ],
+                    isHighlighted: true,
                   ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 28),
+
+            // ── Employer section ──────────────────────────────────────────────
+            const _SectionHeader(
+              label: 'For Employers',
+              icon: Icons.business_outlined,
+            ),
+            const SizedBox(height: 12),
+            const _EmployerCard(
+              name: 'Starter',
+              price: 'R999',
+              period: '/month',
+              subtitle: 'Small teams getting started with smart hiring',
+              features: [
+                '3 active job posts',
+                'MatchIQ candidate scoring',
+                'Basic pipeline view',
+                'Email support',
+              ],
+              variant: _EmployerVariant.standard,
+            ),
+            const SizedBox(height: 10),
+            const _EmployerCard(
+              name: 'Growth',
+              price: 'R2,499',
+              period: '/month',
+              subtitle: 'Scale your hiring with the full AI suite',
+              features: [
+                '15 active job posts',
+                'SignalIQ market intelligence',
+                'WildcardIQ unbiased scoring',
+                'Full pipeline + ATS integration',
+                'Priority support',
+              ],
+              variant: _EmployerVariant.navy,
+            ),
+            const SizedBox(height: 10),
+            const _EmployerCard(
+              name: 'Enterprise',
+              price: 'Custom',
+              period: '',
+              subtitle: 'Tailored solutions for large organisations',
+              features: [
+                'Unlimited job posts',
+                'Dedicated account manager',
+                'Custom API integrations',
+                'SLA performance guarantee',
+                'Onboarding & team training',
+              ],
+              variant: _EmployerVariant.amber,
+            ),
+
+            const SizedBox(height: 28),
+
+            // ── Recruiter section ─────────────────────────────────────────────
+            const _SectionHeader(
+              label: 'For Recruiters',
+              icon: Icons.work_outline_rounded,
+            ),
+            const SizedBox(height: 12),
+            const _RecruiterCard(),
+
+            const SizedBox(height: 28),
+
+            // ── FAQ ───────────────────────────────────────────────────────────
+            const _SectionHeader(
+              label: 'Frequently Asked Questions',
+              icon: Icons.help_outline_rounded,
+            ),
+            const SizedBox(height: 12),
+            _FaqAccordion(
+              expandedIndex: _expandedFaq,
+              onToggle: (i) =>
+                  setState(() => _expandedFaq = _expandedFaq == i ? null : i),
+            ),
+
+            const SizedBox(height: 24),
+
+            // ── VAT footer note ───────────────────────────────────────────────
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: HireIQTheme.primaryTeal.withValues(alpha: 0.06),
+                borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
+                border: Border.all(
+                  color: HireIQTheme.primaryTeal.withValues(alpha: 0.2),
                 ),
-
-                const SizedBox(height: 48),
-
-                // ═══════════════════════════════════════════════════
-                // CANDIDATE TIER
-                // ═══════════════════════════════════════════════════
-                const _SectionHeader(
-                  icon: Icons.person_outline_rounded,
-                  label: 'Candidate',
-                  accent: HireIQTheme.primaryTeal,
-                ),
-                const SizedBox(height: 16),
-
-                // Free / Pro toggle
-                _PlanToggle(
-                  isOn: _candidatePro,
-                  onLabel: 'Pro  R49/mo',
-                  offLabel: 'Free',
-                  accent: HireIQTheme.primaryTeal,
-                  onChanged: (v) {
-                    HapticFeedback.selectionClick();
-                    setState(() => _candidatePro = v);
-                  },
-                ),
-                const SizedBox(height: 20),
-
-                // Single animated candidate card
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  switchInCurve: Curves.easeOut,
-                  switchOutCurve: Curves.easeIn,
-                  transitionBuilder: (child, anim) => FadeTransition(
-                    opacity: anim,
-                    child: SlideTransition(
-                      position: Tween<Offset>(
-                        begin: const Offset(0, 0.04),
-                        end: Offset.zero,
-                      ).animate(anim),
-                      child: child,
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(
+                    Icons.info_outline_rounded,
+                    size: 16,
+                    color: HireIQTheme.primaryTeal,
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      'All prices are exclusive of VAT (15%). Billed monthly or annually. Cancel anytime with no penalty.',
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: HireIQTheme.primaryTeal,
+                        height: 1.5,
+                      ),
                     ),
                   ),
-                  child: _PricingCard(
-                    key: ValueKey(_candidatePro),
-                    plan: _candidatePro ? _proCard : _candidateFree,
-                    maxWidth: isWide ? 420 : double.infinity,
-                  ),
-                ),
-
-                const SizedBox(height: 52),
-
-                // ═══════════════════════════════════════════════════
-                // EMPLOYER TIER
-                // ═══════════════════════════════════════════════════
-                const _SectionHeader(
-                  icon: Icons.business_outlined,
-                  label: 'Employer',
-                  accent: HireIQTheme.primaryNavy,
-                ),
-                const SizedBox(height: 24),
-
-                isWide
-                    ? const _WideCardRow(plans: _employerPlans)
-                    : const _StackedCards(plans: _employerPlans),
-
-                const SizedBox(height: 52),
-
-                // ═══════════════════════════════════════════════════
-                // RECRUITER TIER
-                // ═══════════════════════════════════════════════════
-                const _SectionHeader(
-                  icon: Icons.handshake_outlined,
-                  label: 'Recruiter',
-                  accent: HireIQTheme.recruiterAccent,
-                ),
-                const SizedBox(height: 24),
-
-                _RecruiterCard(maxWidth: isWide ? 560 : double.infinity),
-
-                const SizedBox(height: 48),
-
-                // Bottom note
-                Text(
-                  'All prices are in South African Rand (ZAR) and exclude VAT.\nEmployer and Recruiter plans billed monthly. Cancel anytime.',
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    color: HireIQTheme.textLight,
-                    height: 1.6,
-                  ),
-                ),
-
-                const SizedBox(height: 24),
-              ],
+                ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Section header
-// ─────────────────────────────────────────────────────────────────────────────
+// ── Section header ─────────────────────────────────────────────────────────────
 
 class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({
-    required this.icon,
-    required this.label,
-    required this.accent,
-  });
-
-  final IconData icon;
+  const _SectionHeader({required this.label, required this.icon});
   final String label;
-  final Color accent;
+  final IconData icon;
 
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Container(
-          width: 32,
-          height: 32,
+          width: 28,
+          height: 28,
           decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: accent.withValues(alpha: 0.12),
+            color: HireIQTheme.primaryNavy.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(icon, size: 17, color: accent),
+          child: Icon(icon, size: 16, color: HireIQTheme.primaryNavy),
         ),
         const SizedBox(width: 10),
         Text(
           label,
           style: GoogleFonts.inter(
-            fontSize: 18,
+            fontSize: 16,
             fontWeight: FontWeight.w700,
-            color: HireIQTheme.textPrimary,
-            letterSpacing: -0.3,
+            color: HireIQTheme.primaryNavy,
           ),
-        ),
-        const SizedBox(width: 12),
-        const Expanded(
-          child: Divider(color: HireIQTheme.borderLight, thickness: 1),
         ),
       ],
     );
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Plan toggle (Free ↔ Pro)
-// ─────────────────────────────────────────────────────────────────────────────
+// ── Candidate cards (horizontal scroll) ───────────────────────────────────────
 
-class _PlanToggle extends StatelessWidget {
-  const _PlanToggle({
-    required this.isOn,
-    required this.offLabel,
-    required this.onLabel,
-    required this.accent,
-    required this.onChanged,
+class _CandidateCard extends StatelessWidget {
+  const _CandidateCard({
+    required this.name,
+    required this.price,
+    required this.period,
+    required this.subtitle,
+    required this.features,
+    required this.isHighlighted,
   });
 
-  final bool isOn;
-  final String offLabel;
-  final String onLabel;
-  final Color accent;
-  final ValueChanged<bool> onChanged;
+  final String name;
+  final String price;
+  final String period;
+  final String subtitle;
+  final List<String> features;
+  final bool isHighlighted;
 
   @override
   Widget build(BuildContext context) {
+    final cardWidth = MediaQuery.of(context).size.width * 0.72;
+
     return Container(
-      padding: const EdgeInsets.all(4),
+      width: cardWidth,
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: HireIQTheme.backgroundLight,
-        borderRadius: BorderRadius.circular(40),
-        border: Border.all(color: HireIQTheme.borderLight),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _TogglePill(
-            label: offLabel,
-            active: !isOn,
-            accent: accent,
-            onTap: () => onChanged(false),
+        color: isHighlighted ? HireIQTheme.primaryTeal : HireIQTheme.surfaceWhite,
+        borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
+        border: Border.all(
+          color: isHighlighted ? HireIQTheme.primaryTeal : HireIQTheme.borderLight,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: isHighlighted
+                ? HireIQTheme.primaryTeal.withValues(alpha: 0.18)
+                : HireIQTheme.primaryNavy.withValues(alpha: 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 3),
           ),
-          const SizedBox(width: 4),
-          _TogglePill(
-            label: onLabel,
-            active: isOn,
-            accent: accent,
-            onTap: () => onChanged(true),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Badge
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+            decoration: BoxDecoration(
+              color: isHighlighted
+                  ? Colors.white.withValues(alpha: 0.2)
+                  : HireIQTheme.background,
+              borderRadius: BorderRadius.circular(HireIQTheme.radiusFull),
+            ),
+            child: Text(
+              isHighlighted ? 'Most Popular' : 'Free forever',
+              style: GoogleFonts.inter(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: isHighlighted ? Colors.white : HireIQTheme.textMuted,
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 14),
+
+          // Plan name
+          Text(
+            name,
+            style: GoogleFonts.inter(
+              fontSize: 18,
+              fontWeight: FontWeight.w800,
+              color: isHighlighted ? Colors.white : HireIQTheme.primaryNavy,
+            ),
+          ),
+          const SizedBox(height: 4),
+
+          // Price
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                price,
+                style: GoogleFonts.inter(
+                  fontSize: 32,
+                  fontWeight: FontWeight.w800,
+                  color: isHighlighted ? Colors.white : HireIQTheme.primaryNavy,
+                  height: 1.0,
+                ),
+              ),
+              if (period.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 4, left: 2),
+                  child: Text(
+                    period,
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      color: isHighlighted
+                          ? Colors.white.withValues(alpha: 0.75)
+                          : HireIQTheme.textMuted,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 6),
+
+          Text(
+            subtitle,
+            style: GoogleFonts.inter(
+              fontSize: 12,
+              color: isHighlighted
+                  ? Colors.white.withValues(alpha: 0.8)
+                  : HireIQTheme.textMuted,
+              height: 1.45,
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          // Features
+          ...features.map(
+            (f) => Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    Icons.check_circle_rounded,
+                    size: 15,
+                    color: isHighlighted
+                        ? Colors.white.withValues(alpha: 0.9)
+                        : HireIQTheme.primaryTeal,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      f,
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: isHighlighted
+                            ? Colors.white.withValues(alpha: 0.9)
+                            : HireIQTheme.textSecondary,
+                        height: 1.4,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),
@@ -457,683 +419,418 @@ class _PlanToggle extends StatelessWidget {
   }
 }
 
-class _TogglePill extends StatelessWidget {
-  const _TogglePill({
-    required this.label,
-    required this.active,
-    required this.accent,
-    required this.onTap,
+// ── Employer cards (stacked vertical) ─────────────────────────────────────────
+
+enum _EmployerVariant { standard, navy, amber }
+
+class _EmployerCard extends StatelessWidget {
+  const _EmployerCard({
+    required this.name,
+    required this.price,
+    required this.period,
+    required this.subtitle,
+    required this.features,
+    required this.variant,
   });
 
-  final String label;
-  final bool active;
-  final Color accent;
-  final VoidCallback onTap;
+  final String name;
+  final String price;
+  final String period;
+  final String subtitle;
+  final List<String> features;
+  final _EmployerVariant variant;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 220),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        decoration: BoxDecoration(
-          color: active ? accent : Colors.transparent,
-          borderRadius: BorderRadius.circular(32),
-          boxShadow: active
-              ? [
-                  BoxShadow(
-                    color: accent.withValues(alpha: 0.3),
-                    blurRadius: 10,
-                    offset: const Offset(0, 3),
-                  )
-                ]
-              : [],
-        ),
-        child: Text(
-          label,
-          style: GoogleFonts.inter(
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-            color: active ? Colors.white : HireIQTheme.textMuted,
+    final isNavy = variant == _EmployerVariant.navy;
+    final isAmber = variant == _EmployerVariant.amber;
+
+    final bg = isNavy ? HireIQTheme.primaryNavy : HireIQTheme.surfaceWhite;
+    final borderColor = isAmber
+        ? HireIQTheme.amber
+        : isNavy
+            ? HireIQTheme.primaryNavy
+            : HireIQTheme.borderLight;
+    final titleColor = isNavy ? Colors.white : HireIQTheme.primaryNavy;
+    final priceColor = isNavy
+        ? Colors.white
+        : isAmber
+            ? HireIQTheme.amber
+            : HireIQTheme.primaryNavy;
+    final subtitleColor =
+        isNavy ? Colors.white.withValues(alpha: 0.7) : HireIQTheme.textMuted;
+    final featureColor = isNavy
+        ? Colors.white.withValues(alpha: 0.9)
+        : HireIQTheme.textSecondary;
+    final checkColor = isNavy
+        ? Colors.white.withValues(alpha: 0.85)
+        : isAmber
+            ? HireIQTheme.amber
+            : HireIQTheme.primaryTeal;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
+        border: Border.all(color: borderColor, width: isAmber ? 2 : 1),
+        boxShadow: [
+          BoxShadow(
+            color: isNavy
+                ? HireIQTheme.primaryNavy.withValues(alpha: 0.15)
+                : HireIQTheme.primaryNavy.withValues(alpha: 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 3),
           ),
-        ),
+        ],
       ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Pricing card
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _PricingCard extends StatelessWidget {
-  const _PricingCard({
-    super.key,
-    required this.plan,
-    this.maxWidth = double.infinity,
-  });
-
-  final _PlanCard plan;
-  final double maxWidth;
-
-  @override
-  Widget build(BuildContext context) {
-    final featured = plan.isFeatured;
-    final accent = plan.accent;
-
-    return Center(
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: maxWidth),
-        child: Container(
-          decoration: BoxDecoration(
-            color: HireIQTheme.surfaceWhite,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: featured ? accent : HireIQTheme.borderLight,
-              width: featured ? 2 : 1,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: featured
-                    ? accent.withValues(alpha: 0.14)
-                    : Colors.black.withValues(alpha: 0.05),
-                blurRadius: featured ? 28 : 12,
-                offset: const Offset(0, 6),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
-              // Badge strip
-              if (plan.badge != null)
-                _BadgeStrip(label: plan.badge!, accent: accent),
-
-              Padding(
-                padding: const EdgeInsets.all(24),
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Plan name
                     Text(
-                      plan.name,
+                      name,
                       style: GoogleFonts.inter(
-                        fontSize: 13,
+                        fontSize: 16,
                         fontWeight: FontWeight.w700,
-                        color: accent,
-                        letterSpacing: 0.5,
+                        color: titleColor,
                       ),
                     ),
-                    const SizedBox(height: 8),
-
-                    // Price
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.baseline,
-                      textBaseline: TextBaseline.alphabetic,
-                      children: [
-                        Text(
-                          plan.price,
-                          style: GoogleFonts.inter(
-                            fontSize: 38,
-                            fontWeight: FontWeight.w800,
-                            color: HireIQTheme.textPrimary,
-                            letterSpacing: -1.0,
-                            height: 1.0,
-                          ),
-                        ),
-                        if (plan.period.isNotEmpty) ...[
-                          const SizedBox(width: 4),
-                          Text(
-                            plan.period,
-                            style: GoogleFonts.inter(
-                              fontSize: 14,
-                              color: HireIQTheme.textMuted,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-
-                    // Description
+                    const SizedBox(height: 2),
                     Text(
-                      plan.description,
+                      subtitle,
                       style: GoogleFonts.inter(
-                        fontSize: 13,
-                        color: HireIQTheme.textMuted,
-                        height: 1.5,
+                        fontSize: 12,
+                        color: subtitleColor,
+                        height: 1.4,
                       ),
-                    ),
-
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 20),
-                      child: Divider(
-                          color: HireIQTheme.borderLight, thickness: 1),
-                    ),
-
-                    // Features
-                    ...plan.features.map(
-                      (f) => _FeatureRow(feature: f, accent: accent),
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    // CTA
-                    _CardButton(
-                      label: plan.cta,
-                      accent: accent,
-                      filled: featured,
                     ),
                   ],
                 ),
               ),
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    price,
+                    style: GoogleFonts.inter(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                      color: priceColor,
+                      height: 1.0,
+                    ),
+                  ),
+                  if (period.isNotEmpty)
+                    Text(
+                      period,
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                        color: subtitleColor,
+                      ),
+                    ),
+                ],
+              ),
             ],
           ),
-        ),
+          SizedBox(height: isNavy ? 0 : 12),
+          if (isNavy)
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: 12),
+              height: 1,
+              color: Colors.white.withValues(alpha: 0.12),
+            ),
+          ...features.map(
+            (f) => Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.check_rounded, size: 14, color: checkColor),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      f,
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: featureColor,
+                        height: 1.4,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          if (isNavy || isAmber) ...[
+            const SizedBox(height: 14),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {},
+                style: ElevatedButton.styleFrom(
+                  backgroundColor:
+                      isNavy ? HireIQTheme.primaryTeal : HireIQTheme.amber,
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.circular(HireIQTheme.radiusMd),
+                  ),
+                ),
+                child: Text(
+                  isNavy ? 'Get Started' : 'Contact Sales',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Badge strip
-// ─────────────────────────────────────────────────────────────────────────────
+// ── Recruiter card ─────────────────────────────────────────────────────────────
 
-class _BadgeStrip extends StatelessWidget {
-  const _BadgeStrip({required this.label, required this.accent});
-  final String label;
-  final Color accent;
+class _RecruiterCard extends StatelessWidget {
+  const _RecruiterCard();
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
-        color: accent,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(19),
-          topRight: Radius.circular(19),
-        ),
-      ),
-      child: Text(
-        label,
-        textAlign: TextAlign.center,
-        style: GoogleFonts.inter(
-          fontSize: 12,
-          fontWeight: FontWeight.w700,
-          color: Colors.white,
-          letterSpacing: 0.6,
-        ),
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Feature row
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _FeatureRow extends StatelessWidget {
-  const _FeatureRow({required this.feature, required this.accent});
-  final _Feature feature;
-  final Color accent;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 18,
-            height: 18,
-            margin: const EdgeInsets.only(top: 1),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: accent.withValues(alpha: feature.highlight ? 0.15 : 0.08),
-            ),
-            child: Icon(
-              Icons.check_rounded,
-              size: 11,
-              color: accent,
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              feature.label,
-              style: GoogleFonts.inter(
-                fontSize: 13,
-                fontWeight:
-                    feature.highlight ? FontWeight.w600 : FontWeight.w400,
-                color: feature.highlight
-                    ? HireIQTheme.textPrimary
-                    : HireIQTheme.textSecondary,
-                height: 1.4,
-              ),
-            ),
+        color: HireIQTheme.surfaceWhite,
+        borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
+        border: Border.all(color: HireIQTheme.borderLight),
+        boxShadow: [
+          BoxShadow(
+            color: HireIQTheme.primaryNavy.withValues(alpha: 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 3),
           ),
         ],
       ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Card CTA button
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _CardButton extends StatefulWidget {
-  const _CardButton({
-    required this.label,
-    required this.accent,
-    required this.filled,
-  });
-
-  final String label;
-  final Color accent;
-  final bool filled;
-
-  @override
-  State<_CardButton> createState() => _CardButtonState();
-}
-
-class _CardButtonState extends State<_CardButton>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _press;
-  late final Animation<double> _scale;
-
-  @override
-  void initState() {
-    super.initState();
-    _press = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 80),
-      reverseDuration: const Duration(milliseconds: 200),
-    );
-    _scale = Tween<double>(begin: 1.0, end: 0.97).animate(
-      CurvedAnimation(parent: _press, curve: Curves.easeOut),
-    );
-  }
-
-  @override
-  void dispose() {
-    _press.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: (_) => _press.forward(),
-      onTapUp: (_) {
-        _press.reverse();
-        context.go('/signup');
-      },
-      onTapCancel: () => _press.reverse(),
-      child: ScaleTransition(
-        scale: _scale,
-        child: Container(
-          width: double.infinity,
-          height: 48,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            color: widget.filled ? widget.accent : Colors.transparent,
-            border: widget.filled
-                ? null
-                : Border.all(color: widget.accent, width: 1.5),
-            boxShadow: widget.filled
-                ? [
-                    BoxShadow(
-                      color: widget.accent.withValues(alpha: 0.3),
-                      blurRadius: 14,
-                      offset: const Offset(0, 4),
-                    )
-                  ]
-                : [],
-          ),
-          child: Center(
-            child: Text(
-              widget.label,
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: widget.filled ? Colors.white : widget.accent,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Wide three-column row
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _WideCardRow extends StatelessWidget {
-  const _WideCardRow({required this.plans});
-  final List<_PlanCard> plans;
-
-  @override
-  Widget build(BuildContext context) {
-    return IntrinsicHeight(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: plans.asMap().entries.map((e) {
-          final i = e.key;
-          return Expanded(
-            child: Padding(
-              padding: EdgeInsets.only(
-                left: i == 0 ? 0 : 8,
-                right: i == plans.length - 1 ? 0 : 8,
-              ),
-              child: _PricingCard(plan: e.value),
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Stacked cards (mobile)
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _StackedCards extends StatelessWidget {
-  const _StackedCards({required this.plans});
-  final List<_PlanCard> plans;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: plans
-          .map((p) => Padding(
-                padding: const EdgeInsets.only(bottom: 16),
-                child: _PricingCard(plan: p),
-              ))
-          .toList(),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Recruiter card
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _RecruiterCard extends StatelessWidget {
-  const _RecruiterCard({this.maxWidth = double.infinity});
-  final double maxWidth;
-
-  @override
-  Widget build(BuildContext context) {
-    const accent = HireIQTheme.recruiterAccent;
-
-    return Center(
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: maxWidth),
-        child: Container(
-          decoration: BoxDecoration(
-            color: HireIQTheme.surfaceWhite,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: accent, width: 2),
-            boxShadow: [
-              BoxShadow(
-                color: accent.withValues(alpha: 0.14),
-                blurRadius: 28,
-                offset: const Offset(0, 6),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header strip
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                decoration: const BoxDecoration(
-                  color: accent,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(19),
-                    topRight: Radius.circular(19),
-                  ),
-                ),
-                child: Text(
-                  'Commission Based — No Monthly Fee',
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                    letterSpacing: 0.5,
-                  ),
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Purple left accent bar
+            Container(
+              width: 4,
+              decoration: const BoxDecoration(
+                color: HireIQTheme.recruiterAccent,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(HireIQTheme.radiusLg),
+                  bottomLeft: Radius.circular(HireIQTheme.radiusLg),
                 ),
               ),
-
-              Padding(
-                padding: const EdgeInsets.all(24),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(18),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Recruiter',
-                      style: GoogleFonts.inter(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        color: accent,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Zero upfront cost.',
-                      style: GoogleFonts.inter(
-                        fontSize: 32,
-                        fontWeight: FontWeight.w800,
-                        color: HireIQTheme.textPrimary,
-                        letterSpacing: -0.8,
-                        height: 1.1,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      'You earn when you place. We succeed together.',
-                      style: GoogleFonts.inter(
-                        fontSize: 13,
-                        color: HireIQTheme.textMuted,
-                        height: 1.5,
-                      ),
-                    ),
-
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 20),
-                      child: Divider(
-                          color: HireIQTheme.borderLight, thickness: 1),
-                    ),
-
-                    // Fee tiers
-                    Text(
-                      'Fee Structure',
-                      style: GoogleFonts.inter(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        color: HireIQTheme.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-
-                    const _FeeTierRow(
-                      level: 'Junior roles',
-                      rate: '10%',
-                      accent: accent,
-                    ),
-                    const SizedBox(height: 8),
-                    const _FeeTierRow(
-                      level: 'Mid-level roles',
-                      rate: '12%',
-                      accent: accent,
-                      highlight: true,
-                    ),
-                    const SizedBox(height: 8),
-                    const _FeeTierRow(
-                      level: 'Senior & Specialist',
-                      rate: '15%',
-                      accent: accent,
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // Example calculation
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: accent.withValues(alpha: 0.05),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: accent.withValues(alpha: 0.2),
-                        ),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Icon(
-                                Icons.calculate_outlined,
-                                size: 15,
-                                color: accent,
-                              ),
-                              const SizedBox(width: 6),
                               Text(
-                                'Example calculation',
+                                'Recruiter Platform',
+                                style: GoogleFonts.inter(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  color: HireIQTheme.primaryNavy,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                'Manage briefs, build your CV vault, and earn on placements.',
                                 style: GoogleFonts.inter(
                                   fontSize: 12,
-                                  fontWeight: FontWeight.w700,
-                                  color: accent,
-                                  letterSpacing: 0.3,
+                                  color: HireIQTheme.textMuted,
+                                  height: 1.4,
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 10),
-                          const _ExampleRow(
-                            label: 'Annual salary',
-                            value: 'R300,000',
+                        ),
+                        const SizedBox(width: 12),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              'R499',
+                              style: GoogleFonts.inter(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w800,
+                                color: HireIQTheme.recruiterAccent,
+                                height: 1.0,
+                              ),
+                            ),
+                            Text(
+                              '/month',
+                              style: GoogleFonts.inter(
+                                fontSize: 11,
+                                color: HireIQTheme.textMuted,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Fee table header
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: HireIQTheme.recruiterAccent.withValues(alpha: 0.06),
+                        borderRadius:
+                            BorderRadius.circular(HireIQTheme.radiusMd),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            flex: 2,
+                            child: Text(
+                              'Level',
+                              style: GoogleFonts.inter(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: HireIQTheme.recruiterAccent,
+                              ),
+                            ),
                           ),
-                          const SizedBox(height: 4),
-                          const _ExampleRow(
-                            label: 'Commission rate',
-                            value: '12% (mid-level)',
+                          Expanded(
+                            child: Text(
+                              'Fee %',
+                              style: GoogleFonts.inter(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: HireIQTheme.recruiterAccent,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            child: Divider(
-                                color: accent.withValues(alpha: 0.2),
-                                thickness: 1),
-                          ),
-                          const _ExampleRow(
-                            label: 'Your fee',
-                            value: 'R36,000',
-                            bold: true,
-                            valueColor: accent,
+                          Expanded(
+                            flex: 2,
+                            child: Text(
+                              'Avg. Placement',
+                              style: GoogleFonts.inter(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: HireIQTheme.recruiterAccent,
+                              ),
+                              textAlign: TextAlign.right,
+                            ),
                           ),
                         ],
                       ),
                     ),
 
-                    const SizedBox(height: 8),
-                    Text(
-                      'Calculated on candidate\'s first year annual salary.',
-                      style: GoogleFonts.inter(
-                        fontSize: 11,
-                        color: HireIQTheme.textLight,
-                      ),
+                    const SizedBox(height: 4),
+
+                    const _FeeTierRow(
+                      level: 'Junior',
+                      fee: '10%',
+                      placement: 'R20,000',
+                      isShaded: false,
                     ),
-
-                    const SizedBox(height: 24),
-
-                    const _CardButton(
-                      label: 'Get Started',
-                      accent: accent,
-                      filled: true,
+                    const _FeeTierRow(
+                      level: 'Mid-level',
+                      fee: '12%',
+                      placement: 'R36,000',
+                      isShaded: true,
+                    ),
+                    const _FeeTierRow(
+                      level: 'Senior',
+                      fee: '15%',
+                      placement: 'R75,000',
+                      isShaded: false,
                     ),
                   ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Fee tier row
-// ─────────────────────────────────────────────────────────────────────────────
-
 class _FeeTierRow extends StatelessWidget {
   const _FeeTierRow({
     required this.level,
-    required this.rate,
-    required this.accent,
-    this.highlight = false,
+    required this.fee,
+    required this.placement,
+    required this.isShaded,
   });
 
   final String level;
-  final String rate;
-  final Color accent;
-  final bool highlight;
+  final String fee;
+  final String placement;
+  final bool isShaded;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
       decoration: BoxDecoration(
-        color: highlight
-            ? accent.withValues(alpha: 0.08)
-            : HireIQTheme.backgroundLight,
-        borderRadius: BorderRadius.circular(10),
-        border: highlight
-            ? Border.all(color: accent.withValues(alpha: 0.25))
-            : null,
+        color: isShaded ? HireIQTheme.background : HireIQTheme.surfaceWhite,
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
         children: [
           Expanded(
+            flex: 2,
             child: Text(
               level,
               style: GoogleFonts.inter(
                 fontSize: 13,
-                fontWeight:
-                    highlight ? FontWeight.w600 : FontWeight.w400,
-                color: highlight
-                    ? HireIQTheme.textPrimary
-                    : HireIQTheme.textSecondary,
+                color: HireIQTheme.textPrimary,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ),
-          Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-              color: accent.withValues(alpha: highlight ? 0.15 : 0.08),
-              borderRadius: BorderRadius.circular(20),
-            ),
+          Expanded(
             child: Text(
-              rate,
+              fee,
               style: GoogleFonts.inter(
                 fontSize: 13,
+                color: HireIQTheme.recruiterAccent,
                 fontWeight: FontWeight.w700,
-                color: accent,
               ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: Text(
+              placement,
+              style: GoogleFonts.inter(
+                fontSize: 13,
+                color: HireIQTheme.textSecondary,
+                fontWeight: FontWeight.w500,
+              ),
+              textAlign: TextAlign.right,
             ),
           ),
         ],
@@ -1142,45 +839,108 @@ class _FeeTierRow extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Example row
-// ─────────────────────────────────────────────────────────────────────────────
+// ── FAQ accordion ──────────────────────────────────────────────────────────────
 
-class _ExampleRow extends StatelessWidget {
-  const _ExampleRow({
-    required this.label,
-    required this.value,
-    this.bold = false,
-    this.valueColor,
+const _faqs = <(String, String)>[
+  (
+    'Can I switch plans at any time?',
+    'Yes, you can upgrade or downgrade your plan at any time. Changes take effect at the start of your next billing cycle. There are no penalties for switching.'
+  ),
+  (
+    'Is there a free trial for paid plans?',
+    "All paid plans include a 14-day free trial. No credit card required to start. You'll only be billed after your trial period ends."
+  ),
+  (
+    'How do recruiter placement fees work?',
+    "Recruiters pay a monthly platform fee of R499. When a successful placement is made, a percentage fee is charged on the candidate's first-month salary based on role level: 10% for Junior, 12% for Mid-level, and 15% for Senior placements."
+  ),
+  (
+    'What payment methods are accepted?',
+    'We accept all major credit and debit cards (Visa, Mastercard), EFT, and instant EFT via PayFast. Enterprise customers can arrange invoice-based billing.'
+  ),
+];
+
+class _FaqAccordion extends StatelessWidget {
+  const _FaqAccordion({
+    required this.expandedIndex,
+    required this.onToggle,
   });
 
-  final String label;
-  final String value;
-  final bool bold;
-  final Color? valueColor;
+  final int? expandedIndex;
+  final ValueChanged<int> onToggle;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: GoogleFonts.inter(
-            fontSize: 13,
-            color: HireIQTheme.textMuted,
-            fontWeight: bold ? FontWeight.w600 : FontWeight.w400,
+    return Column(
+      children: List.generate(_faqs.length, (i) {
+        final isOpen = expandedIndex == i;
+        return GestureDetector(
+          onTap: () => onToggle(i),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 220),
+            curve: Curves.easeInOut,
+            margin: const EdgeInsets.only(bottom: 8),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: HireIQTheme.surfaceWhite,
+              borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
+              border: Border.all(
+                color: isOpen
+                    ? HireIQTheme.primaryTeal.withValues(alpha: 0.4)
+                    : HireIQTheme.borderLight,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: HireIQTheme.primaryNavy.withValues(alpha: 0.04),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        _faqs[i].$1,
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: HireIQTheme.primaryNavy,
+                          height: 1.4,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    AnimatedRotation(
+                      turns: isOpen ? 0.5 : 0,
+                      duration: const Duration(milliseconds: 220),
+                      child: const Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        color: HireIQTheme.textMuted,
+                        size: 22,
+                      ),
+                    ),
+                  ],
+                ),
+                if (isOpen) ...[
+                  const SizedBox(height: 10),
+                  Text(
+                    _faqs[i].$2,
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      color: HireIQTheme.textMuted,
+                      height: 1.55,
+                    ),
+                  ),
+                ],
+              ],
+            ),
           ),
-        ),
-        Text(
-          value,
-          style: GoogleFonts.inter(
-            fontSize: 13,
-            fontWeight: bold ? FontWeight.w700 : FontWeight.w500,
-            color: valueColor ?? HireIQTheme.textPrimary,
-          ),
-        ),
-      ],
+        );
+      }),
     );
   }
 }
