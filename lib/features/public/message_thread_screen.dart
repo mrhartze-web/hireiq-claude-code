@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../shared/theme.dart';
 
 class MessageThreadScreen extends StatelessWidget {
@@ -10,29 +11,40 @@ class MessageThreadScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: HireIQTheme.background,
       appBar: AppBar(
+        backgroundColor: HireIQTheme.primaryNavy,
+        foregroundColor: Colors.white,
         titleSpacing: 0,
         title: Row(
           children: [
             CircleAvatar(
               radius: 18,
-              backgroundColor: HireIQTheme.primaryNavy.withAlpha(25),
-              child: const Text('A',
-                  style: TextStyle(
-                      color: HireIQTheme.primaryNavy,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold)),
+              backgroundColor: Colors.white.withValues(alpha: 0.15),
+              child: Text(
+                'A',
+                style: GoogleFonts.inter(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold),
+              ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 10),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Apex Digital',
-                    style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-                Text('Online',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: HireIQTheme.success,
-                        fontWeight: FontWeight.w500)),
+                Text(
+                  'Apex Digital',
+                  style: GoogleFonts.inter(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white),
+                ),
+                Text(
+                  'Online',
+                  style: GoogleFonts.inter(
+                      fontSize: 12,
+                      color: HireIQTheme.primaryTeal,
+                      fontWeight: FontWeight.w500),
+                ),
               ],
             ),
           ],
@@ -40,12 +52,10 @@ class MessageThreadScreen extends StatelessWidget {
         actions: [
           IconButton(
               onPressed: () {},
-              icon: const Icon(Icons.videocam_outlined,
-                  color: HireIQTheme.primaryNavy)),
+              icon: const Icon(Icons.videocam_outlined, color: Colors.white)),
           IconButton(
               onPressed: () {},
-              icon: const Icon(Icons.info_outline,
-                  color: HireIQTheme.primaryNavy)),
+              icon: const Icon(Icons.info_outline, color: Colors.white)),
         ],
       ),
       body: Column(
@@ -75,7 +85,7 @@ class MessageThreadScreen extends StatelessWidget {
                 ),
                 _buildMessage(
                   context,
-                  "Great! I'll send the Google Meet link shortly. Looking forward to chatting! 🎉",
+                  "Great! I'll send the Google Meet link shortly. Looking forward to chatting!",
                   false,
                   '10:06 AM',
                 ),
@@ -90,17 +100,17 @@ class MessageThreadScreen extends StatelessWidget {
 
   Widget _buildDateTag(String date) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 24),
+      padding: const EdgeInsets.symmetric(vertical: 20),
       child: Center(
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
           decoration: BoxDecoration(
-            color: HireIQTheme.borderLight.withAlpha(127),
-            borderRadius: BorderRadius.circular(20),
+            color: HireIQTheme.borderLight.withValues(alpha: 0.5),
+            borderRadius: BorderRadius.circular(HireIQTheme.radiusFull),
           ),
           child: Text(
             date,
-            style: const TextStyle(
+            style: GoogleFonts.inter(
                 fontSize: 12,
                 color: HireIQTheme.textMuted,
                 fontWeight: FontWeight.w500),
@@ -130,8 +140,8 @@ class MessageThreadScreen extends StatelessWidget {
           boxShadow: [
             if (!isMe)
               BoxShadow(
-                color: Colors.black.withAlpha(12),
-                blurRadius: 5,
+                color: HireIQTheme.primaryNavy.withValues(alpha: 0.06),
+                blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
           ],
@@ -141,17 +151,19 @@ class MessageThreadScreen extends StatelessWidget {
           children: [
             Text(
               text,
-              style: TextStyle(
+              style: GoogleFonts.inter(
                 color: isMe ? Colors.white : HireIQTheme.textPrimary,
-                fontSize: 15,
-                height: 1.4,
+                fontSize: 14,
+                height: 1.5,
               ),
             ),
             const SizedBox(height: 4),
             Text(
               time,
-              style: TextStyle(
-                color: isMe ? Colors.white70 : HireIQTheme.textMuted,
+              style: GoogleFonts.inter(
+                color: isMe
+                    ? Colors.white.withValues(alpha: 0.6)
+                    : HireIQTheme.textMuted,
                 fontSize: 10,
               ),
             ),
@@ -179,13 +191,17 @@ class MessageThreadScreen extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
                   color: HireIQTheme.background,
-                  borderRadius: BorderRadius.circular(24),
+                  borderRadius: BorderRadius.circular(HireIQTheme.radiusFull),
+                  border: Border.all(color: HireIQTheme.borderLight),
                 ),
-                child: const TextField(
+                child: TextField(
+                  style: GoogleFonts.inter(
+                      fontSize: 14, color: HireIQTheme.textPrimary),
                   decoration: InputDecoration(
                     hintText: 'Type a message...',
                     border: InputBorder.none,
-                    hintStyle: TextStyle(color: HireIQTheme.textMuted),
+                    hintStyle: GoogleFonts.inter(
+                        color: HireIQTheme.textMuted, fontSize: 14),
                   ),
                 ),
               ),

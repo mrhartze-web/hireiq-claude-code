@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../shared/theme.dart';
 
 class MessagesScreen extends StatelessWidget {
@@ -48,15 +49,22 @@ class MessagesScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: HireIQTheme.background,
       appBar: AppBar(
-        title: const Text('Messages'),
+        backgroundColor: HireIQTheme.primaryNavy,
+        foregroundColor: Colors.white,
+        centerTitle: true,
+        title: Text(
+          'Messages',
+          style: GoogleFonts.inter(
+              fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white),
+        ),
         actions: [
           IconButton(
             onPressed: () {},
-            icon: const Icon(Icons.search, color: HireIQTheme.primaryNavy),
+            icon: const Icon(Icons.search, color: Colors.white),
           ),
           IconButton(
             onPressed: () {},
-            icon: const Icon(Icons.more_vert, color: HireIQTheme.primaryNavy),
+            icon: const Icon(Icons.more_vert, color: Colors.white),
           ),
         ],
       ),
@@ -77,78 +85,95 @@ class MessagesScreen extends StatelessWidget {
   }
 
   Widget _buildChatTile(BuildContext context, Map<String, String> chat) {
-    bool isUnread = chat['unread'] != '0';
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      leading: Stack(
-        children: [
-          CircleAvatar(
-            radius: 28,
-            backgroundColor: HireIQTheme.primaryNavy.withAlpha(25),
-            child: Text(
-              chat['name']![0],
-              style: const TextStyle(
-                color: HireIQTheme.primaryNavy,
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-              ),
-            ),
-          ),
-          if (isUnread)
-            Positioned(
-              right: 0,
-              bottom: 0,
-              child: Container(
-                width: 14,
-                height: 14,
-                decoration: BoxDecoration(
-                  color: HireIQTheme.success,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 2),
+    final bool isUnread = chat['unread'] != '0';
+    return InkWell(
+      onTap: () => context.push('/messages/${chat['id']}'),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            Stack(
+              children: [
+                CircleAvatar(
+                  radius: 28,
+                  backgroundColor:
+                      HireIQTheme.primaryNavy.withValues(alpha: 0.1),
+                  child: Text(
+                    chat['name']![0],
+                    style: GoogleFonts.inter(
+                      color: HireIQTheme.primaryNavy,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
                 ),
+                if (isUnread)
+                  Positioned(
+                    right: 0,
+                    bottom: 0,
+                    child: Container(
+                      width: 14,
+                      height: 14,
+                      decoration: BoxDecoration(
+                        color: HireIQTheme.success,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 2),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        chat['name']!,
+                        style: GoogleFonts.inter(
+                          fontWeight:
+                              isUnread ? FontWeight.bold : FontWeight.w600,
+                          fontSize: 15,
+                          color: HireIQTheme.primaryNavy,
+                        ),
+                      ),
+                      Text(
+                        chat['time']!,
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: isUnread
+                              ? HireIQTheme.primaryTeal
+                              : HireIQTheme.textMuted,
+                          fontWeight: isUnread
+                              ? FontWeight.bold
+                              : FontWeight.normal,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    chat['message']!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      color: isUnread
+                          ? HireIQTheme.textPrimary
+                          : HireIQTheme.textMuted,
+                      fontWeight:
+                          isUnread ? FontWeight.w500 : FontWeight.normal,
+                    ),
+                  ),
+                ],
               ),
             ),
-        ],
-      ),
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            chat['name']!,
-            style: TextStyle(
-              fontWeight: isUnread ? FontWeight.bold : FontWeight.w600,
-              fontSize: 16,
-              color: HireIQTheme.textPrimary,
-            ),
-          ),
-          Text(
-            chat['time']!,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: isUnread
-                      ? HireIQTheme.primaryTeal
-                      : HireIQTheme.textMuted,
-                  fontWeight: isUnread ? FontWeight.bold : FontWeight.normal,
-                ),
-          ),
-        ],
-      ),
-      subtitle: Padding(
-        padding: const EdgeInsets.only(top: 4.0),
-        child: Text(
-          chat['message']!,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color:
-                    isUnread ? HireIQTheme.textPrimary : HireIQTheme.textMuted,
-                fontWeight: isUnread ? FontWeight.w500 : FontWeight.normal,
-              ),
+          ],
         ),
       ),
-      onTap: () {
-        // Use the constant if it existed, but since we are updating it:
-        context.push('/messages/${chat['id']}');
-      },
     );
   }
 }
