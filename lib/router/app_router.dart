@@ -193,7 +193,11 @@ final routerProvider = Provider<GoRouter>((ref) {
           builder: (context, state) => const LoginScreen()),
       GoRoute(
           path: MobileRoutes.signup,
-          builder: (context, state) => const SignupScreen()),
+          builder: (context, state) {
+            final extra = state.extra as Map<String, dynamic>?;
+            final role = extra?['role'] as String?;
+            return SignupScreen(initialRole: role);
+          }),
       GoRoute(
           path: MobileRoutes.emailVerification,
           builder: (context, state) => const EmailVerificationScreen()),

@@ -19,22 +19,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   late final Animation<double> _logoFade;
   late final Animation<double> _logoScale;
 
-  // Tagline entrance
-  late final AnimationController _taglineController;
-  late final Animation<double> _taglineFade;
-  late final Animation<Offset> _taglineSlide;
-
-  // Pulsing ring
-  late final AnimationController _pulseController;
-  late final Animation<double> _pulseScale;
-  late final Animation<double> _pulseOpacity;
-
-  // Dot loader
-  late final AnimationController _dotController;
-
-  // Exit fade
-  late final AnimationController _exitController;
-  late final Animation<double> _exitFade;
+  // Progress bar (2.5 s)
+  late final AnimationController _progressController;
 
   @override
   void initState() {
@@ -45,139 +31,88 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       statusBarIconBrightness: Brightness.light,
     ));
 
-    // ── Logo ────────────────────────────────────────────────────────────────
     _logoController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 900),
+      duration: const Duration(milliseconds: 800),
     );
-    _logoFade = CurvedAnimation(parent: _logoController, curve: Curves.easeOut);
-    _logoScale = Tween<double>(begin: 0.72, end: 1.0).animate(
+    _logoFade =
+        CurvedAnimation(parent: _logoController, curve: Curves.easeOut);
+    _logoScale = Tween<double>(begin: 0.80, end: 1.0).animate(
       CurvedAnimation(parent: _logoController, curve: Curves.easeOutBack),
     );
 
-    // ── Tagline ─────────────────────────────────────────────────────────────
-    _taglineController = AnimationController(
+    _progressController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 700),
-    );
-    _taglineFade =
-        CurvedAnimation(parent: _taglineController, curve: Curves.easeOut);
-    _taglineSlide = Tween<Offset>(
-      begin: const Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(
-        CurvedAnimation(parent: _taglineController, curve: Curves.easeOut));
-
-    // ── Pulse ring ──────────────────────────────────────────────────────────
-    _pulseController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1400),
-    )..repeat();
-    _pulseScale = Tween<double>(begin: 1.0, end: 1.55).animate(
-      CurvedAnimation(parent: _pulseController, curve: Curves.easeOut),
-    );
-    _pulseOpacity = Tween<double>(begin: 0.55, end: 0.0).animate(
-      CurvedAnimation(parent: _pulseController, curve: Curves.easeOut),
-    );
-
-    // ── Dot loader ──────────────────────────────────────────────────────────
-    _dotController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1200),
-    )..repeat();
-
-    // ── Exit ────────────────────────────────────────────────────────────────
-    _exitController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 400),
-    );
-    _exitFade = Tween<double>(begin: 1.0, end: 0.0).animate(
-      CurvedAnimation(parent: _exitController, curve: Curves.easeIn),
+      duration: const Duration(milliseconds: 2500),
     );
 
     _runSequence();
   }
 
   Future<void> _runSequence() async {
-    await Future.delayed(const Duration(milliseconds: 150));
+    await Future.delayed(const Duration(milliseconds: 200));
     _logoController.forward();
+    _progressController.forward();
 
-    await Future.delayed(const Duration(milliseconds: 450));
-    _taglineController.forward();
-
-    await Future.delayed(const Duration(milliseconds: 2000));
-    if (!mounted) return;
-
-    await _exitController.forward();
+    await Future.delayed(const Duration(milliseconds: 3000));
     if (mounted) context.go('/onboarding');
   }
 
   @override
   void dispose() {
     _logoController.dispose();
-    _taglineController.dispose();
-    _pulseController.dispose();
-    _dotController.dispose();
-    _exitController.dispose();
+    _progressController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return FadeTransition(
-      opacity: _exitFade,
-      child: Scaffold(
-        backgroundColor: HireIQTheme.primaryNavy,
-        body: Stack(
+    return Scaffold(
+      backgroundColor: HireIQTheme.primaryNavy,
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              HireIQTheme.primaryNavy,
+              Color(0xFF0D9488),
+            ],
+          ),
+        ),
+        child: Stack(
           children: [
-            // ── Background radial glow ─────────────────────────────────────
-            Positioned.fill(
-              child: CustomPaint(painter: _BackgroundPainter()),
-            ),
-
-            // ── Main content ──────────────────────────────────────────────
+            // ── Centre logo + wordmark + tagline ────────────────────────────
             Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Logo mark with pulse
-                  _LogoMark(
-                    fadeAnimation: _logoFade,
-                    scaleAnimation: _logoScale,
-                    pulseScale: _pulseScale,
-                    pulseOpacity: _pulseOpacity,
-                  ),
-
-                  const SizedBox(height: 28),
-
-                  // Wordmark
+                  // Neural-network logo mark
                   FadeTransition(
                     opacity: _logoFade,
                     child: ScaleTransition(
                       scale: _logoScale,
-                      child: RichText(
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                              text: 'Hire',
-                              style: GoogleFonts.inter(
-                                fontSize: 44,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.white,
-                                letterSpacing: -1.0,
-                              ),
-                            ),
-                            TextSpan(
-                              text: 'IQ',
-                              style: GoogleFonts.inter(
-                                fontSize: 44,
-                                fontWeight: FontWeight.w800,
-                                color: HireIQTheme.primaryTeal,
-                                letterSpacing: -1.0,
-                              ),
-                            ),
-                          ],
-                        ),
+                      child: const SizedBox(
+                        width: 80,
+                        height: 80,
+                        child: CustomPaint(painter: _NeuralNetPainter()),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // Wordmark — all white, no colour split
+                  FadeTransition(
+                    opacity: _logoFade,
+                    child: Text(
+                      'HireIQ',
+                      style: GoogleFonts.inter(
+                        fontSize: 36,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
                       ),
                     ),
                   ),
@@ -185,49 +120,65 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                   const SizedBox(height: 12),
 
                   // Tagline
-                  SlideTransition(
-                    position: _taglineSlide,
-                    child: FadeTransition(
-                      opacity: _taglineFade,
-                      child: Text(
-                        'Hire Smarter. Work Better.',
-                        style: GoogleFonts.inter(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w400,
-                          color: Colors.white.withValues(alpha: 0.55),
-                          letterSpacing: 0.3,
-                        ),
+                  FadeTransition(
+                    opacity: _logoFade,
+                    child: Text(
+                      'Intelligence that finds talent others miss.',
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.white.withValues(alpha: 0.6),
                       ),
                     ),
-                  ),
-
-                  const SizedBox(height: 64),
-
-                  // Dot loader
-                  FadeTransition(
-                    opacity: _taglineFade,
-                    child: _DotLoader(controller: _dotController),
                   ),
                 ],
               ),
             ),
 
-            // ── Bottom brand strip ────────────────────────────────────────
+            // ── Progress bar at ~75% down ────────────────────────────────────
             Positioned(
-              bottom: 40,
+              top: MediaQuery.of(context).size.height * 0.75,
               left: 0,
               right: 0,
-              child: FadeTransition(
-                opacity: _taglineFade,
-                child: Text(
-                  'Powered by AI · Built for Africa',
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.white.withValues(alpha: 0.25),
-                    letterSpacing: 0.8,
+              child: Center(
+                child: SizedBox(
+                  width: 120,
+                  height: 2,
+                  child: AnimatedBuilder(
+                    animation: _progressController,
+                    builder: (_, __) => Stack(
+                      children: [
+                        // Track
+                        Container(
+                          width: 120,
+                          height: 2,
+                          color: Colors.white.withValues(alpha: 0.15),
+                        ),
+                        // Animated fill
+                        Container(
+                          width: 120 * _progressController.value,
+                          height: 2,
+                          color:
+                              const Color(0xFF0D9488).withValues(alpha: 0.7),
+                        ),
+                      ],
+                    ),
                   ),
+                ),
+              ),
+            ),
+
+            // ── Version label ────────────────────────────────────────────────
+            Positioned(
+              bottom: 32,
+              left: 0,
+              right: 0,
+              child: Text(
+                'v1.0.0',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  color: Colors.white.withValues(alpha: 0.3),
                 ),
               ),
             ),
@@ -238,197 +189,45 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   }
 }
 
-// ── Logo mark widget ──────────────────────────────────────────────────────────
+// ── Neural-network custom painter ─────────────────────────────────────────────
 
-class _LogoMark extends StatelessWidget {
-  const _LogoMark({
-    required this.fadeAnimation,
-    required this.scaleAnimation,
-    required this.pulseScale,
-    required this.pulseOpacity,
-  });
+class _NeuralNetPainter extends CustomPainter {
+  const _NeuralNetPainter();
 
-  final Animation<double> fadeAnimation;
-  final Animation<double> scaleAnimation;
-  final Animation<double> pulseScale;
-  final Animation<double> pulseOpacity;
-
-  @override
-  Widget build(BuildContext context) {
-    return FadeTransition(
-      opacity: fadeAnimation,
-      child: ScaleTransition(
-        scale: scaleAnimation,
-        child: SizedBox(
-          width: 120,
-          height: 120,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              // Outer pulse ring
-              AnimatedBuilder(
-                animation: pulseScale,
-                builder: (_, __) => Transform.scale(
-                  scale: pulseScale.value,
-                  child: Opacity(
-                    opacity: pulseOpacity.value,
-                    child: Container(
-                      width: 100,
-                      height: 100,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: HireIQTheme.primaryTeal,
-                          width: 2.5,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-
-              // Inner glow
-              Container(
-                width: 88,
-                height: 88,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: HireIQTheme.primaryTeal.withValues(alpha: 0.12),
-                  border: Border.all(
-                    color: HireIQTheme.primaryTeal.withValues(alpha: 0.35),
-                    width: 1.5,
-                  ),
-                ),
-              ),
-
-              // Icon container
-              Container(
-                width: 72,
-                height: 72,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      HireIQTheme.primaryTeal,
-                      HireIQTheme.primaryTeal.withValues(alpha: 0.75),
-                    ],
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: HireIQTheme.primaryTeal.withValues(alpha: 0.45),
-                      blurRadius: 24,
-                      spreadRadius: 2,
-                    ),
-                  ],
-                ),
-                child: const Icon(
-                  Icons.bolt_rounded,
-                  color: Colors.white,
-                  size: 36,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ── Three-dot loader ──────────────────────────────────────────────────────────
-
-class _DotLoader extends StatelessWidget {
-  const _DotLoader({required this.controller});
-
-  final AnimationController controller;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: List.generate(3, (i) {
-        final delay = i / 3;
-        final animation = TweenSequence<double>([
-          TweenSequenceItem(
-              tween: Tween(begin: 0.35, end: 1.0)
-                  .chain(CurveTween(curve: Curves.easeOut)),
-              weight: 30),
-          TweenSequenceItem(
-              tween: Tween(begin: 1.0, end: 0.35)
-                  .chain(CurveTween(curve: Curves.easeIn)),
-              weight: 30),
-          TweenSequenceItem(
-              tween: ConstantTween(0.35),
-              weight: 40),
-        ]).animate(
-          CurvedAnimation(
-            parent: controller,
-            curve: Interval(delay, (delay + 0.6).clamp(0.0, 1.0)),
-          ),
-        );
-
-        return AnimatedBuilder(
-          animation: animation,
-          builder: (_, __) => Container(
-            margin: const EdgeInsets.symmetric(horizontal: 4),
-            width: 7,
-            height: 7,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: HireIQTheme.primaryTeal.withValues(alpha: animation.value),
-            ),
-          ),
-        );
-      }),
-    );
-  }
-}
-
-// ── Background painter ────────────────────────────────────────────────────────
-
-class _BackgroundPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    // Top-centre radial glow
-    final topGlow = Paint()
-      ..shader = RadialGradient(
-        colors: [
-          const Color(0xFF0D9488).withValues(alpha: 0.18),
-          Colors.transparent,
-        ],
-        stops: const [0.0, 1.0],
-      ).createShader(
-        Rect.fromCircle(
-          center: Offset(size.width / 2, size.height * 0.28),
-          radius: size.width * 0.72,
-        ),
-      );
-    canvas.drawCircle(
-      Offset(size.width / 2, size.height * 0.28),
-      size.width * 0.72,
-      topGlow,
-    );
+    final linePaint = Paint()
+      ..color = const Color(0xFF0D9488)
+      ..strokeWidth = 1.5
+      ..style = PaintingStyle.stroke;
 
-    // Bottom-right accent glow
-    final bottomGlow = Paint()
-      ..shader = RadialGradient(
-        colors: [
-          const Color(0xFF0D9488).withValues(alpha: 0.10),
-          Colors.transparent,
-        ],
-      ).createShader(
-        Rect.fromCircle(
-          center: Offset(size.width * 0.85, size.height * 0.82),
-          radius: size.width * 0.5,
-        ),
-      );
-    canvas.drawCircle(
-      Offset(size.width * 0.85, size.height * 0.82),
-      size.width * 0.5,
-      bottomGlow,
-    );
+    final dotPaint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.fill;
+
+    // Left column (x ≈ 35%) — three rows at 35 %, 50 %, 65 % of height
+    final tl = Offset(size.width * 0.35, size.height * 0.35);
+    final ml = Offset(size.width * 0.35, size.height * 0.50);
+    final bl = Offset(size.width * 0.35, size.height * 0.65);
+
+    // Right column (x ≈ 65%)
+    final tr = Offset(size.width * 0.65, size.height * 0.35);
+    final mr = Offset(size.width * 0.65, size.height * 0.50);
+    final br = Offset(size.width * 0.65, size.height * 0.65);
+
+    // Fully-connected bipartite graph — 9 cross-connections.
+    // The diagonals (tl→br, bl→tr) cross through the centre, producing
+    // the hourglass/diamond network pattern described in the design spec.
+    for (final left in [tl, ml, bl]) {
+      for (final right in [tr, mr, br]) {
+        canvas.drawLine(left, right, linePaint);
+      }
+    }
+
+    // Draw dots on top of lines so they are always visible
+    for (final dot in [tl, ml, bl, tr, mr, br]) {
+      canvas.drawCircle(dot, 4.0, dotPaint);
+    }
   }
 
   @override

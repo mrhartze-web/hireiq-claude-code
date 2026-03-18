@@ -1,12 +1,16 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../shared/theme.dart';
 import '../../providers/auth_provider.dart';
+import '../mobile_screens.dart';
 
 class SignupScreen extends ConsumerStatefulWidget {
-  const SignupScreen({super.key});
+  const SignupScreen({super.key, this.initialRole});
+
+  final String? initialRole;
 
   @override
   ConsumerState<SignupScreen> createState() => _SignupScreenState();
@@ -16,9 +20,18 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  String _selectedRole = 'candidate';
+  late String _selectedRole;
   bool _isLoading = false;
   String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    const validRoles = {'candidate', 'employer', 'recruiter'};
+    final incoming = widget.initialRole;
+    _selectedRole =
+        (incoming != null && validRoles.contains(incoming)) ? incoming : 'candidate';
+  }
 
   @override
   void dispose() {
@@ -43,9 +56,34 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
         displayName: _nameController.text.trim(),
         role: _selectedRole,
       );
-      if (mounted) context.go('/onboarding');
+      if (mounted) {
+        switch (_selectedRole) {
+          case 'employer':
+            context.go(MobileRoutes.employerDashboard);
+          case 'recruiter':
+            context.go(MobileRoutes.recruiterDashboard);
+          default:
+            context.go(MobileRoutes.candidateDashboard);
+        }
+      }
     } catch (e) {
-      setState(() => _error = 'Sign up failed. Please try again.');
+      String message = 'Sign up failed. Please try again.';
+      if (e is FirebaseAuthException) {
+        switch (e.code) {
+          case 'email-already-in-use':
+            message = 'This email is already registered. Please sign in instead.';
+            break;
+          case 'weak-password':
+            message = 'Password must be at least 6 characters.';
+            break;
+          case 'invalid-email':
+            message = 'Please enter a valid email address.';
+            break;
+          default:
+            message = e.message ?? 'Sign up failed. Please try again.';
+        }
+      }
+      setState(() => _error = message);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
