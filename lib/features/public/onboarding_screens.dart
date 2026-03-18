@@ -52,14 +52,14 @@ const _slides = [
 
 // ── Screen ────────────────────────────────────────────────────────────────────
 
-class OnboardingScreen extends StatefulWidget {
-  const OnboardingScreen({super.key});
+class CandidateOnboardingFlow extends StatefulWidget {
+  const CandidateOnboardingFlow({super.key});
 
   @override
-  State<OnboardingScreen> createState() => _OnboardingScreenState();
+  State<CandidateOnboardingFlow> createState() => _CandidateOnboardingFlowState();
 }
 
-class _OnboardingScreenState extends State<OnboardingScreen> {
+class _CandidateOnboardingFlowState extends State<CandidateOnboardingFlow> {
   final _pageController = PageController();
   int _currentPage = 0;
 
@@ -85,11 +85,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         curve: Curves.easeInOut,
       );
     } else {
-      context.go('/role-selection');
+      context.go('/candidate');
     }
   }
 
-  void _skip() => context.go('/role-selection');
+  void _skip() => context.go('/candidate');
 
   @override
   Widget build(BuildContext context) {
@@ -210,7 +210,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         ),
                       ),
                       child: Text(
-                        isLast ? 'Get Started' : 'Next',
+                        isLast ? 'Complete Profile' : 'Next',
                         style: GoogleFonts.inter(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,

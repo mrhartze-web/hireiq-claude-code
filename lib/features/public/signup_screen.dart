@@ -66,7 +66,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
           case 'recruiter':
             context.go(MobileRoutes.recruiterDashboard);
           default:
-            context.go(MobileRoutes.candidateOnboardingWelcome);
+            context.go('/candidate-onboarding');
         }
       }
     } catch (e) {

@@ -63,8 +63,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     final currentUser = FirebaseAuth.instance.currentUser;
 
     if (currentUser == null) {
-      // No signed-in user → show onboarding intro
-      context.go('/onboarding');
+      // No signed-in user → show welcome gateway
+      context.go('/welcome');
       return;
     }
 

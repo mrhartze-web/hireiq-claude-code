@@ -9,6 +9,7 @@ import '../shared/navigation/role_navigation_bar.dart';
 
 // Import Public & Common Screens
 import '../features/public/splash_screen.dart';
+import '../features/public/welcome_screen.dart';
 import '../features/public/login_screen.dart';
 import '../features/public/signup_screen.dart';
 import '../features/public/email_verification_screen.dart';
@@ -130,11 +131,13 @@ final routerProvider = Provider<GoRouter>((ref) {
       // ── Routes that never require authentication ───────────────────────────
       const publicRoutes = {
         '/',                         // splash
-        '/onboarding',
+        '/welcome',
+        '/onboarding',               // backwards compat → redirects to /welcome
         '/login',
         '/signup',
         '/forgot-password',
         '/role-selection',
+        '/candidate-onboarding',
         '/email-verification',
         '/auth-loading',
         '/password-reset-success',
@@ -163,9 +166,9 @@ final routerProvider = Provider<GoRouter>((ref) {
           path.startsWith('/thundafund') ||
           path.startsWith('/web/');
 
-      // ── Guard: unauthenticated user → /login ─────────────────────────────
+      // ── Guard: unauthenticated user → /welcome ───────────────────────────
       if (!isAuth && (isProtectedPath || !isPublicRoute)) {
-        return '/login';
+        return '/welcome';
       }
 
       // ── Authenticated user on auth/onboarding screens → role dashboard ───
@@ -173,6 +176,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       // direct URL navigation and post-auth screen returns.
       if (isAuth) {
         final onAuthScreen = path == '/' ||
+            path == '/welcome' ||
             path == '/onboarding' ||
             path == '/login' ||
             path == '/signup' ||
@@ -211,8 +215,14 @@ final routerProvider = Provider<GoRouter>((ref) {
           path: MobileRoutes.splash,
           builder: (context, state) => const SplashScreen()),
       GoRoute(
+          path: '/welcome',
+          builder: (context, state) => const WelcomeScreen()),
+      GoRoute(
           path: '/onboarding',
-          builder: (context, state) => const OnboardingScreen()),
+          redirect: (context, state) => '/welcome'),
+      GoRoute(
+          path: '/candidate-onboarding',
+          builder: (context, state) => const CandidateOnboardingFlow()),
       GoRoute(
           path: MobileRoutes.login,
           builder: (context, state) => const LoginScreen()),
