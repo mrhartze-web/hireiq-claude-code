@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -7,46 +5,6 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../shared/theme.dart';
 import '../mobile_screens.dart';
-
-// ── Slide data ────────────────────────────────────────────────────────────────
-
-class _Slide {
-  const _Slide({
-    required this.title,
-    required this.subtitle,
-    required this.accent,
-    required this.iconPainter,
-  });
-
-  final String title;
-  final String subtitle;
-  final Color accent;
-  final CustomPainter iconPainter;
-}
-
-const _slides = <_Slide>[
-  _Slide(
-    title: 'Find Your\nPerfect Match',
-    subtitle:
-        'AI-powered job matching that understands your skills, experience, and ambitions.',
-    accent: HireIQTheme.primaryTeal,
-    iconPainter: _PersonStarPainter(color: HireIQTheme.primaryTeal),
-  ),
-  _Slide(
-    title: 'Hire With\nIntelligence',
-    subtitle:
-        'MatchIQ and WildcardIQ find candidates others miss. Reduce bias, improve retention.',
-    accent: HireIQTheme.primaryNavy,
-    iconPainter: _BriefcaseLightningPainter(color: HireIQTheme.primaryNavy),
-  ),
-  _Slide(
-    title: 'Place With\nConfidence',
-    subtitle:
-        'SignalIQ gives recruiters real market intelligence. Know salary benchmarks before you pitch.',
-    accent: HireIQTheme.recruiterAccent,
-    iconPainter: _HandshakePainter(color: HireIQTheme.recruiterAccent),
-  ),
-];
 
 // ── Screen ────────────────────────────────────────────────────────────────────
 
@@ -57,371 +15,111 @@ class OnboardingScreen extends StatefulWidget {
   State<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
-class _OnboardingScreenState extends State<OnboardingScreen>
-    with TickerProviderStateMixin {
-  final _pageController = PageController();
-  int _page = 0;
+class _OnboardingScreenState extends State<OnboardingScreen> {
+  int _step = 0;
+  static const int _totalSteps = 5;
 
-  // Per-page content entrance
-  late AnimationController _enterCtrl;
-  late Animation<double> _enterFade;
-  late Animation<Offset> _enterSlide;
-  late Animation<double> _iconEnter;
+  // ── Step 1 ──────────────────────────────────────────────────────────────────
+  final _firstNameCtrl = TextEditingController();
+  final _lastNameCtrl = TextEditingController();
+  final _phoneCtrl = TextEditingController();
+  bool _hasPhoto = false;
 
-  // Accent cross-fade between pages
-  late AnimationController _accentCtrl;
-  late Animation<double> _accentT;
-  Color _fromAccent = _slides[0].accent;
-  Color _toAccent = _slides[0].accent;
+  // ── Step 2 ──────────────────────────────────────────────────────────────────
+  final _categorySearchCtrl = TextEditingController();
+  String? _selectedCategory;
+  String? _expLevel; // Entry, Mid, Senior, Exec
 
-  // Button press scale
-  late AnimationController _btnCtrl;
-  late Animation<double> _btnScale;
+  // ── Step 3 ──────────────────────────────────────────────────────────────────
+  final _cityCtrl = TextEditingController();
+  final List<String> _selectedCities = [];
+  bool _openToRemote = false;
+  RangeValues _salaryRange = const RangeValues(8000, 35000);
+  final _availCtrl = TextEditingController();
+
+  // ── Step 4 ──────────────────────────────────────────────────────────────────
+  final List<String> _skills = [];
+  final _skillCtrl = TextEditingController();
+  String? _expYears;
+  String? _qualification;
+  final _employerCtrl = TextEditingController();
+
+  // ── Step 5 ──────────────────────────────────────────────────────────────────
+  String? _referral;
+  bool _jobAlerts = true;
+  bool _whatsappAlerts = false;
 
   @override
   void initState() {
     super.initState();
-
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light,
+      statusBarIconBrightness: Brightness.dark,
     ));
-
-    _enterCtrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 520),
-    );
-    _enterFade = CurvedAnimation(
-      parent: _enterCtrl,
-      curve: const Interval(0.1, 1.0, curve: Curves.easeOut),
-    );
-    _enterSlide = Tween<Offset>(
-      begin: const Offset(0.0, 0.06),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _enterCtrl,
-      curve: const Interval(0.0, 0.85, curve: Curves.easeOutCubic),
-    ));
-    _iconEnter = Tween<double>(begin: 0.55, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _enterCtrl,
-        curve: const Interval(0.0, 0.75, curve: Curves.easeOutBack),
-      ),
-    );
-
-    _accentCtrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 500),
-    );
-    _accentT = CurvedAnimation(parent: _accentCtrl, curve: Curves.easeInOut);
-
-    _btnCtrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 90),
-      reverseDuration: const Duration(milliseconds: 220),
-    );
-    _btnScale = Tween<double>(begin: 1.0, end: 0.95).animate(
-      CurvedAnimation(parent: _btnCtrl, curve: Curves.easeOut),
-    );
-
-    _enterCtrl.forward();
   }
 
   @override
   void dispose() {
-    _pageController.dispose();
-    _enterCtrl.dispose();
-    _accentCtrl.dispose();
-    _btnCtrl.dispose();
+    _firstNameCtrl.dispose();
+    _lastNameCtrl.dispose();
+    _phoneCtrl.dispose();
+    _categorySearchCtrl.dispose();
+    _cityCtrl.dispose();
+    _availCtrl.dispose();
+    _skillCtrl.dispose();
+    _employerCtrl.dispose();
     super.dispose();
   }
 
-  void _goTo(int index) {
-    if (index < 0 || index >= _slides.length) return;
-    _fromAccent = _slides[_page].accent;
-    _toAccent = _slides[index].accent;
-    _accentCtrl.forward(from: 0);
-    _enterCtrl.forward(from: 0);
-    setState(() => _page = index);
-    _pageController.animateToPage(
-      index,
-      duration: const Duration(milliseconds: 480),
-      curve: Curves.easeInOutCubic,
-    );
-  }
-
   void _next() {
-    if (_page < _slides.length - 1) {
-      _goTo(_page + 1);
+    if (_step < _totalSteps - 1) {
+      setState(() => _step++);
     } else {
-      context.go(MobileRoutes.roleSelection);
+      context.go(MobileRoutes.candidateDashboard);
     }
   }
 
-  void _skip() => context.go(MobileRoutes.login);
-
-  Color get _currentAccent => Color.lerp(
-        _fromAccent,
-        _toAccent,
-        _accentT.value,
-      )!;
-
-  @override
-  Widget build(BuildContext context) {
-    final size = MediaQuery.sizeOf(context);
-    final isLast = _page == _slides.length - 1;
-
-    return AnimatedBuilder(
-      animation: _accentT,
-      builder: (context, _) {
-        final accent = _currentAccent;
-        return Scaffold(
-          backgroundColor: const Color(0xFF0F1A2E),
-          body: Stack(
-            children: [
-              // ── Ambient background ───────────────────────────────────
-              Positioned.fill(
-                child: CustomPaint(
-                  painter: _BackgroundPainter(accent: accent),
-                ),
-              ),
-
-              // ── Pages ────────────────────────────────────────────────
-              PageView.builder(
-                controller: _pageController,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: _slides.length,
-                itemBuilder: (_, i) => _SlidePage(
-                  slide: _slides[i],
-                  enterFade: _enterFade,
-                  enterSlide: _enterSlide,
-                  iconEnter: _iconEnter,
-                  accent: accent,
-                  screenSize: size,
-                ),
-              ),
-
-              // ── Top bar ──────────────────────────────────────────────
-              SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 24, vertical: 16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // Wordmark
-                      RichText(
-                        text: TextSpan(children: [
-                          TextSpan(
-                            text: 'Hire',
-                            style: GoogleFonts.inter(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.white,
-                            ),
-                          ),
-                          TextSpan(
-                            text: 'IQ',
-                            style: GoogleFonts.inter(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w800,
-                              color: accent,
-                            ),
-                          ),
-                        ]),
-                      ),
-
-                      // Skip — hidden on last slide
-                      AnimatedOpacity(
-                        opacity: isLast ? 0.0 : 1.0,
-                        duration: const Duration(milliseconds: 250),
-                        child: TextButton(
-                          onPressed: isLast ? null : _skip,
-                          style: TextButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 8),
-                            foregroundColor:
-                                Colors.white.withValues(alpha: 0.5),
-                          ),
-                          child: Text(
-                            'Skip',
-                            style: GoogleFonts.inter(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // ── Bottom controls ──────────────────────────────────────
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(28, 0, 28, 28),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        // Dot indicator
-                        _DotIndicator(
-                          count: _slides.length,
-                          current: _page,
-                          accent: accent,
-                        ),
-
-                        // Next / Get Started button
-                        ScaleTransition(
-                          scale: _btnScale,
-                          child: GestureDetector(
-                            onTapDown: (_) => _btnCtrl.forward(),
-                            onTapUp: (_) {
-                              _btnCtrl.reverse();
-                              _next();
-                            },
-                            onTapCancel: () => _btnCtrl.reverse(),
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 400),
-                              height: 52,
-                              padding: EdgeInsets.symmetric(
-                                horizontal: isLast ? 28 : 20,
-                              ),
-                              decoration: BoxDecoration(
-                                color: accent,
-                                borderRadius: BorderRadius.circular(26),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: accent.withValues(alpha: 0.45),
-                                    blurRadius: 20,
-                                    offset: const Offset(0, 6),
-                                  ),
-                                ],
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  AnimatedSwitcher(
-                                    duration:
-                                        const Duration(milliseconds: 200),
-                                    child: Text(
-                                      isLast ? 'Get Started' : 'Next',
-                                      key: ValueKey(isLast),
-                                      style: GoogleFonts.inter(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  const Icon(
-                                    Icons.arrow_forward_rounded,
-                                    color: Colors.white,
-                                    size: 18,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
+  void _back() {
+    if (_step > 0) {
+      setState(() => _step--);
+    } else {
+      context.pop();
+    }
   }
-}
 
-// ── Slide page ─────────────────────────────────────────────────────────────────
+  void _skip() => context.go(MobileRoutes.candidateDashboard);
 
-class _SlidePage extends StatelessWidget {
-  const _SlidePage({
-    required this.slide,
-    required this.enterFade,
-    required this.enterSlide,
-    required this.iconEnter,
-    required this.accent,
-    required this.screenSize,
-  });
-
-  final _Slide slide;
-  final Animation<double> enterFade;
-  final Animation<Offset> enterSlide;
-  final Animation<double> iconEnter;
-  final Color accent;
-  final Size screenSize;
+  static String _formatSalary(double value) {
+    final n = value.round();
+    final s = n.toString();
+    final buf = StringBuffer();
+    for (int i = 0; i < s.length; i++) {
+      if (i > 0 && (s.length - i) % 3 == 0) buf.write(',');
+      buf.write(s[i]);
+    }
+    return 'R${buf.toString()}';
+  }
 
   @override
   Widget build(BuildContext context) {
-    final iconSize = (screenSize.width * 0.52).clamp(180.0, 260.0);
-
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 28),
+    return Scaffold(
+      backgroundColor: HireIQTheme.background,
+      body: SafeArea(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Top-bar spacer (wordmark + skip sit above SafeArea)
-            const SizedBox(height: 64),
+            // Top bar
+            _buildTopBar(),
 
-            // Illustrated icon circle
-            FadeTransition(
-              opacity: enterFade,
-              child: ScaleTransition(
-                scale: iconEnter,
-                child: Center(
-                  child: _IconCircle(
-                    size: iconSize,
-                    accent: accent,
-                    painter: slide.iconPainter,
-                  ),
-                ),
-              ),
-            ),
+            // Progress bar
+            _buildProgressBar(),
 
-            SizedBox(height: screenSize.height * 0.055),
-
-            // Title + subtitle
-            SlideTransition(
-              position: enterSlide,
-              child: FadeTransition(
-                opacity: enterFade,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      slide.title,
-                      style: GoogleFonts.inter(
-                        fontSize: 36,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                        height: 1.15,
-                        letterSpacing: -1.0,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      slide.subtitle,
-                      style: GoogleFonts.inter(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
-                        color: Colors.white.withValues(alpha: 0.6),
-                        height: 1.6,
-                      ),
-                    ),
-                  ],
-                ),
+            // Step content
+            Expanded(
+              child: SingleChildScrollView(
+                physics: const ClampingScrollPhysics(),
+                padding:
+                    const EdgeInsets.fromLTRB(24, 24, 24, 32),
+                child: _buildStepContent(),
               ),
             ),
           ],
@@ -429,77 +127,946 @@ class _SlidePage extends StatelessWidget {
       ),
     );
   }
+
+  Widget _buildTopBar() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+      child: Row(
+        children: [
+          IconButton(
+            onPressed: _back,
+            icon: const Icon(Icons.arrow_back_rounded,
+                color: HireIQTheme.primaryNavy, size: 22),
+          ),
+          const Spacer(),
+          TextButton(
+            onPressed: _skip,
+            child: Text(
+              'Skip',
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                color: HireIQTheme.textMuted,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProgressBar() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
+      child: Row(
+        children: List.generate(_totalSteps, (i) {
+          return Expanded(
+            child: Container(
+              margin: i < _totalSteps - 1
+                  ? const EdgeInsets.only(right: 5)
+                  : EdgeInsets.zero,
+              height: 4,
+              decoration: BoxDecoration(
+                color: i <= _step
+                    ? HireIQTheme.primaryTeal
+                    : HireIQTheme.borderLight,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          );
+        }),
+      ),
+    );
+  }
+
+  Widget _buildStepContent() {
+    switch (_step) {
+      case 0:
+        return _buildStep1();
+      case 1:
+        return _buildStep2();
+      case 2:
+        return _buildStep3();
+      case 3:
+        return _buildStep4();
+      case 4:
+        return _buildStep5();
+      default:
+        return const SizedBox.shrink();
+    }
+  }
+
+  // ── Step 1 — What's your name? ───────────────────────────────────────────────
+
+  Widget _buildStep1() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _StepHeading(title: "What's your name?"),
+        const SizedBox(height: 24),
+
+        _FieldLabel('First name'),
+        const SizedBox(height: 8),
+        _OnboardField(
+          controller: _firstNameCtrl,
+          hint: 'e.g. Thabo',
+          prefixIcon: Icons.person_outline_rounded,
+        ),
+
+        const SizedBox(height: 16),
+
+        _FieldLabel('Last name'),
+        const SizedBox(height: 8),
+        _OnboardField(
+          controller: _lastNameCtrl,
+          hint: 'e.g. Nkosi',
+          prefixIcon: Icons.person_outline_rounded,
+        ),
+
+        const SizedBox(height: 16),
+
+        _FieldLabel('Phone number'),
+        const SizedBox(height: 8),
+        _PhoneField(controller: _phoneCtrl),
+
+        const SizedBox(height: 24),
+
+        _FieldLabel('Profile photo'),
+        const SizedBox(height: 8),
+        GestureDetector(
+          onTap: () => setState(() => _hasPhoto = !_hasPhoto),
+          child: Container(
+            height: 100,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: HireIQTheme.surfaceWhite,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: CustomPaint(
+              painter: _DashedBorderPainter(),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    _hasPhoto
+                        ? Icons.check_circle_outline
+                        : Icons.camera_alt_outlined,
+                    color: _hasPhoto
+                        ? HireIQTheme.primaryTeal
+                        : HireIQTheme.textMuted,
+                    size: 28,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    _hasPhoto
+                        ? 'Photo added'
+                        : 'Add a profile photo (optional)',
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      color: _hasPhoto
+                          ? HireIQTheme.primaryTeal
+                          : HireIQTheme.textMuted,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 32),
+        _ContinueButton(onTap: _next),
+      ],
+    );
+  }
+
+  // ── Step 2 — What kind of work? ──────────────────────────────────────────────
+
+  Widget _buildStep2() {
+    const categories = [
+      (icon: Icons.computer_outlined, label: 'Technology'),
+      (icon: Icons.build_outlined, label: 'Engineering'),
+      (icon: Icons.account_balance_outlined, label: 'Finance'),
+      (icon: Icons.local_hospital_outlined, label: 'Healthcare'),
+      (icon: Icons.campaign_outlined, label: 'Marketing'),
+      (icon: Icons.gavel_outlined, label: 'Legal'),
+      (icon: Icons.school_outlined, label: 'Education'),
+      (icon: Icons.shopping_bag_outlined, label: 'Sales & Retail'),
+      (icon: Icons.more_horiz, label: 'More'),
+    ];
+    const levels = ['Entry', 'Mid', 'Senior', 'Exec'];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _StepHeading(title: 'What kind of work?'),
+        const SizedBox(height: 24),
+
+        // Category search
+        _OnboardField(
+          controller: _categorySearchCtrl,
+          hint: 'Search categories...',
+          prefixIcon: Icons.search_rounded,
+        ),
+
+        const SizedBox(height: 16),
+
+        // 3×3 category grid
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 3,
+            childAspectRatio: 1.05,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+          ),
+          itemCount: categories.length,
+          itemBuilder: (_, i) {
+            final cat = categories[i];
+            final isSelected = _selectedCategory == cat.label;
+            return GestureDetector(
+              onTap: () => setState(() => _selectedCategory = cat.label),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 150),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? HireIQTheme.primaryTeal.withValues(alpha: 0.08)
+                      : HireIQTheme.surfaceWhite,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: isSelected
+                        ? HireIQTheme.primaryTeal
+                        : HireIQTheme.borderLight,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color:
+                          HireIQTheme.primaryNavy.withValues(alpha: 0.04),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      cat.icon,
+                      size: 22,
+                      color: isSelected
+                          ? HireIQTheme.primaryTeal
+                          : HireIQTheme.textMuted,
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      cat.label,
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                        color: isSelected
+                            ? HireIQTheme.primaryTeal
+                            : HireIQTheme.textMuted,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+
+        const SizedBox(height: 24),
+
+        _FieldLabel('Experience level'),
+        const SizedBox(height: 12),
+
+        Row(
+          children: levels.asMap().entries.map((e) {
+            final isSelected = _expLevel == e.value;
+            return Expanded(
+              child: GestureDetector(
+                onTap: () => setState(() => _expLevel = e.value),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 150),
+                  margin: EdgeInsets.only(
+                      right: e.key < levels.length - 1 ? 8 : 0),
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? HireIQTheme.primaryTeal
+                        : HireIQTheme.surfaceWhite,
+                    borderRadius:
+                        BorderRadius.circular(HireIQTheme.radiusFull),
+                    border: Border.all(
+                      color: isSelected
+                          ? HireIQTheme.primaryTeal
+                          : HireIQTheme.borderLight,
+                    ),
+                  ),
+                  child: Text(
+                    e.value,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: isSelected
+                          ? Colors.white
+                          : HireIQTheme.textMuted,
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+
+        const SizedBox(height: 32),
+        _ContinueButton(onTap: _next),
+      ],
+    );
+  }
+
+  // ── Step 3 — Where are you based? ────────────────────────────────────────────
+
+  Widget _buildStep3() {
+    const popularCities = ['Cape Town', 'Durban', 'Pretoria', 'Port Elizabeth'];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _StepHeading(title: 'Where are you based?'),
+        const SizedBox(height: 24),
+
+        // City search
+        _OnboardField(
+          controller: _cityCtrl,
+          hint: 'City or town',
+          prefixIcon: Icons.location_on_outlined,
+        ),
+
+        const SizedBox(height: 20),
+
+        _FieldLabel('Popular in South Africa'),
+        const SizedBox(height: 10),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: popularCities.map((city) {
+            final isSelected = _selectedCities.contains(city);
+            return GestureDetector(
+              onTap: () => setState(() {
+                if (isSelected) {
+                  _selectedCities.remove(city);
+                } else {
+                  _selectedCities.add(city);
+                }
+              }),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 150),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 14, vertical: 8),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? HireIQTheme.primaryTeal.withValues(alpha: 0.1)
+                      : HireIQTheme.surfaceWhite,
+                  borderRadius:
+                      BorderRadius.circular(HireIQTheme.radiusFull),
+                  border: Border.all(
+                    color: isSelected
+                        ? HireIQTheme.primaryTeal
+                        : HireIQTheme.borderLight,
+                  ),
+                ),
+                child: Text(
+                  city,
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: isSelected
+                        ? HireIQTheme.primaryTeal
+                        : HireIQTheme.textMuted,
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+
+        const SizedBox(height: 16),
+
+        // Remote toggle
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: HireIQTheme.surfaceWhite,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: HireIQTheme.borderLight),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.public_outlined,
+                  color: HireIQTheme.primaryTeal, size: 20),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'Open to remote work',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: HireIQTheme.textPrimary,
+                  ),
+                ),
+              ),
+              Switch(
+                value: _openToRemote,
+                onChanged: (v) => setState(() => _openToRemote = v),
+                activeThumbColor: Colors.white,
+                activeTrackColor: HireIQTheme.primaryTeal,
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 20),
+
+        _FieldLabel('Expected monthly salary (ZAR)'),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+          decoration: BoxDecoration(
+            color: HireIQTheme.surfaceWhite,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: HireIQTheme.borderLight),
+          ),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    _formatSalary(_salaryRange.start),
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: HireIQTheme.primaryNavy,
+                    ),
+                  ),
+                  Text(
+                    _formatSalary(_salaryRange.end),
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: HireIQTheme.primaryNavy,
+                    ),
+                  ),
+                ],
+              ),
+              RangeSlider(
+                values: _salaryRange,
+                min: 0,
+                max: 100000,
+                activeColor: HireIQTheme.primaryTeal,
+                inactiveColor: HireIQTheme.borderLight,
+                onChanged: (v) => setState(() => _salaryRange = v),
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 20),
+
+        _FieldLabel('Available to start'),
+        const SizedBox(height: 8),
+        _OnboardField(
+          controller: _availCtrl,
+          hint: 'e.g. Immediately, 1 month notice',
+          prefixIcon: Icons.calendar_today_outlined,
+        ),
+
+        const SizedBox(height: 32),
+        _ContinueButton(onTap: _next),
+      ],
+    );
+  }
+
+  // ── Step 4 — Your skills and experience ──────────────────────────────────────
+
+  Widget _buildStep4() {
+    const expYearOptions = ['0-1yr', '1-3yrs', '4-6yrs', '7-10yrs'];
+    const qualifications = [
+      'Matric / Grade 12',
+      'Certificate',
+      'Diploma',
+      "Bachelor's Degree",
+      'Honours Degree',
+      "Master's Degree",
+      'PhD / Doctorate',
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _StepHeading(title: 'Your skills and experience'),
+        const SizedBox(height: 24),
+
+        _FieldLabel('Skills'),
+        const SizedBox(height: 8),
+
+        // Skills chips
+        if (_skills.isNotEmpty) ...[
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: _skills
+                .map((skill) => _SkillChip(
+                      label: skill,
+                      onRemove: () => setState(() => _skills.remove(skill)),
+                    ))
+                .toList(),
+          ),
+          const SizedBox(height: 10),
+        ],
+
+        // Skill input
+        Row(
+          children: [
+            Expanded(
+              child: _OnboardField(
+                controller: _skillCtrl,
+                hint: 'e.g. Flutter, Firebase, UI/UX Design',
+                prefixIcon: Icons.add_rounded,
+                onSubmitted: (_) => _addSkill(),
+              ),
+            ),
+            const SizedBox(width: 10),
+            GestureDetector(
+              onTap: _addSkill,
+              child: Container(
+                height: 50,
+                width: 50,
+                decoration: BoxDecoration(
+                  color: HireIQTheme.primaryTeal,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(Icons.add_rounded,
+                    color: Colors.white, size: 20),
+              ),
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 20),
+
+        _FieldLabel('Years of experience'),
+        const SizedBox(height: 12),
+
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: expYearOptions.map((yr) {
+            final isSelected = _expYears == yr;
+            return GestureDetector(
+              onTap: () => setState(() => _expYears = yr),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 150),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 16, vertical: 9),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? HireIQTheme.primaryTeal
+                      : HireIQTheme.surfaceWhite,
+                  borderRadius:
+                      BorderRadius.circular(HireIQTheme.radiusFull),
+                  border: Border.all(
+                    color: isSelected
+                        ? HireIQTheme.primaryTeal
+                        : HireIQTheme.borderLight,
+                  ),
+                ),
+                child: Text(
+                  yr,
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color:
+                        isSelected ? Colors.white : HireIQTheme.textMuted,
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+
+        const SizedBox(height: 20),
+
+        _FieldLabel('Highest qualification'),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: HireIQTheme.borderLight),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              value: _qualification,
+              hint: Text(
+                'Select qualification',
+                style: GoogleFonts.inter(
+                    fontSize: 14, color: HireIQTheme.textLight),
+              ),
+              isExpanded: true,
+              icon: const Icon(Icons.keyboard_arrow_down_rounded,
+                  color: HireIQTheme.textMuted),
+              items: qualifications
+                  .map((q) => DropdownMenuItem(
+                        value: q,
+                        child: Text(
+                          q,
+                          style: GoogleFonts.inter(
+                              fontSize: 14,
+                              color: HireIQTheme.textPrimary),
+                        ),
+                      ))
+                  .toList(),
+              onChanged: (v) => setState(() => _qualification = v),
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 16),
+
+        _FieldLabel('Current employer'),
+        const SizedBox(height: 8),
+        _OnboardField(
+          controller: _employerCtrl,
+          hint: 'Company name or self-employed',
+          prefixIcon: Icons.business_outlined,
+        ),
+
+        const SizedBox(height: 20),
+
+        // MatchIQ tip card
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF0EDFF),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: const Color(0xFF7C3AED).withValues(alpha: 0.2),
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF7C3AED).withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.bolt_rounded,
+                    color: Color(0xFF7C3AED), size: 18),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'More skills = higher MatchIQ score',
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF7C3AED),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 32),
+        _ContinueButton(onTap: _next),
+      ],
+    );
+  }
+
+  void _addSkill() {
+    final text = _skillCtrl.text.trim();
+    if (text.isNotEmpty && !_skills.contains(text)) {
+      setState(() {
+        _skills.add(text);
+        _skillCtrl.clear();
+      });
+    }
+  }
+
+  // ── Step 5 — One last thing ───────────────────────────────────────────────────
+
+  Widget _buildStep5() {
+    const referralOptions = [
+      'Word of mouth',
+      'Social media',
+      'Google search',
+      'LinkedIn',
+      'Recruiter referred me',
+      'Other',
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _StepHeading(title: 'One last thing.'),
+        const SizedBox(height: 6),
+        Text(
+          'Help us improve by sharing how you found us.',
+          style: GoogleFonts.inter(
+            fontSize: 14,
+            color: HireIQTheme.textMuted,
+          ),
+        ),
+        const SizedBox(height: 24),
+
+        _FieldLabel('How did you hear about us?'),
+        const SizedBox(height: 12),
+
+        // 2×3 grid of referral options
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            childAspectRatio: 2.8,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+          ),
+          itemCount: referralOptions.length,
+          itemBuilder: (_, i) {
+            final option = referralOptions[i];
+            final isSelected = _referral == option;
+            return GestureDetector(
+              onTap: () => setState(() => _referral = option),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 150),
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? HireIQTheme.primaryTeal.withValues(alpha: 0.1)
+                      : HireIQTheme.surfaceWhite,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: isSelected
+                        ? HireIQTheme.primaryTeal
+                        : HireIQTheme.borderLight,
+                  ),
+                ),
+                child: Center(
+                  child: Text(
+                    option,
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: isSelected
+                          ? HireIQTheme.primaryTeal
+                          : HireIQTheme.textMuted,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+
+        const SizedBox(height: 24),
+
+        _FieldLabel('Stay updated'),
+        const SizedBox(height: 12),
+
+        // Job alerts toggle
+        _ToggleRow(
+          icon: Icons.work_outline_rounded,
+          label: 'Job Alerts',
+          subtitle: 'New job matches delivered daily',
+          value: _jobAlerts,
+          onChanged: (v) => setState(() => _jobAlerts = v),
+        ),
+
+        const SizedBox(height: 10),
+
+        _ToggleRow(
+          icon: Icons.chat_bubble_outline_rounded,
+          label: 'WhatsApp Alerts',
+          subtitle: 'Get notified via WhatsApp',
+          value: _whatsappAlerts,
+          onChanged: (v) => setState(() => _whatsappAlerts = v),
+        ),
+
+        const SizedBox(height: 32),
+
+        // Complete button
+        GestureDetector(
+          onTap: _next,
+          child: Container(
+            width: double.infinity,
+            height: 52,
+            decoration: BoxDecoration(
+              color: HireIQTheme.primaryTeal,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Center(
+              child: Text(
+                'Complete Profile',
+                style: GoogleFonts.inter(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }
 
-// ── Icon circle ───────────────────────────────────────────────────────────────
+// ── Shared step widgets ────────────────────────────────────────────────────────
 
-class _IconCircle extends StatelessWidget {
-  const _IconCircle({
-    required this.size,
-    required this.accent,
-    required this.painter,
-  });
-
-  final double size;
-  final Color accent;
-  final CustomPainter painter;
+class _StepHeading extends StatelessWidget {
+  const _StepHeading({required this.title});
+  final String title;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: size,
-      height: size,
-      child: Stack(
-        alignment: Alignment.center,
+    return Text(
+      title,
+      style: GoogleFonts.inter(
+        fontSize: 24,
+        fontWeight: FontWeight.w700,
+        color: HireIQTheme.primaryNavy,
+      ),
+    );
+  }
+}
+
+class _FieldLabel extends StatelessWidget {
+  const _FieldLabel(this.label);
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      label,
+      style: GoogleFonts.inter(
+        fontSize: 13,
+        fontWeight: FontWeight.w600,
+        color: HireIQTheme.textPrimary,
+      ),
+    );
+  }
+}
+
+class _OnboardField extends StatelessWidget {
+  const _OnboardField({
+    required this.controller,
+    required this.hint,
+    required this.prefixIcon,
+    this.onSubmitted,
+  });
+
+  final TextEditingController controller;
+  final String hint;
+  final IconData prefixIcon;
+  final ValueChanged<String>? onSubmitted;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: HireIQTheme.borderLight),
+      ),
+      child: TextField(
+        controller: controller,
+        onSubmitted: onSubmitted,
+        style: GoogleFonts.inter(
+            fontSize: 14, color: HireIQTheme.textPrimary),
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: GoogleFonts.inter(
+              fontSize: 14, color: HireIQTheme.textLight),
+          prefixIcon:
+              Icon(prefixIcon, size: 18, color: HireIQTheme.textLight),
+          border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        ),
+      ),
+    );
+  }
+}
+
+class _PhoneField extends StatelessWidget {
+  const _PhoneField({required this.controller});
+  final TextEditingController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: HireIQTheme.borderLight),
+      ),
+      child: Row(
         children: [
-          // Outer diffuse ring
+          // +27 prefix
           Container(
-            width: size,
-            height: size,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: accent.withValues(alpha: 0.08),
-            ),
-          ),
-          // Mid ring
-          Container(
-            width: size * 0.78,
-            height: size * 0.78,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: accent.withValues(alpha: 0.12),
-              border: Border.all(
-                color: accent.withValues(alpha: 0.2),
-                width: 1.5,
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            height: 50,
+            decoration: const BoxDecoration(
+              border: Border(
+                right: BorderSide(color: HireIQTheme.borderLight),
               ),
             ),
-          ),
-          // Inner filled circle
-          Container(
-            width: size * 0.56,
-            height: size * 0.56,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: RadialGradient(
-                colors: [
-                  accent.withValues(alpha: 0.9),
-                  accent.withValues(alpha: 0.6),
-                ],
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: accent.withValues(alpha: 0.5),
-                  blurRadius: 32,
-                  spreadRadius: 4,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('🇿🇦', style: const TextStyle(fontSize: 18)),
+                const SizedBox(width: 6),
+                Text(
+                  '+27',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: HireIQTheme.textPrimary,
+                  ),
                 ),
               ],
             ),
           ),
-          // Custom icon
-          SizedBox(
-            width: size * 0.38,
-            height: size * 0.38,
-            child: CustomPaint(painter: painter),
+          Expanded(
+            child: TextField(
+              controller: controller,
+              keyboardType: TextInputType.phone,
+              style: GoogleFonts.inter(
+                  fontSize: 14, color: HireIQTheme.textPrimary),
+              decoration: InputDecoration(
+                hintText: '82 123 4567',
+                hintStyle: GoogleFonts.inter(
+                    fontSize: 14, color: HireIQTheme.textLight),
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 14, vertical: 14),
+              ),
+            ),
           ),
         ],
       ),
@@ -507,274 +1074,206 @@ class _IconCircle extends StatelessWidget {
   }
 }
 
-// ── Dot indicator ─────────────────────────────────────────────────────────────
-
-class _DotIndicator extends StatelessWidget {
-  const _DotIndicator({
-    required this.count,
-    required this.current,
-    required this.accent,
-  });
-
-  final int count;
-  final int current;
-  final Color accent;
+class _SkillChip extends StatelessWidget {
+  const _SkillChip({required this.label, required this.onRemove});
+  final String label;
+  final VoidCallback onRemove;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: List.generate(count, (i) {
-        final active = i == current;
-        return AnimatedContainer(
-          duration: const Duration(milliseconds: 350),
-          curve: Curves.easeInOut,
-          margin: const EdgeInsets.symmetric(horizontal: 3),
-          width: active ? 24 : 7,
-          height: 7,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(4),
-            color: active
-                ? accent
-                : Colors.white.withValues(alpha: 0.25),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: HireIQTheme.primaryTeal.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(HireIQTheme.radiusFull),
+        border: Border.all(
+          color: HireIQTheme.primaryTeal.withValues(alpha: 0.3),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            label,
+            style: GoogleFonts.inter(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: HireIQTheme.primaryTeal,
+            ),
           ),
-        );
-      }),
+          const SizedBox(width: 6),
+          GestureDetector(
+            onTap: onRemove,
+            child: const Icon(Icons.close_rounded,
+                size: 14, color: HireIQTheme.primaryTeal),
+          ),
+        ],
+      ),
     );
   }
 }
 
-// ── Background painter ────────────────────────────────────────────────────────
+class _ToggleRow extends StatelessWidget {
+  const _ToggleRow({
+    required this.icon,
+    required this.label,
+    required this.subtitle,
+    required this.value,
+    required this.onChanged,
+  });
 
-class _BackgroundPainter extends CustomPainter {
-  const _BackgroundPainter({required this.accent});
-  final Color accent;
+  final IconData icon;
+  final String label;
+  final String subtitle;
+  final bool value;
+  final ValueChanged<bool> onChanged;
 
   @override
-  void paint(Canvas canvas, Size size) {
-    // Top-right glow
-    canvas.drawCircle(
-      Offset(size.width * 0.88, size.height * 0.12),
-      size.width * 0.7,
-      Paint()
-        ..shader = RadialGradient(
-          colors: [accent.withValues(alpha: 0.22), Colors.transparent],
-        ).createShader(Rect.fromCircle(
-          center: Offset(size.width * 0.88, size.height * 0.12),
-          radius: size.width * 0.7,
-        )),
-    );
-    // Bottom-left glow
-    canvas.drawCircle(
-      Offset(size.width * 0.05, size.height * 0.9),
-      size.width * 0.55,
-      Paint()
-        ..shader = RadialGradient(
-          colors: [accent.withValues(alpha: 0.12), Colors.transparent],
-        ).createShader(Rect.fromCircle(
-          center: Offset(size.width * 0.05, size.height * 0.9),
-          radius: size.width * 0.55,
-        )),
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: HireIQTheme.surfaceWhite,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: HireIQTheme.borderLight),
+        boxShadow: [
+          BoxShadow(
+            color: HireIQTheme.primaryNavy.withValues(alpha: 0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: HireIQTheme.primaryTeal.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: HireIQTheme.primaryTeal, size: 16),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: HireIQTheme.textPrimary,
+                  ),
+                ),
+                Text(
+                  subtitle,
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    color: HireIQTheme.textMuted,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Switch(
+            value: value,
+            onChanged: onChanged,
+            activeThumbColor: Colors.white,
+            activeTrackColor: HireIQTheme.primaryTeal,
+          ),
+        ],
+      ),
     );
   }
-
-  @override
-  bool shouldRepaint(_BackgroundPainter old) => old.accent != accent;
 }
 
-// ── Icon painters ─────────────────────────────────────────────────────────────
+class _ContinueButton extends StatelessWidget {
+  const _ContinueButton({required this.onTap});
+  final VoidCallback onTap;
 
-/// Slide 1 — person silhouette with a star above
-class _PersonStarPainter extends CustomPainter {
-  const _PersonStarPainter({required this.color});
-  final Color color;
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        height: 52,
+        decoration: BoxDecoration(
+          color: HireIQTheme.primaryTeal,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Center(
+          child: Text(
+            'Continue',
+            style: GoogleFonts.inter(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
 
+// ── Dashed border painter ──────────────────────────────────────────────────────
+
+class _DashedBorderPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.fill;
+      ..color = HireIQTheme.borderLight
+      ..strokeWidth = 1.5
+      ..style = PaintingStyle.stroke;
 
-    final cx = size.width / 2;
-    final cy = size.height / 2;
+    const dash = 8.0;
+    const gap = 5.0;
 
-    // Head
-    canvas.drawCircle(
-      Offset(cx, cy * 0.42),
-      size.width * 0.14,
-      paint,
-    );
-
-    // Body (rounded rectangle)
-    final bodyRect = RRect.fromRectAndRadius(
-      Rect.fromCenter(
-        center: Offset(cx, cy * 1.05),
-        width: size.width * 0.42,
-        height: size.height * 0.35,
-      ),
-      const Radius.circular(40),
-    );
-    canvas.drawRRect(bodyRect, paint);
-
-    // Star (top-right)
-    _drawStar(
-      canvas,
-      Offset(cx + size.width * 0.28, cy * 0.18),
-      size.width * 0.11,
-      Paint()..color = Colors.white.withValues(alpha: 0.95),
-    );
-  }
-
-  void _drawStar(Canvas canvas, Offset center, double r, Paint paint) {
-    final path = Path();
-    for (int i = 0; i < 5; i++) {
-      final outer = Offset(
-        center.dx + r * math.cos((i * 72 - 90) * math.pi / 180),
-        center.dy + r * math.sin((i * 72 - 90) * math.pi / 180),
-      );
-      final inner = Offset(
-        center.dx +
-            (r * 0.42) *
-                math.cos(((i * 72) + 36 - 90) * math.pi / 180),
-        center.dy +
-            (r * 0.42) *
-                math.sin(((i * 72) + 36 - 90) * math.pi / 180),
-      );
-      if (i == 0) {
-        path.moveTo(outer.dx, outer.dy);
-      } else {
-        path.lineTo(outer.dx, outer.dy);
-      }
-      path.lineTo(inner.dx, inner.dy);
-    }
-    path.close();
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter old) => false;
-}
-
-/// Slide 2 — briefcase with a lightning bolt
-class _BriefcaseLightningPainter extends CustomPainter {
-  const _BriefcaseLightningPainter({required this.color});
-  final Color color;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.fill;
-
-    final cx = size.width / 2;
-    final cy = size.height / 2;
-
-    // Briefcase body
-    final bodyRect = RRect.fromRectAndRadius(
-      Rect.fromCenter(
-        center: Offset(cx, cy + size.height * 0.06),
-        width: size.width * 0.7,
-        height: size.height * 0.46,
-      ),
-      const Radius.circular(10),
-    );
-    canvas.drawRRect(bodyRect, paint);
-
-    // Briefcase handle
-    final handlePaint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = size.width * 0.07
-      ..strokeCap = StrokeCap.round;
-    final handleRect = Rect.fromCenter(
-      center: Offset(cx, cy - size.height * 0.16),
-      width: size.width * 0.32,
-      height: size.height * 0.18,
-    );
-    canvas.drawArc(handleRect, math.pi, math.pi, false, handlePaint);
-
-    // Lightning bolt (overlay)
-    final boltPaint = Paint()
-      ..color = color.withValues(alpha: 0.85)
-      ..style = PaintingStyle.fill;
-    final bolt = Path()
-      ..moveTo(cx + size.width * 0.04, cy - size.height * 0.04)
-      ..lineTo(cx - size.width * 0.08, cy + size.height * 0.08)
-      ..lineTo(cx + size.width * 0.01, cy + size.height * 0.05)
-      ..lineTo(cx - size.width * 0.04, cy + size.height * 0.2)
-      ..lineTo(cx + size.width * 0.1, cy + size.height * 0.04)
-      ..lineTo(cx + size.width * 0.02, cy + size.height * 0.07)
-      ..close();
-    canvas.drawPath(bolt, boltPaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter old) => false;
-}
-
-/// Slide 3 — two hands meeting in a handshake
-class _HandshakePainter extends CustomPainter {
-  const _HandshakePainter({required this.color});
-  final Color color;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = size.width * 0.075
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;
-
-    final cx = size.width / 2;
-    final cy = size.height / 2;
-
-    // Left arm
-    final leftArm = Path()
-      ..moveTo(size.width * 0.05, cy + size.height * 0.22)
-      ..cubicTo(
-        size.width * 0.12, cy,
-        size.width * 0.22, cy - size.height * 0.08,
-        cx - size.width * 0.04, cy - size.height * 0.02,
-      );
-    canvas.drawPath(leftArm, paint);
-
-    // Right arm
-    final rightArm = Path()
-      ..moveTo(size.width * 0.95, cy + size.height * 0.22)
-      ..cubicTo(
-        size.width * 0.88, cy,
-        size.width * 0.78, cy - size.height * 0.08,
-        cx + size.width * 0.04, cy - size.height * 0.02,
-      );
-    canvas.drawPath(rightArm, paint);
-
-    // Clasped hands — filled oval in centre
-    canvas.drawOval(
-      Rect.fromCenter(
-        center: Offset(cx, cy - size.height * 0.02),
-        width: size.width * 0.26,
-        height: size.height * 0.2,
-      ),
-      Paint()
-        ..color = Colors.white
-        ..style = PaintingStyle.fill,
-    );
-
-    // Finger lines on the clasped oval
-    final fingerPaint = Paint()
-      ..color = color.withValues(alpha: 0.6)
-      ..strokeWidth = size.width * 0.04
-      ..strokeCap = StrokeCap.round;
-    for (int i = -1; i <= 1; i++) {
+    // Top
+    double x = 0;
+    while (x < size.width) {
       canvas.drawLine(
-        Offset(cx + i * size.width * 0.06, cy - size.height * 0.09),
-        Offset(cx + i * size.width * 0.06, cy + size.height * 0.05),
-        fingerPaint,
+        Offset(x, 0),
+        Offset(x + dash < size.width ? x + dash : size.width, 0),
+        paint,
       );
+      x += dash + gap;
+    }
+    // Bottom
+    x = 0;
+    while (x < size.width) {
+      canvas.drawLine(
+        Offset(x, size.height),
+        Offset(x + dash < size.width ? x + dash : size.width, size.height),
+        paint,
+      );
+      x += dash + gap;
+    }
+    // Left
+    double y = 0;
+    while (y < size.height) {
+      canvas.drawLine(
+        Offset(0, y),
+        Offset(0, y + dash < size.height ? y + dash : size.height),
+        paint,
+      );
+      y += dash + gap;
+    }
+    // Right
+    y = 0;
+    while (y < size.height) {
+      canvas.drawLine(
+        Offset(size.width, y),
+        Offset(size.width, y + dash < size.height ? y + dash : size.height),
+        paint,
+      );
+      y += dash + gap;
     }
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter old) => false;
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

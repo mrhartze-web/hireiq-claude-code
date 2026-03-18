@@ -14,8 +14,7 @@ class LoginScreen extends ConsumerStatefulWidget {
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends ConsumerState<LoginScreen>
-    with SingleTickerProviderStateMixin {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -27,51 +26,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
   bool _obscurePassword = true;
   String? _error;
 
-  late final AnimationController _entranceController;
-  late final Animation<double> _headerFade;
-  late final Animation<Offset> _headerSlide;
-  late final Animation<double> _cardFade;
-  late final Animation<Offset> _cardSlide;
-
   @override
   void initState() {
     super.initState();
-
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.dark,
     ));
-
-    _entranceController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 800),
-    );
-
-    _headerFade = CurvedAnimation(
-      parent: _entranceController,
-      curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
-    );
-    _headerSlide = Tween<Offset>(
-      begin: const Offset(0, -0.15),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _entranceController,
-      curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
-    ));
-
-    _cardFade = CurvedAnimation(
-      parent: _entranceController,
-      curve: const Interval(0.25, 0.9, curve: Curves.easeOut),
-    );
-    _cardSlide = Tween<Offset>(
-      begin: const Offset(0, 0.1),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _entranceController,
-      curve: const Interval(0.25, 0.9, curve: Curves.easeOut),
-    ));
-
-    _entranceController.forward();
   }
 
   @override
@@ -80,13 +41,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     _passwordController.dispose();
     _emailFocus.dispose();
     _passwordFocus.dispose();
-    _entranceController.dispose();
     super.dispose();
   }
 
-  /// Navigate to the correct dashboard after sign-in.
-  /// [uid] comes directly from the UserCredential so we don't
-  /// depend on authStateProvider having propagated yet.
   Future<void> _navigateByRole({String? uid}) async {
     final effectiveUid = uid ?? ref.read(authStateProvider).value?.uid ?? '';
     final role = effectiveUid.isNotEmpty
@@ -101,7 +58,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
       case 'admin':
         context.go(MobileRoutes.adminDashboard);
       default:
-        // null role (Firestore doc missing or still loading) — default to candidate
         context.go(MobileRoutes.candidateDashboard);
     }
   }
@@ -155,323 +111,239 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: HireIQTheme.background,
-      body: Stack(
-        children: [
-          // Subtle top gradient wash
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 260,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    HireIQTheme.primaryNavy.withValues(alpha: 0.06),
-                    Colors.transparent,
-                  ],
+      appBar: AppBar(
+        backgroundColor: HireIQTheme.background,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        leading: const BackButton(color: HireIQTheme.primaryNavy),
+        centerTitle: true,
+        title: Text(
+          'Sign in',
+          style: GoogleFonts.inter(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: HireIQTheme.primaryNavy,
+          ),
+        ),
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          physics: const ClampingScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 24),
+
+              // Heading
+              Text(
+                'Welcome back.',
+                style: GoogleFonts.inter(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w700,
+                  color: HireIQTheme.primaryNavy,
                 ),
               ),
-            ),
-          ),
+              const SizedBox(height: 6),
+              Text(
+                'Sign in to your HireIQ account.',
+                style: GoogleFonts.inter(
+                  fontSize: 15,
+                  color: HireIQTheme.textMuted,
+                ),
+              ),
 
-          SafeArea(
-            child: SingleChildScrollView(
-              physics: const ClampingScrollPhysics(),
-              child: Column(
-                children: [
-                  // ── Header ─────────────────────────────────────────────
-                  SlideTransition(
-                    position: _headerSlide,
-                    child: FadeTransition(
-                      opacity: _headerFade,
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(24, 32, 24, 0),
-                        child: Column(
+              const SizedBox(height: 32),
+
+              // Form
+              Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Error banner
+                    if (_error != null) ...[
+                      _ErrorBanner(message: _error!),
+                      const SizedBox(height: 16),
+                    ],
+
+                    // Email
+                    _FieldLabel(label: 'Email address'),
+                    const SizedBox(height: 6),
+                    _LoginField(
+                      controller: _emailController,
+                      focusNode: _emailFocus,
+                      nextFocus: _passwordFocus,
+                      hint: 'you@example.com',
+                      keyboardType: TextInputType.emailAddress,
+                      prefixIcon: Icons.mail_outline_rounded,
+                      validator: (v) {
+                        if (v == null || v.trim().isEmpty) {
+                          return 'Email is required';
+                        }
+                        if (!v.contains('@')) return 'Enter a valid email';
+                        return null;
+                      },
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Password
+                    _FieldLabel(label: 'Password'),
+                    const SizedBox(height: 6),
+                    _LoginField(
+                      controller: _passwordController,
+                      focusNode: _passwordFocus,
+                      hint: '••••••••',
+                      obscureText: _obscurePassword,
+                      prefixIcon: Icons.lock_outline_rounded,
+                      suffixIcon: _obscurePassword
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined,
+                      onSuffixTap: () => setState(
+                          () => _obscurePassword = !_obscurePassword),
+                      onSubmitted: (_) => _signIn(),
+                      validator: (v) {
+                        if (v == null || v.isEmpty) {
+                          return 'Password is required';
+                        }
+                        return null;
+                      },
+                    ),
+
+                    const SizedBox(height: 10),
+
+                    // Forgot password
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: GestureDetector(
+                        onTap: () => context.push('/forgot-password'),
+                        child: Text(
+                          'Forgot password?',
+                          style: GoogleFonts.inter(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: HireIQTheme.primaryTeal,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    // Sign in button (teal)
+                    _SignInButton(
+                      isLoading: _isLoading,
+                      onTap: _signIn,
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    // Or divider
+                    Row(
+                      children: [
+                        const Expanded(
+                          child: Divider(
+                            color: HireIQTheme.borderLight,
+                            thickness: 1,
+                          ),
+                        ),
+                        Padding(
+                          padding:
+                              const EdgeInsets.symmetric(horizontal: 12),
+                          child: Text(
+                            'or continue with',
+                            style: GoogleFonts.inter(
+                              fontSize: 12,
+                              color: HireIQTheme.textMuted,
+                            ),
+                          ),
+                        ),
+                        const Expanded(
+                          child: Divider(
+                            color: HireIQTheme.borderLight,
+                            thickness: 1,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Google button
+                    _GoogleButton(
+                      isLoading: _isGoogleLoading,
+                      onTap: _signInWithGoogle,
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Biometrics row
+                    GestureDetector(
+                      onTap: () {},
+                      child: Center(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            // Logo mark
-                            Container(
-                              width: 56,
-                              height: 56,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                gradient: LinearGradient(
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                  colors: [
-                                    HireIQTheme.primaryTeal,
-                                    HireIQTheme.primaryTeal.withValues(alpha: 0.7),
-                                  ],
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color:
-                                        HireIQTheme.primaryTeal.withValues(alpha: 0.3),
-                                    blurRadius: 16,
-                                    offset: const Offset(0, 6),
-                                  ),
-                                ],
-                              ),
-                              child: const Icon(
-                                Icons.bolt_rounded,
-                                color: Colors.white,
-                                size: 28,
-                              ),
+                            const Icon(
+                              Icons.remove_red_eye_outlined,
+                              color: HireIQTheme.textMuted,
+                              size: 18,
                             ),
-
-                            const SizedBox(height: 20),
-
-                            RichText(
-                              text: TextSpan(children: [
-                                TextSpan(
-                                  text: 'Hire',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 28,
-                                    fontWeight: FontWeight.w800,
-                                    color: HireIQTheme.primaryNavy,
-                                    letterSpacing: -0.8,
-                                  ),
-                                ),
-                                TextSpan(
-                                  text: 'IQ',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 28,
-                                    fontWeight: FontWeight.w800,
-                                    color: HireIQTheme.primaryTeal,
-                                    letterSpacing: -0.8,
-                                  ),
-                                ),
-                              ]),
-                            ),
-
-                            const SizedBox(height: 8),
-
+                            const SizedBox(width: 8),
                             Text(
-                              'Welcome back',
+                              'Use biometrics',
                               style: GoogleFonts.inter(
-                                fontSize: 22,
-                                fontWeight: FontWeight.w700,
-                                color: HireIQTheme.textPrimary,
-                                letterSpacing: -0.4,
-                              ),
-                            ),
-
-                            const SizedBox(height: 4),
-
-                            Text(
-                              'Sign in to continue to your account',
-                              style: GoogleFonts.inter(
-                                fontSize: 14,
+                                fontSize: 13,
                                 color: HireIQTheme.textMuted,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
                           ],
                         ),
                       ),
                     ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 40),
+
+              // Sign up link
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Don't have an account? ",
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      color: HireIQTheme.textMuted,
+                    ),
                   ),
-
-                  const SizedBox(height: 28),
-
-                  // ── Card ───────────────────────────────────────────────
-                  SlideTransition(
-                    position: _cardSlide,
-                    child: FadeTransition(
-                      opacity: _cardFade,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(24),
-                            boxShadow: [
-                              BoxShadow(
-                                color: HireIQTheme.primaryNavy.withValues(alpha: 0.07),
-                                blurRadius: 32,
-                                offset: const Offset(0, 8),
-                              ),
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.04),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          padding: const EdgeInsets.all(24),
-                          child: Form(
-                            key: _formKey,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Error banner
-                                if (_error != null) ...[
-                                  _ErrorBanner(message: _error!),
-                                  const SizedBox(height: 16),
-                                ],
-
-                                // Email field
-                                const _FieldLabel(label: 'Email address'),
-                                const SizedBox(height: 6),
-                                _PremiumField(
-                                  controller: _emailController,
-                                  focusNode: _emailFocus,
-                                  nextFocus: _passwordFocus,
-                                  hint: 'you@example.com',
-                                  keyboardType: TextInputType.emailAddress,
-                                  prefixIcon: Icons.mail_outline_rounded,
-                                  validator: (v) {
-                                    if (v == null || v.trim().isEmpty) {
-                                      return 'Email is required';
-                                    }
-                                    if (!v.contains('@')) {
-                                      return 'Enter a valid email';
-                                    }
-                                    return null;
-                                  },
-                                ),
-
-                                const SizedBox(height: 18),
-
-                                // Password field
-                                const _FieldLabel(label: 'Password'),
-                                const SizedBox(height: 6),
-                                _PremiumField(
-                                  controller: _passwordController,
-                                  focusNode: _passwordFocus,
-                                  hint: '••••••••',
-                                  obscureText: _obscurePassword,
-                                  prefixIcon: Icons.lock_outline_rounded,
-                                  suffixIcon: _obscurePassword
-                                      ? Icons.visibility_outlined
-                                      : Icons.visibility_off_outlined,
-                                  onSuffixTap: () => setState(
-                                      () => _obscurePassword = !_obscurePassword),
-                                  onSubmitted: (_) => _signIn(),
-                                  validator: (v) {
-                                    if (v == null || v.isEmpty) {
-                                      return 'Password is required';
-                                    }
-                                    return null;
-                                  },
-                                ),
-
-                                const SizedBox(height: 8),
-
-                                // Forgot password
-                                Align(
-                                  alignment: Alignment.centerRight,
-                                  child: GestureDetector(
-                                    onTap: () =>
-                                        context.push('/forgot-password'),
-                                    child: Text(
-                                      'Forgot password?',
-                                      style: GoogleFonts.inter(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w500,
-                                        color: HireIQTheme.primaryTeal,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-
-                                const SizedBox(height: 24),
-
-                                // Sign in button
-                                _SignInButton(
-                                  isLoading: _isLoading,
-                                  onTap: _signIn,
-                                ),
-
-                                const SizedBox(height: 20),
-
-                                // Divider
-                                Row(
-                                  children: [
-                                    const Expanded(
-                                      child: Divider(
-                                        color: HireIQTheme.borderLight,
-                                        thickness: 1,
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 12),
-                                      child: Text(
-                                        'or continue with',
-                                        style: GoogleFonts.inter(
-                                          fontSize: 12,
-                                          color: HireIQTheme.textMuted,
-                                        ),
-                                      ),
-                                    ),
-                                    const Expanded(
-                                      child: Divider(
-                                        color: HireIQTheme.borderLight,
-                                        thickness: 1,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-
-                                const SizedBox(height: 16),
-
-                                // Google button
-                                _GoogleButton(
-                                  isLoading: _isGoogleLoading,
-                                  onTap: _signInWithGoogle,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
+                  GestureDetector(
+                    onTap: () => context.push('/signup'),
+                    child: Text(
+                      'Create one free',
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: HireIQTheme.primaryTeal,
                       ),
                     ),
                   ),
-
-                  const SizedBox(height: 28),
-
-                  // ── Sign up link ───────────────────────────────────────
-                  FadeTransition(
-                    opacity: _cardFade,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Don't have an account?  ",
-                          style: GoogleFonts.inter(
-                            fontSize: 14,
-                            color: HireIQTheme.textMuted,
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () => context.push('/signup'),
-                          child: Text(
-                            'Create account',
-                            style: GoogleFonts.inter(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: HireIQTheme.primaryNavy,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 32),
                 ],
               ),
-            ),
+
+              const SizedBox(height: 32),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
 }
 
-// ── Reusable sub-widgets ──────────────────────────────────────────────────────
+// ── Field label ────────────────────────────────────────────────────────────────
 
 class _FieldLabel extends StatelessWidget {
   const _FieldLabel({required this.label});
@@ -490,8 +362,10 @@ class _FieldLabel extends StatelessWidget {
   }
 }
 
-class _PremiumField extends StatefulWidget {
-  const _PremiumField({
+// ── Login field ────────────────────────────────────────────────────────────────
+
+class _LoginField extends StatefulWidget {
+  const _LoginField({
     required this.controller,
     required this.focusNode,
     required this.hint,
@@ -518,10 +392,10 @@ class _PremiumField extends StatefulWidget {
   final FormFieldValidator<String>? validator;
 
   @override
-  State<_PremiumField> createState() => _PremiumFieldState();
+  State<_LoginField> createState() => _LoginFieldState();
 }
 
-class _PremiumFieldState extends State<_PremiumField> {
+class _LoginFieldState extends State<_LoginField> {
   bool _focused = false;
 
   @override
@@ -530,9 +404,7 @@ class _PremiumFieldState extends State<_PremiumField> {
     widget.focusNode.addListener(_onFocusChange);
   }
 
-  void _onFocusChange() {
-    setState(() => _focused = widget.focusNode.hasFocus);
-  }
+  void _onFocusChange() => setState(() => _focused = widget.focusNode.hasFocus);
 
   @override
   void dispose() {
@@ -545,17 +417,16 @@ class _PremiumFieldState extends State<_PremiumField> {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       decoration: BoxDecoration(
+        color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: _focused
-              ? HireIQTheme.primaryTeal
-              : HireIQTheme.borderLight,
+          color: _focused ? HireIQTheme.primaryTeal : HireIQTheme.borderLight,
           width: _focused ? 1.5 : 1.0,
         ),
         boxShadow: _focused
             ? [
                 BoxShadow(
-                  color: HireIQTheme.primaryTeal.withValues(alpha: 0.12),
+                  color: HireIQTheme.primaryTeal.withValues(alpha: 0.08),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -567,8 +438,9 @@ class _PremiumFieldState extends State<_PremiumField> {
         focusNode: widget.focusNode,
         keyboardType: widget.keyboardType,
         obscureText: widget.obscureText,
-        textInputAction:
-            widget.nextFocus != null ? TextInputAction.next : TextInputAction.done,
+        textInputAction: widget.nextFocus != null
+            ? TextInputAction.next
+            : TextInputAction.done,
         onFieldSubmitted: (v) {
           if (widget.nextFocus != null) {
             FocusScope.of(context).requestFocus(widget.nextFocus);
@@ -578,7 +450,6 @@ class _PremiumFieldState extends State<_PremiumField> {
         validator: widget.validator,
         style: GoogleFonts.inter(
           fontSize: 15,
-          fontWeight: FontWeight.w400,
           color: HireIQTheme.textPrimary,
         ),
         decoration: InputDecoration(
@@ -607,19 +478,17 @@ class _PremiumFieldState extends State<_PremiumField> {
           focusedBorder: InputBorder.none,
           errorBorder: InputBorder.none,
           focusedErrorBorder: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 14,
-            vertical: 14,
-          ),
-          errorStyle: GoogleFonts.inter(
-            fontSize: 12,
-            color: HireIQTheme.error,
-          ),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+          errorStyle:
+              GoogleFonts.inter(fontSize: 12, color: HireIQTheme.error),
         ),
       ),
     );
   }
 }
+
+// ── Sign in button (teal) ──────────────────────────────────────────────────────
 
 class _SignInButton extends StatefulWidget {
   const _SignInButton({required this.isLoading, required this.onTap});
@@ -643,9 +512,8 @@ class _SignInButtonState extends State<_SignInButton>
       duration: const Duration(milliseconds: 100),
       reverseDuration: const Duration(milliseconds: 200),
     );
-    _scale = Tween<double>(begin: 1.0, end: 0.97).animate(
-      CurvedAnimation(parent: _press, curve: Curves.easeOut),
-    );
+    _scale = Tween<double>(begin: 1.0, end: 0.97)
+        .animate(CurvedAnimation(parent: _press, curve: Curves.easeOut));
   }
 
   @override
@@ -667,24 +535,10 @@ class _SignInButtonState extends State<_SignInButton>
         scale: _scale,
         child: Container(
           width: double.infinity,
-          height: 54,
+          height: 52,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(14),
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Color(0xFF243659),
-                HireIQTheme.primaryNavy,
-              ],
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: HireIQTheme.primaryNavy.withValues(alpha: 0.35),
-                blurRadius: 16,
-                offset: const Offset(0, 6),
-              ),
-            ],
+            color: HireIQTheme.primaryTeal,
+            borderRadius: BorderRadius.circular(12),
           ),
           child: Center(
             child: widget.isLoading
@@ -699,10 +553,9 @@ class _SignInButtonState extends State<_SignInButton>
                 : Text(
                     'Sign in',
                     style: GoogleFonts.inter(
-                      fontSize: 16,
+                      fontSize: 15,
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
-                      letterSpacing: 0.2,
                     ),
                   ),
           ),
@@ -711,6 +564,8 @@ class _SignInButtonState extends State<_SignInButton>
     );
   }
 }
+
+// ── Google button ──────────────────────────────────────────────────────────────
 
 class _GoogleButton extends StatelessWidget {
   const _GoogleButton({required this.isLoading, required this.onTap});
@@ -726,7 +581,7 @@ class _GoogleButton extends StatelessWidget {
         height: 50,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(12),
           border: Border.all(color: HireIQTheme.borderLight, width: 1.5),
           boxShadow: [
             BoxShadow(
@@ -749,7 +604,6 @@ class _GoogleButton extends StatelessWidget {
               : Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Google 'G' drawn with a custom painter — no asset needed
                     CustomPaint(
                       size: const Size(20, 20),
                       painter: _GoogleGPainter(),
@@ -771,6 +625,8 @@ class _GoogleButton extends StatelessWidget {
   }
 }
 
+// ── Error banner ───────────────────────────────────────────────────────────────
+
 class _ErrorBanner extends StatelessWidget {
   const _ErrorBanner({required this.message});
   final String message;
@@ -784,16 +640,12 @@ class _ErrorBanner extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
           color: HireIQTheme.error.withValues(alpha: 0.25),
-          width: 1,
         ),
       ),
       child: Row(
         children: [
-          const Icon(
-            Icons.error_outline_rounded,
-            size: 16,
-            color: HireIQTheme.error,
-          ),
+          const Icon(Icons.error_outline_rounded,
+              size: 16, color: HireIQTheme.error),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -811,7 +663,7 @@ class _ErrorBanner extends StatelessWidget {
   }
 }
 
-// ── Google G painter ──────────────────────────────────────────────────────────
+// ── Google G painter ───────────────────────────────────────────────────────────
 
 class _GoogleGPainter extends CustomPainter {
   @override
@@ -820,7 +672,6 @@ class _GoogleGPainter extends CustomPainter {
     final cy = size.height / 2;
     final r = size.width / 2;
 
-    // Blue arc (top → right-ish)
     canvas.drawArc(
       Rect.fromCircle(center: Offset(cx, cy), radius: r),
       -1.1, 1.7, false,
@@ -830,7 +681,6 @@ class _GoogleGPainter extends CustomPainter {
         ..strokeWidth = 2.8
         ..strokeCap = StrokeCap.round,
     );
-    // Red arc (top-left)
     canvas.drawArc(
       Rect.fromCircle(center: Offset(cx, cy), radius: r),
       -2.7, 1.4, false,
@@ -840,7 +690,6 @@ class _GoogleGPainter extends CustomPainter {
         ..strokeWidth = 2.8
         ..strokeCap = StrokeCap.round,
     );
-    // Yellow arc (bottom-left)
     canvas.drawArc(
       Rect.fromCircle(center: Offset(cx, cy), radius: r),
       2.2, 1.1, false,
@@ -850,7 +699,6 @@ class _GoogleGPainter extends CustomPainter {
         ..strokeWidth = 2.8
         ..strokeCap = StrokeCap.round,
     );
-    // Green arc (bottom-right)
     canvas.drawArc(
       Rect.fromCircle(center: Offset(cx, cy), radius: r),
       0.6, 1.0, false,
@@ -860,7 +708,6 @@ class _GoogleGPainter extends CustomPainter {
         ..strokeWidth = 2.8
         ..strokeCap = StrokeCap.round,
     );
-    // Horizontal bar of the 'G'
     canvas.drawLine(
       Offset(cx, cy),
       Offset(cx + r, cy),

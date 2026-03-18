@@ -15,6 +15,7 @@ class _Role {
     required this.title,
     required this.subtitle,
     required this.accent,
+    required this.iconBg,
     required this.chips,
   });
 
@@ -23,6 +24,7 @@ class _Role {
   final String title;
   final String subtitle;
   final Color accent;
+  final Color iconBg;  // circle background and chip background
   final List<String> chips;
 }
 
@@ -33,6 +35,7 @@ const _roles = <_Role>[
     title: "I'm looking for work",
     subtitle: 'AI-matched jobs with smart scoring and verified credentials.',
     accent: HireIQTheme.primaryTeal,
+    iconBg: Color(0xFFE6F7F5),
     chips: ['MatchIQ', 'PassportIQ'],
   ),
   _Role(
@@ -40,15 +43,17 @@ const _roles = <_Role>[
     icon: Icons.business_outlined,
     title: "I'm hiring",
     subtitle: 'Post jobs, screen candidates, and hire smarter with AI.',
-    accent: HireIQTheme.primaryNavy,
-    chips: ['SignalIQ', 'WildcardIQ'],
+    accent: Color(0xFF7C3AED),
+    iconBg: Color(0xFFF0EDFF),
+    chips: ['SignalIQ', 'ShieldIQ'],
   ),
   _Role(
     key: 'recruiter',
-    icon: Icons.handshake_outlined,
+    icon: Icons.work_outline_rounded,
     title: "I'm a recruiter",
     subtitle: 'Manage briefs, build your CV vault, and earn on placements.',
-    accent: HireIQTheme.recruiterAccent,
+    accent: Color(0xFF2563EB),
+    iconBg: Color(0xFFE8F4FF),
     chips: ['CRM Pipeline', 'CV Vault'],
   ),
   _Role(
@@ -56,7 +61,8 @@ const _roles = <_Role>[
     icon: Icons.bolt_rounded,
     title: 'I want gig work',
     subtitle: 'Browse short-term contracts with secure escrow payments.',
-    accent: HireIQTheme.amber,
+    accent: Color(0xFF059669),
+    iconBg: Color(0xFFE8FFF3),
     chips: ['Gig Marketplace', 'Escrow Payments'],
   ),
 ];
@@ -152,7 +158,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen>
 
           Column(
             children: [
-              // ── Navy header bar ──────────────────────────────────────────
+              // ── Navy header ───────────────────────────────────────────────
               SafeArea(
                 bottom: false,
                 child: SlideTransition(
@@ -164,7 +170,6 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Wordmark
                           Center(
                             child: RichText(
                               text: TextSpan(children: [
@@ -222,7 +227,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen>
                 ),
               ),
 
-              // ── White card sheet ─────────────────────────────────────────
+              // ── White card sheet ──────────────────────────────────────────
               Expanded(
                 child: SlideTransition(
                   position: _cardsSlide,
@@ -241,7 +246,6 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen>
                         padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
                         child: Column(
                           children: [
-                            // Role cards
                             ..._roles.map(
                               (role) => Padding(
                                 padding: const EdgeInsets.only(bottom: 12),
@@ -254,7 +258,6 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen>
 
                             const SizedBox(height: 28),
 
-                            // ── Sign in link ─────────────────────────────
                             SafeArea(
                               top: false,
                               child: Padding(
@@ -366,19 +369,15 @@ class _RoleCardState extends State<_RoleCard>
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Icon bubble
+              // Icon bubble — exact background color per spec
               Container(
                 width: 50,
                 height: 50,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: role.accent.withValues(alpha: 0.1),
+                  color: role.iconBg,
                 ),
-                child: Icon(
-                  role.icon,
-                  size: 24,
-                  color: role.accent,
-                ),
+                child: Icon(role.icon, size: 24, color: role.accent),
               ),
 
               const SizedBox(width: 14),
@@ -407,7 +406,6 @@ class _RoleCardState extends State<_RoleCard>
                       ),
                     ),
                     const SizedBox(height: 8),
-                    // Feature chips
                     Wrap(
                       spacing: 6,
                       runSpacing: 4,
@@ -415,6 +413,7 @@ class _RoleCardState extends State<_RoleCard>
                           .map((chip) => _FeatureChip(
                                 label: chip,
                                 accent: role.accent,
+                                chipBg: role.iconBg,
                               ))
                           .toList(),
                     ),
@@ -441,21 +440,23 @@ class _RoleCardState extends State<_RoleCard>
 // ── Feature chip ──────────────────────────────────────────────────────────────
 
 class _FeatureChip extends StatelessWidget {
-  const _FeatureChip({required this.label, required this.accent});
+  const _FeatureChip({
+    required this.label,
+    required this.accent,
+    required this.chipBg,
+  });
 
   final String label;
   final Color accent;
+  final Color chipBg;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: accent.withValues(alpha: 0.08),
+        color: chipBg,
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(
-          color: accent.withValues(alpha: 0.2),
-        ),
       ),
       child: Text(
         label,
