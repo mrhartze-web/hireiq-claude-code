@@ -1,5 +1,6 @@
 ﻿import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../../models/user_model.dart';
 
@@ -29,13 +30,19 @@ class AuthService {
     required String displayName,
     required String role,
   }) async {
+    debugPrint('[AuthService] signUpWithEmail: starting for $email, role=$role');
+
     final credential = await _auth.createUserWithEmailAndPassword(
       email: email.trim(),
       password: password,
     );
+    debugPrint('[AuthService] signUpWithEmail: Firebase Auth user created, uid=${credential.user!.uid}');
+
     await credential.user?.updateDisplayName(displayName);
+
+    final uid = credential.user!.uid;
     final user = UserModel(
-      uid: credential.user!.uid,
+      uid: uid,
       email: email.trim(),
       displayName: displayName,
       role: role,
@@ -46,10 +53,26 @@ class AuthService {
       subscriptionTier: 'free',
       subscriptionStatus: 'inactive',
     );
-    await _firestore
-        .collection('users')
-        .doc(credential.user!.uid)
-        .set(user.toJson());
+
+    try {
+      debugPrint('[AuthService] signUpWithEmail: writing Firestore document for uid=$uid');
+      await _firestore.collection('users').doc(uid).set(user.toJson());
+      debugPrint('[AuthService] signUpWithEmail: Firestore write complete, verifying...');
+
+      // Verify the document was actually persisted
+      final verification = await _firestore.collection('users').doc(uid).get();
+      if (verification.exists) {
+        debugPrint('[AuthService] signUpWithEmail: Firestore document verified ✓ uid=$uid role=${verification.data()?['role']}');
+      } else {
+        debugPrint('[AuthService] signUpWithEmail: WARNING — Firestore document NOT found after write for uid=$uid');
+      }
+    } catch (e, stack) {
+      debugPrint('[AuthService] signUpWithEmail: ERROR writing Firestore document — $e');
+      debugPrint('[AuthService] signUpWithEmail: stack trace — $stack');
+      // Rethrow so the caller can surface the error to the user
+      rethrow;
+    }
+
     return credential;
   }
 

@@ -50,20 +50,21 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     }
     setState(() { _isLoading = true; _error = null; });
     try {
-      await ref.read(authServiceProvider).signUpWithEmail(
+      final credential = await ref.read(authServiceProvider).signUpWithEmail(
         email: _emailController.text,
         password: _passwordController.text,
         displayName: _nameController.text.trim(),
         role: _selectedRole,
       );
+      debugPrint('[SignupScreen] signup complete — uid=${credential.user?.uid}, role=$_selectedRole');
       if (mounted) {
         switch (_selectedRole) {
           case 'employer':
-            context.go(MobileRoutes.employerDashboard);
+            context.go(MobileRoutes.employerOnboardingSteps);
           case 'recruiter':
             context.go(MobileRoutes.recruiterDashboard);
           default:
-            context.go(MobileRoutes.candidateDashboard);
+            context.go(MobileRoutes.candidateOnboardingWelcome);
         }
       }
     } catch (e) {

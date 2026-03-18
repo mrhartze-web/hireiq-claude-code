@@ -127,10 +127,12 @@ final routerProvider = Provider<GoRouter>((ref) {
       final isAuth = user != null;
       final path = state.uri.path;
 
+      // ── Public routes — never require authentication ──────────────────────
       final publicRoutes = [
-        MobileRoutes.splash,
-        MobileRoutes.login,
-        MobileRoutes.signup,
+        MobileRoutes.splash,       // /
+        '/onboarding',
+        MobileRoutes.login,        // /login
+        MobileRoutes.signup,       // /signup
         MobileRoutes.forgotPassword,
         MobileRoutes.roleSelection,
         MobileRoutes.emailVerification,
@@ -139,10 +141,9 @@ final routerProvider = Provider<GoRouter>((ref) {
         MobileRoutes.phoneVerification,
         MobileRoutes.terms,
         MobileRoutes.privacy,
-        MobileRoutes.pricing,       // /pricing-plans
-        '/onboarding',
+        MobileRoutes.pricing,      // /pricing-plans
         '/landing',
-        '/pricing',                 // web pricing page
+        '/pricing',
         '/about',
         '/contact',
         '/blog',
@@ -153,51 +154,50 @@ final routerProvider = Provider<GoRouter>((ref) {
         '/messages',
       ];
 
+      final isProtectedPrefix = path.startsWith('/candidate') ||
+          path.startsWith('/employer') ||
+          path.startsWith('/recruiter') ||
+          path.startsWith('/admin');
+
       final isPublicRoute = publicRoutes.contains(path) ||
           path.startsWith('/thundafund') ||
           path.startsWith('/web/');
 
-      if (!isAuth && !isPublicRoute) {
+      // ── Unauthenticated users blocked from protected routes ───────────────
+      if (!isAuth && (isProtectedPrefix || !isPublicRoute)) {
         return MobileRoutes.login;
       }
 
+      // ── Authenticated users on auth screens → their dashboard ─────────────
       if (isAuth &&
-          (path == MobileRoutes.login || path == MobileRoutes.signup)) {
-        // If role is still loading, don't redirect — let explicit navigation handle it.
-        // Returning null here prevents a redirect to a non-existent path.
-        if (role == null) return null;
+          (path == MobileRoutes.splash ||
+              path == '/onboarding' ||
+              path == MobileRoutes.login ||
+              path == MobileRoutes.signup)) {
+        if (role == null) return null; // role still loading — stay put
         if (role == 'employer') return MobileRoutes.employerDashboard;
         if (role == 'recruiter') return MobileRoutes.recruiterDashboard;
         if (role == 'admin') return MobileRoutes.adminDashboard;
         return MobileRoutes.candidateDashboard;
       }
 
-      if (isAuth && role != null) {
-        if (role == 'candidate' &&
-            (path.startsWith('/employer') ||
-                path.startsWith('/recruiter') ||
-                path.startsWith('/admin'))) {
-          return '/candidate-dashboard';
+      // ── Cross-role protection (non-admin users stay in their own section) ──
+      // Admin is exempt — they use the View As feature to navigate anywhere.
+      if (isAuth && role != null && role != 'admin') {
+        if (role == 'candidate' && isProtectedPrefix &&
+            !path.startsWith('/candidate')) {
+          return MobileRoutes.candidateDashboard;
         }
-        if (role == 'employer' &&
-            (path.startsWith('/candidate') ||
-                path.startsWith('/recruiter') ||
-                path.startsWith('/admin'))) {
-          return '/employer-dashboard';
+        if (role == 'employer' && isProtectedPrefix &&
+            !path.startsWith('/employer')) {
+          return MobileRoutes.employerDashboard;
         }
-        if (role == 'recruiter' &&
-            (path.startsWith('/candidate') ||
-                path.startsWith('/employer') ||
-                path.startsWith('/admin'))) {
-          return '/recruiter-dashboard';
-        }
-        if (role == 'admin' &&
-            (path.startsWith('/candidate') ||
-                path.startsWith('/employer') ||
-                path.startsWith('/recruiter'))) {
-          return '/admin-dashboard';
+        if (role == 'recruiter' && isProtectedPrefix &&
+            !path.startsWith('/recruiter')) {
+          return MobileRoutes.recruiterDashboard;
         }
       }
+
       return null;
     },
     routes: [

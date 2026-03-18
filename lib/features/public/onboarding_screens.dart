@@ -75,7 +75,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     if (_step < _totalSteps - 1) {
       setState(() => _step++);
     } else {
-      context.go(MobileRoutes.candidateDashboard);
+      context.go(MobileRoutes.signup);
     }
   }
 
@@ -87,7 +87,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     }
   }
 
-  void _skip() => context.go(MobileRoutes.candidateDashboard);
+  void _skip() => context.go(MobileRoutes.signup);
 
   static String _formatSalary(double value) {
     final n = value.round();
