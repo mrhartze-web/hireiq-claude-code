@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../shared/theme.dart';
 
 class RecruiterBriefs extends StatelessWidget {
@@ -7,32 +8,49 @@ class RecruiterBriefs extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Active Briefs'),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          _buildBriefCard(
-            title: 'Senior Frontend Developer',
-            company: 'TechFlow Solutions',
-            candidates: 12,
-            matchRate: 85,
-            priority: 'High',
+      backgroundColor: HireIQTheme.background,
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            pinned: true,
+            backgroundColor: HireIQTheme.primaryNavy,
+            foregroundColor: Colors.white,
+            centerTitle: true,
+            title: Text(
+              'Active Briefs',
+              style: GoogleFonts.inter(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white),
+            ),
           ),
-          _buildBriefCard(
-            title: 'Product Designer (Contract)',
-            company: 'Creative Labs',
-            candidates: 4,
-            matchRate: 72,
-            priority: 'Medium',
-          ),
-          _buildBriefCard(
-            title: 'Data Engineer',
-            company: 'DataScale Inc.',
-            candidates: 8,
-            matchRate: 91,
-            priority: 'High',
+          SliverPadding(
+            padding: const EdgeInsets.all(16),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate([
+                _buildBriefCard(
+                  title: 'Senior Frontend Developer',
+                  company: 'TechFlow Solutions',
+                  candidates: 12,
+                  matchRate: 85,
+                  priority: 'High',
+                ),
+                _buildBriefCard(
+                  title: 'Product Designer (Contract)',
+                  company: 'Creative Labs',
+                  candidates: 4,
+                  matchRate: 72,
+                  priority: 'Medium',
+                ),
+                _buildBriefCard(
+                  title: 'Data Engineer',
+                  company: 'DataScale Inc.',
+                  candidates: 8,
+                  matchRate: 91,
+                  priority: 'High',
+                ),
+              ]),
+            ),
           ),
         ],
       ),
@@ -47,19 +65,21 @@ class RecruiterBriefs extends StatelessWidget {
     required String priority,
   }) {
     final bool isHighPriority = priority == 'High';
+    final Color priorityColor =
+        isHighPriority ? HireIQTheme.error : const Color(0xFFF59E0B);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: HireIQTheme.surfaceWhite,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
         border: Border.all(color: HireIQTheme.borderLight),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(12),
-            offset: const Offset(0, 4),
-            blurRadius: 10,
+            color: HireIQTheme.primaryNavy.withValues(alpha: 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 3),
           ),
         ],
       ),
@@ -73,16 +93,13 @@ class RecruiterBriefs extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: isHighPriority
-                      ? HireIQTheme.error.withAlpha(25)
-                      : HireIQTheme.amber.withAlpha(25),
-                  borderRadius: BorderRadius.circular(20),
+                  color: priorityColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(HireIQTheme.radiusFull),
                 ),
                 child: Text(
                   priority,
-                  style: TextStyle(
-                    color:
-                        isHighPriority ? HireIQTheme.error : HireIQTheme.amber,
+                  style: GoogleFonts.inter(
+                    color: priorityColor,
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                   ),
@@ -93,26 +110,42 @@ class RecruiterBriefs extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(title,
-              style:
-                  const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          Text(company, style: const TextStyle(color: HireIQTheme.textMuted)),
+              style: GoogleFonts.inter(
+                  fontSize: 17,
+                  fontWeight: FontWeight.bold,
+                  color: HireIQTheme.textPrimary)),
+          const SizedBox(height: 2),
+          Text(company,
+              style: GoogleFonts.inter(
+                  fontSize: 13, color: HireIQTheme.textMuted)),
           const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               _buildStat('Matched', candidates.toString()),
               _buildStat('Match IQ', '$matchRate%'),
-              SizedBox(
-                height: 32,
-                child: ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: HireIQTheme.primaryTeal,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+              GestureDetector(
+                onTap: () {},
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [
+                        HireIQTheme.primaryTeal,
+                        Color(0xFF0A7A70),
+                      ],
+                    ),
+                    borderRadius:
+                        BorderRadius.circular(HireIQTheme.radiusMd),
                   ),
-                  child:
-                      const Text('View Match', style: TextStyle(fontSize: 12)),
+                  child: Text(
+                    'View Match',
+                    style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white),
+                  ),
                 ),
               ),
             ],
@@ -127,9 +160,14 @@ class RecruiterBriefs extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label,
-            style: const TextStyle(fontSize: 11, color: HireIQTheme.textMuted)),
+            style: GoogleFonts.inter(
+                fontSize: 11, color: HireIQTheme.textMuted)),
+        const SizedBox(height: 2),
         Text(value,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+            style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: HireIQTheme.textPrimary)),
       ],
     );
   }

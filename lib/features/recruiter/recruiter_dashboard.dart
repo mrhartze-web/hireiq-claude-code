@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../shared/theme.dart';
 
 class RecruiterDashboard extends StatelessWidget {
@@ -8,56 +9,75 @@ class RecruiterDashboard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: HireIQTheme.background,
-      appBar: AppBar(
-        title: const Text('bolt HireIQ',
-            style: TextStyle(fontWeight: FontWeight.bold)),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined),
-            onPressed: () {},
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            pinned: true,
+            backgroundColor: HireIQTheme.primaryNavy,
+            foregroundColor: Colors.white,
+            centerTitle: true,
+            title: Text(
+              'HireIQ',
+              style: GoogleFonts.inter(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white),
+            ),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.notifications_outlined,
+                    color: Colors.white),
+                onPressed: () {},
+              ),
+              const Padding(
+                padding: EdgeInsets.only(right: 16),
+                child: CircleAvatar(
+                  radius: 16,
+                  backgroundImage:
+                      NetworkImage('https://i.pravatar.cc/150?u=riya'),
+                ),
+              ),
+            ],
           ),
-          const Padding(
-            padding: EdgeInsets.only(right: 16),
-            child: CircleAvatar(
-              radius: 16,
-              backgroundImage: NetworkImage('https://i.pravatar.cc/150?u=riya'),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Welcome back, Riya',
+                    style: GoogleFonts.inter(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: HireIQTheme.primaryNavy),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Here\'s your performance overview for today.',
+                    style: GoogleFonts.inter(
+                        fontSize: 14, color: HireIQTheme.textMuted),
+                  ),
+                  const SizedBox(height: 24),
+                  _buildPerformanceGrid(),
+                  const SizedBox(height: 32),
+                  _buildSectionHeader('Quick Actions'),
+                  const SizedBox(height: 16),
+                  _buildQuickActions(context),
+                  const SizedBox(height: 32),
+                  _buildSectionHeader('Recent Candidates'),
+                  const SizedBox(height: 16),
+                  _buildCandidateCard(
+                    'Thabo Mokoena',
+                    'Fullstack Developer • Sandton',
+                    'Waiting for MatchIQ Signal...',
+                    Icons.hourglass_empty,
+                  ),
+                ],
+              ),
             ),
           ),
         ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Welcome back, Riya',
-              style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: HireIQTheme.primaryNavy),
-            ),
-            const Text(
-              'Here\'s your performance overview for today.',
-              style: TextStyle(color: HireIQTheme.textMuted),
-            ),
-            const SizedBox(height: 24),
-            _buildPerformanceGrid(),
-            const SizedBox(height: 32),
-            _buildSectionHeader('Quick Actions'),
-            const SizedBox(height: 16),
-            _buildQuickActions(context),
-            const SizedBox(height: 32),
-            _buildSectionHeader('Recent Candidates'),
-            const SizedBox(height: 16),
-            _buildCandidateCard(
-              'Thabo Mokoena',
-              'Fullstack Developer • Sandton',
-              'Waiting for MatchIQ Signal...',
-              Icons.hourglass_empty,
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -83,9 +103,16 @@ class RecruiterDashboard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        color: HireIQTheme.surfaceWhite,
+        borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
         border: Border.all(color: HireIQTheme.borderLight),
+        boxShadow: [
+          BoxShadow(
+            color: HireIQTheme.primaryNavy.withValues(alpha: 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -96,12 +123,12 @@ class RecruiterDashboard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(value,
-                  style: const TextStyle(
+                  style: GoogleFonts.inter(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: HireIQTheme.primaryNavy)),
               Text(label,
-                  style: const TextStyle(
+                  style: GoogleFonts.inter(
                       fontSize: 12, color: HireIQTheme.textMuted)),
             ],
           ),
@@ -115,11 +142,20 @@ class RecruiterDashboard extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(title,
-            style: const TextStyle(
+            style: GoogleFonts.inter(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: HireIQTheme.primaryNavy)),
-        TextButton(onPressed: () {}, child: const Text('View All')),
+        GestureDetector(
+          onTap: () {},
+          child: Text(
+            'View All',
+            style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: HireIQTheme.primaryTeal),
+          ),
+        ),
       ],
     );
   }
@@ -130,9 +166,12 @@ class RecruiterDashboard extends StatelessWidget {
       children: [
         _buildActionButton(
             context, 'New Brief', Icons.add_box, HireIQTheme.primaryTeal),
-        _buildActionButton(context, 'Search', Icons.search, Colors.orange),
-        _buildActionButton(context, 'Signals', Icons.bolt, Colors.purple),
-        _buildActionButton(context, 'Report', Icons.bar_chart, Colors.blue),
+        _buildActionButton(
+            context, 'Search', Icons.search, const Color(0xFFF59E0B)),
+        _buildActionButton(context, 'Signals', Icons.bolt,
+            HireIQTheme.primaryNavy),
+        _buildActionButton(context, 'Report', Icons.bar_chart,
+            HireIQTheme.primaryTeal),
       ],
     );
   }
@@ -144,14 +183,16 @@ class RecruiterDashboard extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: color.withAlpha(25),
+            color: color.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
           child: Icon(icon, color: color, size: 24),
         ),
         const SizedBox(height: 8),
         Text(label,
-            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
+            style: GoogleFonts.inter(
+                fontSize: 12, fontWeight: FontWeight.w500,
+                color: HireIQTheme.textPrimary)),
       ],
     );
   }
@@ -161,16 +202,23 @@ class RecruiterDashboard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        color: HireIQTheme.surfaceWhite,
+        borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
         border: Border.all(color: HireIQTheme.borderLight),
+        boxShadow: [
+          BoxShadow(
+            color: HireIQTheme.primaryNavy.withValues(alpha: 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Row(
         children: [
           CircleAvatar(
-            backgroundColor: HireIQTheme.primaryTeal.withAlpha(25),
+            backgroundColor: HireIQTheme.primaryTeal.withValues(alpha: 0.1),
             child: Text(name[0],
-                style: const TextStyle(
+                style: GoogleFonts.inter(
                     color: HireIQTheme.primaryTeal,
                     fontWeight: FontWeight.bold)),
           ),
@@ -180,19 +228,22 @@ class RecruiterDashboard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(name,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 16)),
+                    style: GoogleFonts.inter(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: HireIQTheme.textPrimary)),
                 Text(subtitle,
-                    style: const TextStyle(
+                    style: GoogleFonts.inter(
                         color: HireIQTheme.textMuted, fontSize: 13)),
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    Icon(statusIcon, size: 14, color: Colors.orange),
+                    Icon(statusIcon,
+                        size: 14, color: const Color(0xFFF59E0B)),
                     const SizedBox(width: 4),
                     Text(status,
-                        style: const TextStyle(
-                            color: Colors.orange,
+                        style: GoogleFonts.inter(
+                            color: const Color(0xFFF59E0B),
                             fontSize: 12,
                             fontWeight: FontWeight.w500)),
                   ],
