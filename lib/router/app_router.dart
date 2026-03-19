@@ -202,6 +202,16 @@ final routerProvider = Provider<GoRouter>((ref) {
         '/error-404',
         '/notifications',
         '/messages',
+        // Utility / error screens accessible without auth
+        '/otp-verification',
+        '/popia-consent',
+        '/maintenance',
+        '/no-internet',
+        '/app-update',
+        '/payment-failed',
+        '/subscription-expired',
+        '/profile-under-review',
+        '/error',
       };
 
       final isProtectedPath = path.startsWith('/candidate') ||
@@ -210,8 +220,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           path.startsWith('/admin') ||
           path.startsWith('/enterprise');
 
+      // Dynamic /messages/:id segments are public — same as /messages root.
       final isPublicRoute = publicRoutes.contains(path) ||
-          path.startsWith('/web/');
+          path.startsWith('/web/') ||
+          path.startsWith('/messages/');
 
       // ── Guard: unauthenticated user → /welcome ───────────────────────────
       if (!isAuth && (isProtectedPath || !isPublicRoute)) {
@@ -221,13 +233,14 @@ final routerProvider = Provider<GoRouter>((ref) {
       // ── Authenticated user on auth/onboarding screens → role dashboard ───
       // The splash screen handles initial routing; this redirect covers
       // direct URL navigation and post-auth screen returns.
+      // NOTE: /role-selection is intentionally excluded so authenticated users
+      // can revisit it from settings or profile without being bounced away.
       if (isAuth) {
         final onAuthScreen = path == '/' ||
             path == '/welcome' ||
             path == '/onboarding' ||
             path == '/login' ||
-            path == '/signup' ||
-            path == '/role-selection';
+            path == '/signup';
 
         if (onAuthScreen) {
           // Read the synchronous role cache set by the splash/login/signup
@@ -280,7 +293,8 @@ final routerProvider = Provider<GoRouter>((ref) {
           builder: (context, state) {
             final extra = state.extra as Map<String, dynamic>?;
             final role = extra?['role'] as String?;
-            return SignupScreen(initialRole: role);
+            final gigFocused = extra?['gigFocused'] as bool? ?? false;
+            return SignupScreen(initialRole: role, gigFocused: gigFocused);
           }),
       GoRoute(
           path: MobileRoutes.emailVerification,

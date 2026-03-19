@@ -133,7 +133,15 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen>
 
   void _selectRole(_Role role) {
     HapticFeedback.selectionClick();
-    context.go(MobileRoutes.signup, extra: {'role': role.key});
+    // Gig workers are candidates with gig marketplace focus — they share the
+    // candidate role but are routed directly to the gig feed after signup
+    // rather than through the standard candidate onboarding flow.
+    if (role.key == 'gig') {
+      context.go(MobileRoutes.signup,
+          extra: {'role': 'candidate', 'gigFocused': true});
+    } else {
+      context.go(MobileRoutes.signup, extra: {'role': role.key});
+    }
   }
 
   @override

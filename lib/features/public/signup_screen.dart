@@ -8,9 +8,12 @@ import '../../providers/auth_provider.dart';
 import '../mobile_screens.dart';
 
 class SignupScreen extends ConsumerStatefulWidget {
-  const SignupScreen({super.key, this.initialRole});
+  const SignupScreen({super.key, this.initialRole, this.gigFocused = false});
 
   final String? initialRole;
+  // Gig workers are candidates who focus on the gig marketplace — they skip
+  // standard candidate onboarding and land directly on /candidate/gigs.
+  final bool gigFocused;
 
   @override
   ConsumerState<SignupScreen> createState() => _SignupScreenState();
@@ -64,9 +67,17 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
           case 'employer':
             context.go(MobileRoutes.employerOnboardingSteps);
           case 'recruiter':
-            context.go(MobileRoutes.recruiterDashboard);
+            // New recruiters go through the 3-step onboarding flow before
+            // reaching the dashboard.
+            context.go('/recruiter/onboarding/step-1');
           default:
-            context.go('/candidate-onboarding');
+            // Gig-focused candidates skip standard onboarding and land on
+            // the gig feed directly; all other candidates go through onboarding.
+            if (widget.gigFocused) {
+              context.go('/candidate/gigs');
+            } else {
+              context.go('/candidate-onboarding');
+            }
         }
       }
     } catch (e) {
