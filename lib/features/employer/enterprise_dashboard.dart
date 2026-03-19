@@ -9,37 +9,44 @@ class EnterpriseDashboard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: HireIQTheme.background,
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            pinned: true,
-            backgroundColor: HireIQTheme.primaryNavy,
-            foregroundColor: Colors.white,
-            centerTitle: true,
-            title: Text(
-              'Enterprise Hub',
-              style: GoogleFonts.inter(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white),
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildWelcomeHeader(),
-                  const SizedBox(height: 24),
-                  _buildQuickInsights(),
-                  const SizedBox(height: 28),
-                  _buildActiveRoles(),
-                  const SizedBox(height: 28),
-                  _buildTeamActivity(),
-                  const SizedBox(height: 40),
-                ],
-              ),
+      body: Column(
+        children: [
+          const _ComingSoonBanner(),
+          Expanded(
+            child: CustomScrollView(
+              slivers: [
+                SliverAppBar(
+                  pinned: true,
+                  backgroundColor: HireIQTheme.primaryNavy,
+                  foregroundColor: Colors.white,
+                  centerTitle: true,
+                  title: Text(
+                    'Enterprise Hub',
+                    style: GoogleFonts.inter(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildWelcomeHeader(),
+                        const SizedBox(height: 24),
+                        _buildQuickInsights(),
+                        const SizedBox(height: 28),
+                        _buildActiveRoles(),
+                        const SizedBox(height: 28),
+                        _buildTeamActivity(),
+                        const SizedBox(height: 40),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -258,6 +265,63 @@ class EnterpriseDashboard extends StatelessWidget {
               text,
               style: GoogleFonts.inter(
                   fontSize: 13, color: HireIQTheme.textPrimary),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ComingSoonBanner extends StatelessWidget {
+  const _ComingSoonBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      color: HireIQTheme.primaryNavy,
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              'Enterprise — Available Soon',
+              style: GoogleFonts.inter(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: HireIQTheme.amber,
+              borderRadius: BorderRadius.circular(HireIQTheme.radiusFull),
+            ),
+            child: Text(
+              'Soon',
+              style: GoogleFonts.inter(
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+                color: HireIQTheme.primaryNavy,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          TextButton(
+            onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('You will be notified when Enterprise launches.'),
+              ),
+            ),
+            child: Text(
+              'Join Waitlist',
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                color: HireIQTheme.amber,
+              ),
             ),
           ),
         ],

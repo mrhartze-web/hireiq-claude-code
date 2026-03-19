@@ -27,6 +27,15 @@ import '../features/public/notifications_screen.dart';
 import '../features/public/messages_screen.dart';
 import '../features/public/message_thread_screen.dart';
 import '../features/public/phone_verification_screen.dart';
+import '../features/public/otp_verification_screen.dart';
+import '../features/public/popia_consent_screen.dart';
+import '../features/public/maintenance_screen.dart';
+import '../features/public/no_internet_screen.dart';
+import '../features/public/app_update_screen.dart';
+import '../features/public/payment_failed_screen.dart';
+import '../features/public/subscription_expired_screen.dart';
+import '../features/public/profile_under_review_screen.dart';
+import '../features/public/error_generic_screen.dart';
 
 // Import Candidate Screens
 import '../features/candidate/candidate_job_feed.dart';
@@ -64,6 +73,18 @@ import '../features/candidate/candidate_salary_guide.dart';
 import '../features/candidate/candidate_saved_jobs.dart';
 import '../features/candidate/candidate_smart_apply.dart';
 import '../features/candidate/candidate_subscription_upgrade.dart';
+import '../features/candidate/matchiq_processing_screen.dart';
+import '../features/candidate/forge_iq_generating_screen.dart';
+import '../features/candidate/forge_iq_cover_letter_screen.dart';
+import '../features/candidate/uplift_iq_generating_screen.dart';
+import '../features/candidate/referral_invite_screen.dart';
+import '../features/candidate/referral_rewards_history_screen.dart';
+import '../features/candidate/referral_rewards_redeem_screen.dart';
+import '../features/candidate/gig_active_contract_screen.dart';
+import '../features/candidate/gig_milestone_screen.dart';
+import '../features/candidate/gig_dispute_screen.dart';
+import '../features/candidate/gig_review_screen.dart';
+import '../features/candidate/gig_freelancer_profile_screen.dart';
 
 // Import Employer Screens
 import '../features/employer/employer_dashboard.dart';
@@ -90,6 +111,25 @@ import '../features/employer/employer_post_gig.dart';
 import '../features/employer/employer_shortlist.dart';
 import '../features/employer/employer_signal_iq.dart';
 import '../features/employer/employer_wildcard_iq.dart';
+import '../features/employer/employer_confirm_hire_screen.dart';
+import '../features/employer/employer_invoices_screen.dart';
+import '../features/employer/gig_proposals_view_screen.dart';
+import '../features/employer/enterprise_team_management.dart';
+import '../features/employer/enterprise_api_portal.dart';
+import '../features/employer/enterprise_api_keys.dart';
+import '../features/employer/enterprise_white_label.dart';
+import '../features/employer/enterprise_hris_integrations.dart';
+import '../features/employer/enterprise_analytics_suite.dart';
+import '../features/employer/enterprise_employer_brand.dart';
+import '../features/employer/enterprise_hiring_workflow.dart';
+import '../features/employer/enterprise_bulk_review.dart';
+import '../features/employer/enterprise_compliance.dart';
+import '../features/employer/enterprise_job_approval.dart';
+import '../features/employer/enterprise_contracts.dart';
+import '../features/employer/enterprise_sla.dart';
+import '../features/employer/enterprise_onboarding.dart';
+import '../features/employer/enterprise_billing.dart';
+import '../features/employer/enterprise_support.dart';
 
 // Import Recruiter Screens
 import '../features/recruiter/recruiter_dashboard.dart';
@@ -108,6 +148,10 @@ import '../features/recruiter/recruiter_earnings_dashboard.dart';
 import '../features/recruiter/recruiter_messages.dart';
 import '../features/recruiter/recruiter_performance_dashboard.dart';
 import '../features/recruiter/recruiter_placement_tracker.dart';
+import '../features/recruiter/recruiter_onboarding_step1.dart';
+import '../features/recruiter/recruiter_onboarding_step2.dart';
+import '../features/recruiter/recruiter_onboarding_step3.dart';
+import '../features/recruiter/shield_iq_flag_screen.dart';
 
 // Import Admin Screens
 import '../features/admin/admin_dashboard.dart';
@@ -162,7 +206,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       final isProtectedPath = path.startsWith('/candidate') ||
           path.startsWith('/employer') ||
           path.startsWith('/recruiter') ||
-          path.startsWith('/admin');
+          path.startsWith('/admin') ||
+          path.startsWith('/enterprise');
 
       final isPublicRoute = publicRoutes.contains(path) ||
           path.startsWith('/web/');
@@ -199,7 +244,9 @@ final routerProvider = Provider<GoRouter>((ref) {
           if (cachedRole == 'candidate' && !path.startsWith('/candidate')) {
             return '/candidate';
           }
-          if (cachedRole == 'employer' && !path.startsWith('/employer')) {
+          if (cachedRole == 'employer' &&
+              !path.startsWith('/employer') &&
+              !path.startsWith('/enterprise')) {
             return '/employer';
           }
           if (cachedRole == 'recruiter' && !path.startsWith('/recruiter')) {
@@ -272,6 +319,35 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) =>
             MessageThreadScreen(chatId: state.pathParameters['id'] ?? '1'),
       ),
+
+      // New Public / System Routes
+      GoRoute(
+          path: '/otp-verification',
+          builder: (context, state) => const OtpVerificationScreen()),
+      GoRoute(
+          path: '/popia-consent',
+          builder: (context, state) => const PopiaConsentScreen()),
+      GoRoute(
+          path: '/maintenance',
+          builder: (context, state) => const MaintenanceScreen()),
+      GoRoute(
+          path: '/no-internet',
+          builder: (context, state) => const NoInternetScreen()),
+      GoRoute(
+          path: '/app-update',
+          builder: (context, state) => const AppUpdateScreen()),
+      GoRoute(
+          path: '/payment-failed',
+          builder: (context, state) => const PaymentFailedScreen()),
+      GoRoute(
+          path: '/subscription-expired',
+          builder: (context, state) => const SubscriptionExpiredScreen()),
+      GoRoute(
+          path: '/profile-under-review',
+          builder: (context, state) => const ProfileUnderReviewScreen()),
+      GoRoute(
+          path: '/error',
+          builder: (context, state) => const ErrorGenericScreen()),
 
       // Shell 1: Candidate
       ShellRoute(
@@ -395,6 +471,44 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
               path: MobileRoutes.candidateCVUploadPath,
               builder: (context, state) => const CandidateCVUpload()),
+
+          // New Candidate Blueprint Screens
+          GoRoute(
+              path: '/candidate/matchiq-processing',
+              builder: (context, state) => const MatchIQProcessingScreen()),
+          GoRoute(
+              path: '/candidate/forge-iq-generating',
+              builder: (context, state) => const ForgeIQGeneratingScreen()),
+          GoRoute(
+              path: '/candidate/forge-iq-cover-letter',
+              builder: (context, state) => const ForgeIQCoverLetterScreen()),
+          GoRoute(
+              path: '/candidate/uplift-iq-generating',
+              builder: (context, state) => const UpliftIQGeneratingScreen()),
+          GoRoute(
+              path: '/candidate/referral/invite',
+              builder: (context, state) => const ReferralInviteScreen()),
+          GoRoute(
+              path: '/candidate/referral/rewards-history',
+              builder: (context, state) => const ReferralRewardsHistoryScreen()),
+          GoRoute(
+              path: '/candidate/referral/redeem',
+              builder: (context, state) => const ReferralRewardsRedeemScreen()),
+          GoRoute(
+              path: '/candidate/gig/active-contract',
+              builder: (context, state) => const GigActiveContractScreen()),
+          GoRoute(
+              path: '/candidate/gig/milestone',
+              builder: (context, state) => const GigMilestoneScreen()),
+          GoRoute(
+              path: '/candidate/gig/dispute',
+              builder: (context, state) => const GigDisputeScreen()),
+          GoRoute(
+              path: '/candidate/gig/review',
+              builder: (context, state) => const GigReviewScreen()),
+          GoRoute(
+              path: '/candidate/gig/freelancer/:id',
+              builder: (context, state) => const GigFreelancerProfileScreen()),
         ],
       ),
 
@@ -480,6 +594,67 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
               path: MobileRoutes.employerWildcardIq,
               builder: (context, state) => const EmployerWildcardIq()),
+
+          // New Employer Blueprint Screens
+          GoRoute(
+              path: '/employer/confirm-hire',
+              builder: (context, state) => const EmployerConfirmHireScreen()),
+          GoRoute(
+              path: '/employer/invoices',
+              builder: (context, state) => const EmployerInvoicesScreen()),
+          GoRoute(
+              path: '/employer/gig/proposals',
+              builder: (context, state) => const GigProposalsViewScreen()),
+
+          // Enterprise Screens
+          GoRoute(
+              path: '/enterprise/team',
+              builder: (context, state) => const EnterpriseTeamManagementScreen()),
+          GoRoute(
+              path: '/enterprise/api-portal',
+              builder: (context, state) => const EnterpriseApiPortalScreen()),
+          GoRoute(
+              path: '/enterprise/api-keys',
+              builder: (context, state) => const EnterpriseApiKeysScreen()),
+          GoRoute(
+              path: '/enterprise/white-label',
+              builder: (context, state) => const EnterpriseWhiteLabelScreen()),
+          GoRoute(
+              path: '/enterprise/hris',
+              builder: (context, state) => const EnterpriseHrisIntegrationsScreen()),
+          GoRoute(
+              path: '/enterprise/analytics-suite',
+              builder: (context, state) => const EnterpriseAnalyticsSuiteScreen()),
+          GoRoute(
+              path: '/enterprise/employer-brand',
+              builder: (context, state) => const EnterpriseEmployerBrandScreen()),
+          GoRoute(
+              path: '/enterprise/workflow',
+              builder: (context, state) => const EnterpriseHiringWorkflowScreen()),
+          GoRoute(
+              path: '/enterprise/bulk-review',
+              builder: (context, state) => const EnterpriseBulkReviewScreen()),
+          GoRoute(
+              path: '/enterprise/compliance',
+              builder: (context, state) => const EnterpriseComplianceScreen()),
+          GoRoute(
+              path: '/enterprise/job-approval',
+              builder: (context, state) => const EnterpriseJobApprovalScreen()),
+          GoRoute(
+              path: '/enterprise/contracts',
+              builder: (context, state) => const EnterpriseContractsScreen()),
+          GoRoute(
+              path: '/enterprise/sla',
+              builder: (context, state) => const EnterpriseSlaScreen()),
+          GoRoute(
+              path: '/enterprise/onboarding',
+              builder: (context, state) => const EnterpriseOnboardingScreen()),
+          GoRoute(
+              path: '/enterprise/billing',
+              builder: (context, state) => const EnterpriseBillingScreen()),
+          GoRoute(
+              path: '/enterprise/support',
+              builder: (context, state) => const EnterpriseSupportScreen()),
         ],
       ),
 
@@ -540,6 +715,20 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
               path: MobileRoutes.recruiterPlacementTracker,
               builder: (context, state) => const RecruiterPlacementTracker()),
+
+          // New Recruiter Blueprint Screens
+          GoRoute(
+              path: '/recruiter/onboarding/step-1',
+              builder: (context, state) => const RecruiterOnboardingStep1()),
+          GoRoute(
+              path: '/recruiter/onboarding/step-2',
+              builder: (context, state) => const RecruiterOnboardingStep2()),
+          GoRoute(
+              path: '/recruiter/onboarding/step-3',
+              builder: (context, state) => const RecruiterOnboardingStep3()),
+          GoRoute(
+              path: '/recruiter/shield-iq-flag',
+              builder: (context, state) => const ShieldIQFlagScreen()),
         ],
       ),
 
