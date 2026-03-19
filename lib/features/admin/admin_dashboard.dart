@@ -174,6 +174,84 @@ class AdminDashboard extends ConsumerWidget {
                     ],
                   ),
                   const SizedBox(height: 32),
+
+                  // ── Page Directory ───────────────────────────────────────
+                  GestureDetector(
+                    onTap: () => context.push('/admin/pages'),
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            HireIQTheme.primaryNavy,
+                            HireIQTheme.primaryNavy
+                                .withValues(alpha: 0.85),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius:
+                            BorderRadius.circular(HireIQTheme.radiusLg),
+                        boxShadow: [
+                          BoxShadow(
+                            color: HireIQTheme.primaryNavy
+                                .withValues(alpha: 0.25),
+                            blurRadius: 16,
+                            offset: const Offset(0, 6),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: HireIQTheme.primaryTeal
+                                  .withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(
+                                  HireIQTheme.radiusMd),
+                            ),
+                            child: const Icon(
+                              Icons.map_outlined,
+                              color: HireIQTheme.primaryTeal,
+                              size: 22,
+                            ),
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Page Directory',
+                                  style: GoogleFonts.inter(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.white),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  'Browse and launch every screen in the app',
+                                  style: GoogleFonts.inter(
+                                      fontSize: 12,
+                                      color: Colors.white
+                                          .withValues(alpha: 0.65)),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Icon(
+                            Icons.arrow_forward_ios_rounded,
+                            color: Colors.white54,
+                            size: 14,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 32),
                   _buildSectionHeader('Recent Flags'),
                   const SizedBox(height: 16),
                   ...List.generate(

@@ -155,6 +155,7 @@ import '../features/recruiter/shield_iq_flag_screen.dart';
 
 // Import Admin Screens
 import '../features/admin/admin_dashboard.dart';
+import '../features/admin/dev_nav_screen.dart';
 import '../features/admin/admin_users.dart';
 import '../features/admin/admin_revenue.dart';
 import '../features/admin/admin_system_health.dart';
@@ -970,6 +971,9 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
               path: MobileRoutes.adminSystemSettings,
               builder: (context, state) => const AdminSystemSettings()),
+          GoRoute(
+              path: '/admin/pages',
+              builder: (context, state) => const DevNavScreen()),
         ],
       ),
     ],
