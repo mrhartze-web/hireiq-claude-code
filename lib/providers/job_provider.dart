@@ -28,6 +28,10 @@ final jobDetailProvider =
     FutureProvider.family<JobModel?, String>((ref, jobId) =>
         ref.watch(firestoreServiceProvider).getJob(jobId));
 
+final savedJobIdsProvider =
+    StreamProvider.family<List<String>, String>((ref, uid) =>
+        ref.watch(firestoreServiceProvider).getSavedJobIds(uid));
+
 final jobSearchProvider =
     StateNotifierProvider<JobSearchNotifier, List<JobModel>>((ref) =>
         JobSearchNotifier(ref.watch(firestoreServiceProvider)));

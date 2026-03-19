@@ -177,4 +177,26 @@ class FirestoreService {
 
   Future<void> markMessageRead(String messageId) async =>
       await _db.collection('messages').doc(messageId).update({'isRead': true});
+
+  Stream<List<String>> getSavedJobIds(String uid) => _db
+      .collection('users')
+      .doc(uid)
+      .collection('savedJobs')
+      .orderBy('savedAt', descending: true)
+      .snapshots()
+      .map((s) => s.docs.map((d) => d.id).toList());
+
+  Future<void> saveJob(String uid, String jobId) async => await _db
+      .collection('users')
+      .doc(uid)
+      .collection('savedJobs')
+      .doc(jobId)
+      .set({'savedAt': FieldValue.serverTimestamp()});
+
+  Future<void> unsaveJob(String uid, String jobId) async => await _db
+      .collection('users')
+      .doc(uid)
+      .collection('savedJobs')
+      .doc(jobId)
+      .delete();
 }

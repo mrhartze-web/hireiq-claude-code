@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/recruiter_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../utils/constants.dart';
+import '../../shared/components/skeleton_loader.dart';
+import '../../shared/components/empty_state.dart';
 
 // ── Data model ────────────────────────────────────────────────────────────────
 
@@ -44,30 +46,6 @@ class _PlacementRow {
   }
 }
 
-// ── Example rows (spec-mandated) ──────────────────────────────────────────────
-
-const _exampleRows = <_PlacementRow>[
-  _PlacementRow(
-    role: 'Junior Developer',
-    annualSalary: 'R200,000',
-    feePercent: placementFeeJunior,
-    totalFee: 20000,
-  ),
-  _PlacementRow(
-    role: 'Mid-level Engineer',
-    annualSalary: 'R300,000',
-    feePercent: placementFeeMidLevel,
-    totalFee: 36000,
-  ),
-  _PlacementRow(
-    role: 'Senior Architect',
-    annualSalary: 'R500,000',
-    feePercent: placementFeeSenior,
-    totalFee: 75000,
-    isPending: true,
-  ),
-];
-
 // ── Screen ────────────────────────────────────────────────────────────────────
 
 class RecruiterEarningsDashboard extends ConsumerWidget {
@@ -79,15 +57,7 @@ class RecruiterEarningsDashboard extends ConsumerWidget {
     if (user == null) {
       return const Center(child: Text('Not Authenticated'));
     }
-    ref.watch(recruiterPlacementsProvider(user.uid));
-
-    // Summary totals from example rows
-    final totalEarnings = _exampleRows
-        .where((r) => !r.isPending)
-        .fold(0.0, (sum, r) => sum + r.yourEarnings);
-    final pendingEarnings = _exampleRows
-        .where((r) => r.isPending)
-        .fold(0.0, (sum, r) => sum + r.yourEarnings);
+    final placementsAsync = ref.watch(recruiterPlacementsProvider(user.uid));
 
     return Scaffold(
       backgroundColor: HireIQTheme.background,
@@ -106,126 +76,157 @@ class RecruiterEarningsDashboard extends ConsumerWidget {
               onPressed: () {}),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ── Summary hero card ──────────────────────────────────────────
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: HireIQTheme.primaryNavy,
-                borderRadius: BorderRadius.circular(HireIQTheme.radiusXl),
-                boxShadow: [
-                  BoxShadow(
-                    color: HireIQTheme.primaryNavy.withValues(alpha: 0.25),
-                    blurRadius: 20,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Total Earnings (YTD)',
-                    style: GoogleFonts.inter(
-                        color: Colors.white70, fontSize: 14),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    _PlacementRow._rands(totalEarnings),
-                    style: GoogleFonts.inter(
-                        color: Colors.white,
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 24),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _HeroStat(
-                        label: 'Pending Payouts',
-                        value: _PlacementRow._rands(pendingEarnings),
-                        valueColor: HireIQTheme.primaryTeal,
-                      ),
-                      _HeroStat(
-                        label: 'Active Placements',
-                        value: '${_exampleRows.length}',
-                        valueColor: Colors.white,
-                      ),
-                      _HeroStat(
-                        label: 'Platform Cut (${(hireiqPlatformCutPercent * 100).toStringAsFixed(0)}%)',
-                        value: _PlacementRow._rands(
-                          _exampleRows.fold(
-                              0.0, (s, r) => s + r.hireiqCut),
-                        ),
-                        valueColor: Colors.white60,
+      body: placementsAsync.when(
+        loading: () => const Padding(
+          padding: EdgeInsets.all(20),
+          child: SkeletonLoader(itemCount: 3),
+        ),
+        error: (_, __) => const Center(child: Text('Could not load earnings')),
+        data: (placements) {
+          final rows = placements.map((p) => _PlacementRow(
+            role: p.roleName,
+            annualSalary: _PlacementRow._rands(p.annualSalary.toDouble()),
+            feePercent: p.feePercentage / 100,
+            totalFee: p.feeAmount,
+            isPending: p.paymentStatus != 'paid',
+          )).toList();
+
+          if (rows.isEmpty) {
+            return const EmptyState(
+              icon: Icons.account_balance_wallet_outlined,
+              heading: 'No placements yet',
+              body: 'Your earnings will appear here once you record a placement',
+            );
+          }
+
+          final totalEarnings = rows
+              .where((r) => !r.isPending)
+              .fold(0.0, (sum, r) => sum + r.yourEarnings);
+          final pendingEarnings = rows
+              .where((r) => r.isPending)
+              .fold(0.0, (sum, r) => sum + r.yourEarnings);
+
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ── Summary hero card ──────────────────────────────────────────
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: HireIQTheme.primaryNavy,
+                    borderRadius: BorderRadius.circular(HireIQTheme.radiusXl),
+                    boxShadow: [
+                      BoxShadow(
+                        color: HireIQTheme.primaryNavy.withValues(alpha: 0.25),
+                        blurRadius: 20,
+                        offset: const Offset(0, 8),
                       ),
                     ],
                   ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 28),
-
-            // ── Section label ──────────────────────────────────────────────
-            Text(
-              'Placement Breakdown',
-              style: GoogleFonts.inter(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: HireIQTheme.primaryNavy),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'HireIQ retains ${(hireiqPlatformCutPercent * 100).toStringAsFixed(0)}% of each placement fee. '
-              'Your earnings are the remaining ${((1 - hireiqPlatformCutPercent) * 100).toStringAsFixed(0)}%.',
-              style: GoogleFonts.inter(
-                  fontSize: 13, color: HireIQTheme.textMuted, height: 1.5),
-            ),
-
-            const SizedBox(height: 16),
-
-            // ── Placement cards ────────────────────────────────────────────
-            ..._exampleRows.map((row) => _PlacementCard(row: row)),
-
-            const SizedBox(height: 8),
-
-            // ── VAT note ──────────────────────────────────────────────────
-            Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: HireIQTheme.primaryTeal.withValues(alpha: 0.06),
-                borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
-                border: Border.all(
-                    color: HireIQTheme.primaryTeal.withValues(alpha: 0.2)),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Icon(Icons.info_outline_rounded,
-                      size: 15, color: HireIQTheme.primaryTeal),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      'All amounts are exclusive of VAT (15%). '
-                      'Payouts are processed within 5 business days of the guarantee period ending. '
-                      'Contact $supportEmail for queries.',
-                      style: GoogleFonts.inter(
-                          fontSize: 12,
-                          color: HireIQTheme.primaryTeal,
-                          height: 1.5),
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Total Earnings (YTD)',
+                        style: GoogleFonts.inter(
+                            color: Colors.white70, fontSize: 14),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        _PlacementRow._rands(totalEarnings),
+                        style: GoogleFonts.inter(
+                            color: Colors.white,
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 24),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _HeroStat(
+                            label: 'Pending Payouts',
+                            value: _PlacementRow._rands(pendingEarnings),
+                            valueColor: HireIQTheme.primaryTeal,
+                          ),
+                          _HeroStat(
+                            label: 'Active Placements',
+                            value: '${rows.length}',
+                            valueColor: Colors.white,
+                          ),
+                          _HeroStat(
+                            label: 'Platform Cut (${(hireiqPlatformCutPercent * 100).toStringAsFixed(0)}%)',
+                            value: _PlacementRow._rands(
+                              rows.fold(0.0, (s, r) => s + r.hireiqCut),
+                            ),
+                            valueColor: Colors.white60,
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+
+                const SizedBox(height: 28),
+
+                // ── Section label ──────────────────────────────────────────────
+                Text(
+                  'Placement Breakdown',
+                  style: GoogleFonts.inter(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: HireIQTheme.primaryNavy),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'HireIQ retains ${(hireiqPlatformCutPercent * 100).toStringAsFixed(0)}% of each placement fee. '
+                  'Your earnings are the remaining ${((1 - hireiqPlatformCutPercent) * 100).toStringAsFixed(0)}%.',
+                  style: GoogleFonts.inter(
+                      fontSize: 13, color: HireIQTheme.textMuted, height: 1.5),
+                ),
+
+                const SizedBox(height: 16),
+
+                // ── Placement cards ────────────────────────────────────────────
+                ...rows.map((row) => _PlacementCard(row: row)),
+
+                const SizedBox(height: 8),
+
+                // ── VAT note ──────────────────────────────────────────────────
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: HireIQTheme.primaryTeal.withValues(alpha: 0.06),
+                    borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
+                    border: Border.all(
+                        color: HireIQTheme.primaryTeal.withValues(alpha: 0.2)),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(Icons.info_outline_rounded,
+                          size: 15, color: HireIQTheme.primaryTeal),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          'All amounts are exclusive of VAT (15%). '
+                          'Payouts are processed within 5 business days of the guarantee period ending. '
+                          'Contact $supportEmail for queries.',
+                          style: GoogleFonts.inter(
+                              fontSize: 12,
+                              color: HireIQTheme.primaryTeal,
+                              height: 1.5),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
