@@ -81,9 +81,33 @@ class AdminRevenueDashboard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildMiniStat('Growth', '+12.5%', Icons.trending_up),
-              _buildMiniStat(
-                  'Active Subs', '1,240', Icons.subscriptions),
+              // MRR growth — explicitly green
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.arrow_upward_rounded,
+                          color: Color(0xFF22C55E), size: 14),
+                      const SizedBox(width: 4),
+                      Text(
+                        'MRR Growth',
+                        style: GoogleFonts.inter(
+                            color: Colors.white70, fontSize: 12),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    '+12%',
+                    style: GoogleFonts.inter(
+                        color: const Color(0xFF22C55E),
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              _buildMiniStat('Active Subs', '1,240', Icons.subscriptions),
             ],
           ),
         ],

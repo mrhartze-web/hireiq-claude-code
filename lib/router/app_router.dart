@@ -888,16 +888,17 @@ class _PersonaBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 16),
+      height: 28,
       decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: HireIQTheme.borderLight)),
+        color: HireIQTheme.surfaceWhite,
+        border: Border(
+            top: BorderSide(color: HireIQTheme.borderLight, width: 0.5)),
       ),
+      alignment: Alignment.center,
       child: Text(
         _persona,
         textAlign: TextAlign.center,
-        style: const TextStyle(fontSize: 11, color: Color(0xFF94A3B8)),
+        style: const TextStyle(fontSize: 11, color: HireIQTheme.textMuted),
       ),
     );
   }
