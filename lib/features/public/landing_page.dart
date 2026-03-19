@@ -391,6 +391,13 @@ const _iqCards = <(IconData, String, String, String, Color)>[
     'Candidates',
     Color(0xFFF59E0B),
   ),
+  (
+    Icons.security_outlined,
+    'ShieldIQ',
+    'Fraud detection that eliminates fake listings, fake candidates, and misrepresented qualifications before they damage trust.',
+    'Recruiters & Admin',
+    Color(0xFFEF4444),
+  ),
 ];
 
 class _EcosystemSection extends StatelessWidget {
@@ -417,7 +424,7 @@ class _EcosystemSection extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                'Six AI-powered tools working together to transform every step of the hiring journey.',
+                'Seven AI-powered tools working together to transform every step of the hiring journey.',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.inter(
                   fontSize: 16,
@@ -582,7 +589,7 @@ class _RecruiterSection extends StatelessWidget {
               ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 720),
                 child: Text(
-                  'Keep 80% of every placement fee. HireIQ charges no monthly fees — you only pay when you place. SignalIQ tells you exactly what the market is paying before you pitch.',
+                  'Choose the plan that fits your practice. Solo recruiters from R2,999/month, Agency teams from R19,999/month. SignalIQ tells you exactly what the market is paying before you pitch.',
                   style: GoogleFonts.inter(
                     fontSize: 16,
                     color: HireIQTheme.textMuted,
@@ -597,22 +604,22 @@ class _RecruiterSection extends StatelessWidget {
                 children: [
                   Expanded(
                     child: _RecruiterStatCard(
-                      value: '80% of fees',
-                      label: 'yours to keep',
+                      value: 'R2,999',
+                      label: 'Solo Plan · per month · individual recruiter',
                     ),
                   ),
                   SizedBox(width: 24),
                   Expanded(
                     child: _RecruiterStatCard(
-                      value: '12% average',
-                      label: 'mid-level placement fee',
+                      value: 'R19,999',
+                      label: 'Agency Plan · per month · multi-seat',
                     ),
                   ),
                   SizedBox(width: 24),
                   Expanded(
                     child: _RecruiterStatCard(
-                      value: 'R28,800',
-                      label: 'average recruiter earn per placement',
+                      value: '80%',
+                      label: 'placement fee — yours to keep',
                     ),
                   ),
                 ],

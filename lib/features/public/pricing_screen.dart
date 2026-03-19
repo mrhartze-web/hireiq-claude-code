@@ -121,7 +121,7 @@ class _PricingScreenState extends State<PricingScreen> {
             const SizedBox(height: 12),
             const _EmployerCard(
               name: 'Starter',
-              price: 'R999',
+              price: 'R1,999',
               period: '/month',
               subtitle: 'Small teams getting started with smart hiring',
               features: [
@@ -135,7 +135,7 @@ class _PricingScreenState extends State<PricingScreen> {
             const SizedBox(height: 10),
             const _EmployerCard(
               name: 'Growth',
-              price: 'R2,499',
+              price: 'R9,999',
               period: '/month',
               subtitle: 'Scale your hiring with the full AI suite',
               features: [
@@ -150,8 +150,8 @@ class _PricingScreenState extends State<PricingScreen> {
             const SizedBox(height: 10),
             const _EmployerCard(
               name: 'Enterprise',
-              price: 'Custom',
-              period: '',
+              price: 'R49,999+',
+              period: '/month',
               subtitle: 'Tailored solutions for large organisations',
               features: [
                 'Unlimited job posts',
@@ -601,292 +601,239 @@ class _EmployerCard extends StatelessWidget {
   }
 }
 
-// ── Recruiter card ─────────────────────────────────────────────────────────────
+// ── Recruiter plan cards ────────────────────────────────────────────────────────
 
 class _RecruiterCard extends StatelessWidget {
   const _RecruiterCard();
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: HireIQTheme.surfaceWhite,
-        borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
-        border: Border.all(color: HireIQTheme.borderLight),
-        boxShadow: [
-          BoxShadow(
-            color: HireIQTheme.primaryNavy.withValues(alpha: 0.04),
-            blurRadius: 12,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: IntrinsicHeight(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+    return Column(
+      children: [
+        // Solo + Agency plans side by side
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Purple left accent bar
-            Container(
-              width: 4,
-              decoration: const BoxDecoration(
-                color: HireIQTheme.recruiterAccent,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(HireIQTheme.radiusLg),
-                  bottomLeft: Radius.circular(HireIQTheme.radiusLg),
-                ),
+            Expanded(
+              child: _RecruiterPlanCard(
+                name: 'Solo',
+                price: 'R2,999',
+                subtitle: 'Individual recruiter',
+                features: const [
+                  'CRM pipeline',
+                  'CV vault',
+                  'Brief upload & management',
+                  'ShieldIQ fraud detection',
+                  'SignalIQ market intelligence',
+                ],
+                isHighlighted: false,
+                onCta: () => context.go('/signup?role=recruiter'),
+                ctaLabel: 'Join as Recruiter',
               ),
             ),
+            const SizedBox(width: 16),
             Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(18),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Recruiter Platform',
-                                style: GoogleFonts.inter(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                  color: HireIQTheme.primaryNavy,
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                'Manage briefs, build your CV vault, and earn on placements.',
-                                style: GoogleFonts.inter(
-                                  fontSize: 12,
-                                  color: HireIQTheme.textMuted,
-                                  height: 1.4,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              'R499',
-                              style: GoogleFonts.inter(
-                                fontSize: 22,
-                                fontWeight: FontWeight.w800,
-                                color: HireIQTheme.recruiterAccent,
-                                height: 1.0,
-                              ),
-                            ),
-                            Text(
-                              '/month',
-                              style: GoogleFonts.inter(
-                                fontSize: 11,
-                                color: HireIQTheme.textMuted,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // Fee table header
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: HireIQTheme.recruiterAccent.withValues(alpha: 0.06),
-                        borderRadius:
-                            BorderRadius.circular(HireIQTheme.radiusMd),
-                      ),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            flex: 2,
-                            child: Text(
-                              'Level',
-                              style: GoogleFonts.inter(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                                color: HireIQTheme.recruiterAccent,
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: Text(
-                              'Fee %',
-                              style: GoogleFonts.inter(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                                color: HireIQTheme.recruiterAccent,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                          Expanded(
-                            flex: 2,
-                            child: Text(
-                              'Avg. Placement',
-                              style: GoogleFonts.inter(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                                color: HireIQTheme.recruiterAccent,
-                              ),
-                              textAlign: TextAlign.right,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 4),
-
-                    const _FeeTierRow(
-                      level: 'Junior',
-                      fee: '10%',
-                      placement: 'R20,000',
-                      isShaded: false,
-                    ),
-                    const _FeeTierRow(
-                      level: 'Mid-level',
-                      fee: '12%',
-                      placement: 'R36,000',
-                      isShaded: true,
-                    ),
-                    const _FeeTierRow(
-                      level: 'Senior',
-                      fee: '15%',
-                      placement: 'R75,000',
-                      isShaded: false,
-                    ),
-
-                    const SizedBox(height: 14),
-
-                    // Platform fee disclosure
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Icon(
-                          Icons.info_outline_rounded,
-                          size: 14,
-                          color: HireIQTheme.recruiterAccent,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            'HireIQ retains 20% of the placement fee as a platform charge. You keep 80%. No monthly fees, no upfront costs.',
-                            style: GoogleFonts.inter(
-                              fontSize: 12,
-                              fontStyle: FontStyle.italic,
-                              color: HireIQTheme.textMuted,
-                              height: 1.5,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 14),
-
-                    const _EarningsExampleCard(),
-                  ],
-                ),
+              child: _RecruiterPlanCard(
+                name: 'Agency',
+                price: 'R19,999',
+                subtitle: 'Multi-seat team plan',
+                features: const [
+                  'All Solo features',
+                  'Multi-seat team management',
+                  'Bulk brief processing',
+                  'Agency analytics dashboard',
+                  'White-label reports',
+                ],
+                isHighlighted: true,
+                badge: 'Most Popular',
+                onCta: () => context.go('/contact'),
+                ctaLabel: 'Contact Sales',
               ),
             ),
           ],
         ),
-      ),
+        const SizedBox(height: 16),
+        // Credits card
+        const _RecruiterCreditsCard(),
+      ],
     );
   }
 }
 
-// ── Earnings example card ──────────────────────────────────────────────────────
+class _RecruiterPlanCard extends StatelessWidget {
+  const _RecruiterPlanCard({
+    required this.name,
+    required this.price,
+    required this.subtitle,
+    required this.features,
+    required this.isHighlighted,
+    required this.onCta,
+    required this.ctaLabel,
+    this.badge,
+  });
 
-class _EarningsExampleCard extends StatelessWidget {
-  const _EarningsExampleCard();
+  final String name;
+  final String price;
+  final String subtitle;
+  final List<String> features;
+  final bool isHighlighted;
+  final VoidCallback onCta;
+  final String ctaLabel;
+  final String? badge;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: HireIQTheme.recruiterAccent.withValues(alpha: 0.04),
-        borderRadius: BorderRadius.circular(HireIQTheme.radiusMd),
+        color: isHighlighted
+            ? HireIQTheme.recruiterAccent
+            : HireIQTheme.surfaceWhite,
+        borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
         border: Border.all(
-          color: HireIQTheme.recruiterAccent.withValues(alpha: 0.15),
+          color: isHighlighted
+              ? HireIQTheme.recruiterAccent
+              : HireIQTheme.borderLight,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: HireIQTheme.recruiterAccent
+                .withValues(alpha: isHighlighted ? 0.2 : 0.04),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if (badge != null) ...[
+            Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+              decoration: BoxDecoration(
+                color: isHighlighted
+                    ? Colors.white.withValues(alpha: 0.25)
+                    : HireIQTheme.recruiterAccent.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(HireIQTheme.radiusFull),
+              ),
+              child: Text(
+                badge!,
+                style: GoogleFonts.inter(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: isHighlighted
+                      ? Colors.white
+                      : HireIQTheme.recruiterAccent,
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+          ],
           Text(
-            'Example placement',
+            name,
             style: GoogleFonts.inter(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              color: HireIQTheme.recruiterAccent,
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color:
+                  isHighlighted ? Colors.white : HireIQTheme.primaryNavy,
             ),
           ),
-          const SizedBox(height: 10),
-          const _ExRow(label: 'Role', value: 'Senior Software Engineer'),
-          const _ExRow(label: 'Annual Salary', value: 'R300,000'),
-          const _ExRow(label: 'Placement Fee (12%)', value: 'R36,000'),
-          const _ExRow(label: 'HireIQ Platform Cut (20%)', value: 'R7,200'),
-          const _ExRow(
-            label: 'Your Earnings (80%)',
-            value: 'R28,800',
-            isHighlighted: true,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ExRow extends StatelessWidget {
-  const _ExRow({
-    required this.label,
-    required this.value,
-    this.isHighlighted = false,
-  });
-
-  final String label;
-  final String value;
-  final bool isHighlighted;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
+          const SizedBox(height: 4),
           Text(
-            label,
+            subtitle,
             style: GoogleFonts.inter(
               fontSize: 12,
               color: isHighlighted
-                  ? HireIQTheme.primaryTeal
+                  ? Colors.white.withValues(alpha: 0.75)
                   : HireIQTheme.textMuted,
-              fontWeight:
-                  isHighlighted ? FontWeight.w600 : FontWeight.normal,
             ),
           ),
-          Text(
-            value,
-            style: GoogleFonts.inter(
-              fontSize: 12,
-              fontWeight:
-                  isHighlighted ? FontWeight.w700 : FontWeight.w500,
-              color: isHighlighted
-                  ? HireIQTheme.primaryTeal
-                  : HireIQTheme.primaryNavy,
+          const SizedBox(height: 16),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                price,
+                style: GoogleFonts.inter(
+                  fontSize: 26,
+                  fontWeight: FontWeight.w800,
+                  color:
+                      isHighlighted ? Colors.white : HireIQTheme.recruiterAccent,
+                  height: 1.0,
+                ),
+              ),
+              const SizedBox(width: 4),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 3),
+                child: Text(
+                  '/month',
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    color: isHighlighted
+                        ? Colors.white.withValues(alpha: 0.7)
+                        : HireIQTheme.textMuted,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          ...features.map(
+            (f) => Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.check_circle_rounded,
+                    size: 16,
+                    color: isHighlighted
+                        ? Colors.white.withValues(alpha: 0.9)
+                        : HireIQTheme.primaryTeal,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      f,
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        color: isHighlighted
+                            ? Colors.white.withValues(alpha: 0.9)
+                            : HireIQTheme.textPrimary,
+                        height: 1.3,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: onCta,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: isHighlighted
+                    ? Colors.white
+                    : HireIQTheme.recruiterAccent,
+                foregroundColor: isHighlighted
+                    ? HireIQTheme.recruiterAccent
+                    : Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius:
+                      BorderRadius.circular(HireIQTheme.radiusMd),
+                ),
+                elevation: 0,
+              ),
+              child: Text(
+                ctaLabel,
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
           ),
         ],
@@ -895,63 +842,74 @@ class _ExRow extends StatelessWidget {
   }
 }
 
-// ── Fee tier row ───────────────────────────────────────────────────────────────
-
-class _FeeTierRow extends StatelessWidget {
-  const _FeeTierRow({
-    required this.level,
-    required this.fee,
-    required this.placement,
-    required this.isShaded,
-  });
-
-  final String level;
-  final String fee;
-  final String placement;
-  final bool isShaded;
+class _RecruiterCreditsCard extends StatelessWidget {
+  const _RecruiterCreditsCard();
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isShaded ? HireIQTheme.background : HireIQTheme.surfaceWhite,
-        borderRadius: BorderRadius.circular(8),
+        color: HireIQTheme.surfaceWhite,
+        borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
+        border: Border.all(color: HireIQTheme.borderLight),
       ),
       child: Row(
         children: [
-          Expanded(
-            flex: 2,
-            child: Text(
-              level,
-              style: GoogleFonts.inter(
-                fontSize: 13,
-                color: HireIQTheme.textPrimary,
-                fontWeight: FontWeight.w500,
-              ),
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: HireIQTheme.recruiterAccent.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(HireIQTheme.radiusMd),
+            ),
+            child: const Icon(
+              Icons.bolt_rounded,
+              size: 22,
+              color: HireIQTheme.recruiterAccent,
             ),
           ),
+          const SizedBox(width: 16),
           Expanded(
-            child: Text(
-              fee,
-              style: GoogleFonts.inter(
-                fontSize: 13,
-                color: HireIQTheme.recruiterAccent,
-                fontWeight: FontWeight.w700,
-              ),
-              textAlign: TextAlign.center,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Credit Packs',
+                  style: GoogleFonts.inter(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: HireIQTheme.primaryNavy,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  'R25 per credit — ad-hoc candidate unlocks, no subscription needed',
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    color: HireIQTheme.textMuted,
+                    height: 1.4,
+                  ),
+                ),
+              ],
             ),
           ),
-          Expanded(
-            flex: 2,
-            child: Text(
-              placement,
-              style: GoogleFonts.inter(
-                fontSize: 13,
-                color: HireIQTheme.textSecondary,
-                fontWeight: FontWeight.w500,
-              ),
-              textAlign: TextAlign.right,
+          const SizedBox(width: 16),
+          Text(
+            'R25',
+            style: GoogleFonts.inter(
+              fontSize: 22,
+              fontWeight: FontWeight.w800,
+              color: HireIQTheme.recruiterAccent,
+              height: 1.0,
+            ),
+          ),
+          const SizedBox(width: 4),
+          Text(
+            '/credit',
+            style: GoogleFonts.inter(
+              fontSize: 11,
+              color: HireIQTheme.textMuted,
             ),
           ),
         ],
@@ -972,8 +930,8 @@ const _faqs = <(String, String)>[
     "All paid plans include a 14-day free trial. No credit card required to start. You'll only be billed after your trial period ends."
   ),
   (
-    'How do recruiter placement fees work?',
-    "Recruiters pay a monthly platform fee of R499. When a successful placement is made, a percentage fee is charged on the candidate's first-month salary based on role level: 10% for Junior, 12% for Mid-level, and 15% for Senior placements."
+    'How does recruiter pricing work?',
+    'Recruiters choose a subscription plan: Solo at R2,999/month for individual recruiters, or Agency at R19,999/month for multi-seat teams. Credit packs (R25 per credit) are available for ad-hoc candidate unlocks without a subscription.'
   ),
   (
     'What payment methods are accepted?',

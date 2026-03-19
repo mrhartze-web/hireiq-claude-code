@@ -7,6 +7,7 @@ import '../features/mobile_screens.dart';
 import '../features/web_screens.dart';
 import '../shared/navigation/role_navigation_bar.dart';
 import '../shared/components/admin_mode_bar.dart';
+import '../shared/theme.dart';
 
 // Import Public & Common Screens
 import '../features/public/splash_screen.dart';
@@ -855,7 +856,49 @@ class MainShell extends ConsumerWidget {
               ],
             )
           : child,
-      bottomNavigationBar: RoleNavigationBar(role: role),
+      bottomNavigationBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _PersonaBar(role: role),
+          RoleNavigationBar(role: role),
+        ],
+      ),
+    );
+  }
+}
+
+class _PersonaBar extends StatelessWidget {
+  const _PersonaBar({required this.role});
+
+  final UserRole role;
+
+  String get _persona {
+    switch (role) {
+      case UserRole.candidate:
+        return 'Thabo Nkosi · Senior Flutter Developer';
+      case UserRole.employer:
+        return 'Nomsa Dlamini · HR Director · FinCorp SA';
+      case UserRole.recruiter:
+        return 'Riya Patel · Senior Recruiter';
+      case UserRole.admin:
+        return 'Alan Nkomo · System Administrator';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 16),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(top: BorderSide(color: HireIQTheme.borderLight)),
+      ),
+      child: Text(
+        _persona,
+        textAlign: TextAlign.center,
+        style: const TextStyle(fontSize: 11, color: Color(0xFF94A3B8)),
+      ),
     );
   }
 }

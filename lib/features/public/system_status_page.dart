@@ -177,6 +177,11 @@ class SystemStatusPage extends StatelessWidget {
 
                 const SizedBox(height: 32),
 
+                // ── Incident history ──────────────────────────────────────
+                const _IncidentHistoryCard(),
+
+                const SizedBox(height: 32),
+
                 // ── Last updated ──────────────────────────────────────────
                 _LastUpdatedRow(),
               ],
@@ -265,6 +270,196 @@ class _ServiceRow extends StatelessWidget {
         if (showDivider)
           const Divider(height: 1, indent: 24, endIndent: 24),
       ],
+    );
+  }
+}
+
+// ── Incident history ──────────────────────────────────────────────────────────
+
+class _Incident {
+  const _Incident({
+    required this.date,
+    required this.title,
+    required this.description,
+    required this.resolved,
+  });
+  final String date;
+  final String title;
+  final String description;
+  final bool resolved;
+}
+
+const _incidents = <_Incident>[
+  _Incident(
+    date: '14 Mar 2026',
+    title: 'Payment Processing — Elevated Latency',
+    description: 'Some users experienced slow response times on PayFast checkout. Root cause identified as upstream gateway congestion. Resolved within 38 minutes.',
+    resolved: true,
+  ),
+  _Incident(
+    date: '02 Feb 2026',
+    title: 'Push Notifications — Delayed Delivery',
+    description: 'FCM delivery delays of up to 12 minutes affected candidate job-match alerts. Firebase infrastructure issue. All notifications delivered after resolution.',
+    resolved: true,
+  ),
+  _Incident(
+    date: '09 Jan 2026',
+    title: 'Authentication — Intermittent Login Failures',
+    description: 'A subset of social-auth (Google/LinkedIn) logins failed for approximately 25 minutes. Caused by an expired OAuth callback config. Fixed and verified.',
+    resolved: true,
+  ),
+  _Incident(
+    date: '18 Nov 2025',
+    title: 'File Storage — CV Upload Timeout',
+    description: 'CV uploads above 5 MB timed out for roughly 2 hours due to a misconfigured Cloud Storage CORS policy. Policy corrected and uploads restored.',
+    resolved: true,
+  ),
+  _Incident(
+    date: '03 Oct 2025',
+    title: 'Database — Read Latency Spike',
+    description: 'Firestore read times spiked for candidate job-feed queries during peak hours. Index optimisation applied within 55 minutes. No data loss occurred.',
+    resolved: true,
+  ),
+  _Incident(
+    date: '22 Aug 2025',
+    title: 'API — MatchIQ Scoring Unavailable',
+    description: 'MatchIQ scoring endpoint returned 503 for 18 minutes following a cold-start failure in Cloud Functions. Function warmed and service restored.',
+    resolved: true,
+  ),
+  _Incident(
+    date: '11 Jul 2025',
+    title: 'API — Planned Maintenance Window',
+    description: 'Scheduled 45-minute maintenance to upgrade Firestore indexes and deploy SignalIQ v2 engine. Completed ahead of schedule with no unplanned downtime.',
+    resolved: true,
+  ),
+];
+
+class _IncidentHistoryCard extends StatelessWidget {
+  const _IncidentHistoryCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: HireIQTheme.surfaceWhite,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: HireIQTheme.borderLight),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
+            child: Text(
+              'Past Incidents',
+              style: GoogleFonts.inter(
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                color: HireIQTheme.textPrimary,
+              ),
+            ),
+          ),
+          const Divider(height: 1),
+          ..._incidents.asMap().entries.map((entry) {
+            final i = entry.key;
+            final incident = entry.value;
+            final isLast = i == _incidents.length - 1;
+            return Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 8,
+                        height: 8,
+                        margin: const EdgeInsets.only(top: 5),
+                        decoration: BoxDecoration(
+                          color: incident.resolved
+                              ? HireIQTheme.success
+                              : HireIQTheme.warning,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    incident.title,
+                                    style: GoogleFonts.inter(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: HireIQTheme.textPrimary,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  incident.date,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 12,
+                                    color: HireIQTheme.textLight,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              incident.description,
+                              style: GoogleFonts.inter(
+                                fontSize: 13,
+                                color: HireIQTheme.textMuted,
+                                height: 1.5,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: incident.resolved
+                                    ? HireIQTheme.successLight
+                                    : HireIQTheme.warningLight,
+                                borderRadius: BorderRadius.circular(999),
+                              ),
+                              child: Text(
+                                incident.resolved ? 'Resolved' : 'Monitoring',
+                                style: GoogleFonts.inter(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: incident.resolved
+                                      ? const Color(0xFF15803D)
+                                      : HireIQTheme.warning,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (!isLast)
+                  const Divider(height: 1, indent: 46, endIndent: 20),
+              ],
+            );
+          }),
+        ],
+      ),
     );
   }
 }

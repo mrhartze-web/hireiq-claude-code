@@ -118,7 +118,7 @@ class CandidatePublicProfile extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Senior Backend Engineer',
+                          'Senior Flutter Developer',
                           style: GoogleFonts.inter(
                             fontSize: 14,
                             color: HireIQTheme.textMuted,

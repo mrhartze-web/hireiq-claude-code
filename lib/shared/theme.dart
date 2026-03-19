@@ -50,10 +50,15 @@ class HireIQTheme {
   static const Color divider = Color(0xFFE2E8F0);
 
   // ── Role Accents ───────────────────────────────────────────────────────
+  // ── CTA Colours ────────────────────────────────────────────────────────────
+  static const Color ctaPrimary = amber;
+  static const Color ctaText = primaryNavy;
+
   static const Color candidateAccent = primaryTeal;
   static const Color employerAccent = primaryNavy;
   static const Color recruiterAccent = Color(0xFF7C3AED);
   static const Color adminAccent = Color(0xFFDC2626);
+  static const Color shieldIQColor = Color(0xFFEF4444);
 
   // ── Shimmer ────────────────────────────────────────────────────────────
   static const Color shimmerBase = Color(0xFFE2E8F0);
