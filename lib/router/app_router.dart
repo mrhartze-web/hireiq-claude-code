@@ -165,7 +165,6 @@ final routerProvider = Provider<GoRouter>((ref) {
           path.startsWith('/admin');
 
       final isPublicRoute = publicRoutes.contains(path) ||
-          path.startsWith('/thundafund') ||
           path.startsWith('/web/');
 
       // ── Guard: unauthenticated user → /welcome ───────────────────────────
@@ -747,44 +746,6 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
           path: '/error-404',
           builder: (context, state) => const Error404Page()),
-      // Thundafund — legacy flat paths (kept for existing links)
-      GoRoute(
-          path: '/thundafund-landing',
-          builder: (context, state) => const ThundafundLanding()),
-      GoRoute(
-          path: '/thundafund-rewards',
-          builder: (context, state) => const ThundafundRewards()),
-      GoRoute(
-          path: '/thundafund-story',
-          builder: (context, state) => const ThundafundStory()),
-      GoRoute(
-          path: '/thundafund-social-proof',
-          builder: (context, state) => const ThundafundSocialProof()),
-      GoRoute(
-          path: '/thundafund-faq',
-          builder: (context, state) => const ThundafundFaq()),
-      GoRoute(
-          path: '/thundafund-updates',
-          builder: (context, state) => const ThundafundUpdates()),
-      // Thundafund — clean spec paths
-      GoRoute(
-          path: '/thundafund',
-          builder: (context, state) => const ThundafundLanding()),
-      GoRoute(
-          path: '/thundafund/rewards',
-          builder: (context, state) => const ThundafundRewards()),
-      GoRoute(
-          path: '/thundafund/story',
-          builder: (context, state) => const ThundafundStory()),
-      GoRoute(
-          path: '/thundafund/social-proof',
-          builder: (context, state) => const ThundafundSocialProof()),
-      GoRoute(
-          path: '/thundafund/faq',
-          builder: (context, state) => const ThundafundFaq()),
-      GoRoute(
-          path: '/thundafund/updates',
-          builder: (context, state) => const ThundafundUpdates()),
 
       // Shell 4: Admin
       ShellRoute(
