@@ -24,6 +24,10 @@ class JobSearchNotifier extends StateNotifier<List<JobModel>> {
   void clear() => state = [];
 }
 
+final jobDetailProvider =
+    FutureProvider.family<JobModel?, String>((ref, jobId) =>
+        ref.watch(firestoreServiceProvider).getJob(jobId));
+
 final jobSearchProvider =
     StateNotifierProvider<JobSearchNotifier, List<JobModel>>((ref) =>
         JobSearchNotifier(ref.watch(firestoreServiceProvider)));

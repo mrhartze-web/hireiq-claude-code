@@ -6,6 +6,8 @@ import '../../providers/auth_provider.dart';
 import '../../providers/candidate_provider.dart';
 import '../../shared/components/skeleton_loader.dart';
 import '../../shared/components/error_state.dart';
+import '../../shared/components/empty_state.dart';
+import 'package:go_router/go_router.dart';
 
 class CandidateProfile extends ConsumerWidget {
   const CandidateProfile({super.key});
@@ -232,9 +234,14 @@ class CandidateProfile extends ConsumerWidget {
                     ),
                   )
                 else
-                  const SliverFillRemaining(
-                    child: Center(
-                      child: ErrorState(message: 'No profile data yet'),
+                  SliverFillRemaining(
+                    child: EmptyState(
+                      icon: Icons.person_add_outlined,
+                      heading: 'Complete your profile',
+                      body: 'Add your details so employers can find you',
+                      ctaLabel: 'Set up profile',
+                      onCtaPressed: () =>
+                          context.go('/candidate/edit-profile'),
                     ),
                   ),
               ],

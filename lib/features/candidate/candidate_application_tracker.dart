@@ -2,78 +2,128 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../shared/theme.dart';
+import '../../providers/auth_provider.dart';
+import '../../providers/application_provider.dart';
+import '../../shared/components/skeleton_loader.dart';
+import '../../shared/components/error_state.dart';
+import '../../shared/components/empty_state.dart';
 
 class ApplicationTracker extends ConsumerWidget {
   const ApplicationTracker({super.key});
 
+  static (Color, int) _statusInfo(String status) {
+    switch (status.toLowerCase()) {
+      case 'reviewing':
+        return (HireIQTheme.amber, 1);
+      case 'shortlisted':
+        return (HireIQTheme.primaryTeal, 2);
+      case 'interview':
+        return (HireIQTheme.primaryTeal, 3);
+      case 'offer':
+        return (HireIQTheme.success, 3);
+      case 'hired':
+        return (HireIQTheme.success, 4);
+      case 'rejected':
+        return (HireIQTheme.error, 0);
+      default:
+        return (HireIQTheme.textMuted, 0);
+    }
+  }
+
+  static String _formatDate(DateTime date) {
+    final diff = DateTime.now().difference(date);
+    if (diff.inDays == 0) return 'Applied today';
+    if (diff.inDays == 1) return 'Applied yesterday';
+    if (diff.inDays < 7) return 'Applied ${diff.inDays} days ago';
+    if (diff.inDays < 14) return 'Applied 1 week ago';
+    return 'Applied ${(diff.inDays / 7).floor()} weeks ago';
+  }
+
+  static String _capitalise(String s) =>
+      s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authStateProvider);
+    final uid = authState.value?.uid ?? '';
+    final applicationsAsync = ref.watch(candidateApplicationsProvider(uid));
+
     return Scaffold(
       backgroundColor: HireIQTheme.background,
       body: SafeArea(
         bottom: false,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ── Header ────────────────────────────────────────────────────
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Applications',
-                    style: GoogleFonts.inter(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w800,
-                      color: HireIQTheme.primaryNavy,
-                      letterSpacing: -0.5,
+        child: applicationsAsync.when(
+          loading: () => const Padding(
+            padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
+            child: SkeletonLoader(itemCount: 3),
+          ),
+          error: (err, _) => ErrorState(
+            message: 'Could not load applications',
+            onRetry: () =>
+                ref.invalidate(candidateApplicationsProvider(uid)),
+          ),
+          data: (applications) => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ── Header ──────────────────────────────────────────────────
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Applications',
+                      style: GoogleFonts.inter(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                        color: HireIQTheme.primaryNavy,
+                        letterSpacing: -0.5,
+                      ),
                     ),
-                  ),
-                  Text(
-                    '3 active applications',
-                    style: GoogleFonts.inter(
-                      fontSize: 13,
-                      color: HireIQTheme.textMuted,
+                    Text(
+                      '${applications.length} application${applications.length == 1 ? '' : 's'}',
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        color: HireIQTheme.textMuted,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
 
-            // ── List ──────────────────────────────────────────────────────
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
-                children: const [
-                  _ApplicationCard(
-                    role: 'Senior Flutter Developer',
-                    company: 'Apex Digital',
-                    status: 'Interview Scheduled',
-                    stage: 3,
-                    statusColor: HireIQTheme.primaryTeal,
-                    appliedDate: 'Applied 2 days ago',
-                  ),
-                  _ApplicationCard(
-                    role: 'UX Designer',
-                    company: 'Synergy Labs',
-                    status: 'CV Under Review',
-                    stage: 1,
-                    statusColor: HireIQTheme.amber,
-                    appliedDate: 'Applied 5 days ago',
-                  ),
-                  _ApplicationCard(
-                    role: 'Backend Engineer',
-                    company: 'M-Pesa Africa',
-                    status: 'Applied',
-                    stage: 0,
-                    statusColor: HireIQTheme.textMuted,
-                    appliedDate: 'Applied 1 week ago',
-                  ),
-                ],
+              // ── List ──────────────────────────────────────────────────────
+              Expanded(
+                child: applications.isEmpty
+                    ? const EmptyState(
+                        icon: Icons.send_outlined,
+                        heading: 'No applications yet',
+                        body:
+                            'Apply to jobs from the feed and track your progress here',
+                      )
+                    : ListView.builder(
+                        padding:
+                            const EdgeInsets.fromLTRB(20, 20, 20, 40),
+                        itemCount: applications.length,
+                        itemBuilder: (context, index) {
+                          final app = applications[index];
+                          final (statusColor, stage) =
+                              _statusInfo(app.status);
+                          final jobRef = app.jobId.length > 8
+                              ? app.jobId.substring(0, 8)
+                              : app.jobId;
+                          return _ApplicationCard(
+                            role: 'Job #$jobRef',
+                            company: 'Application ${index + 1}',
+                            status: _capitalise(app.status),
+                            stage: stage,
+                            statusColor: statusColor,
+                            appliedDate: _formatDate(app.appliedAt),
+                          );
+                        },
+                      ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -98,7 +148,6 @@ class _ApplicationCard extends StatelessWidget {
   final int stage;
   final Color statusColor;
   final String appliedDate;
-
 
   @override
   Widget build(BuildContext context) {
@@ -129,7 +178,8 @@ class _ApplicationCard extends StatelessWidget {
                 height: 44,
                 decoration: BoxDecoration(
                   color: statusColor.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(HireIQTheme.radiusMd),
+                  borderRadius:
+                      BorderRadius.circular(HireIQTheme.radiusMd),
                 ),
                 child: Icon(
                   Icons.work_outline_rounded,

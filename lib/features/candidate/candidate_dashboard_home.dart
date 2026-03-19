@@ -6,6 +6,10 @@ import '../../shared/theme.dart';
 import '../../shared/components/job_card.dart';
 import '../../shared/navigation/role_navigation_bar.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/candidate_provider.dart';
+import '../../providers/application_provider.dart';
+import '../../providers/job_provider.dart';
+import '../../models/job_model.dart';
 
 class CandidateDashboardHome extends ConsumerStatefulWidget {
   const CandidateDashboardHome({super.key});
@@ -20,8 +24,6 @@ class _CandidateDashboardHomeState
     with SingleTickerProviderStateMixin {
   late final AnimationController _scoreController;
   late final Animation<double> _scoreAnim;
-
-  static const int _matchScore = 78;
 
   @override
   void initState() {
@@ -56,39 +58,17 @@ class _CandidateDashboardHomeState
     if (mounted) _scoreController.forward();
   }
 
-  List<Widget> _buildJobCards(BuildContext context) {
-    const jobs = [
-      (
-        title: 'Senior Flutter Developer',
-        company: 'Apex Digital',
-        location: 'Remote',
-        salary: 'R45k – R60k / month',
-        match: '94',
-      ),
-      (
-        title: 'Mobile Engineer (iOS/Android)',
-        company: 'TechWave Solutions',
-        location: 'Cape Town',
-        salary: 'R35k – R50k / month',
-        match: '87',
-      ),
-      (
-        title: 'React Native Developer',
-        company: 'BuildFast Inc.',
-        location: 'Johannesburg · Hybrid',
-        salary: 'R30k – R45k / month',
-        match: '81',
-      ),
-    ];
-
+  List<Widget> _buildJobCards(BuildContext context, List<JobModel> jobs) {
+    if (jobs.isEmpty) return [];
     return jobs
         .map(
           (j) => JobCard(
             title: j.title,
             company: j.company,
             location: j.location,
-            salary: j.salary,
-            matchScore: j.match,
+            salary: j.salaryMin > 0
+                ? 'R${(j.salaryMin / 1000).round()}k – R${(j.salaryMax / 1000).round()}k / month'
+                : null,
             onTap: () => context.push('/candidate/jobs'),
           ),
         )
@@ -100,6 +80,22 @@ class _CandidateDashboardHomeState
     final authState = ref.watch(authStateProvider);
     final firstName =
         authState.value?.displayName?.split(' ').first ?? 'there';
+
+    final user = authState.value;
+    final profileData = user != null
+        ? ref.watch(candidateProfileProvider(user.uid)).valueOrNull
+        : null;
+    final matchScore = profileData?.matchIQScore.toInt() ?? 0;
+    final completionPercent = profileData?.profileCompletionPercent ?? 0;
+    final applicationsCount = user != null
+        ? (ref
+                .watch(candidateApplicationsProvider(user.uid))
+                .valueOrNull
+                ?.length ??
+            0)
+        : 0;
+    final recommendedJobs =
+        ref.watch(activeJobsProvider).valueOrNull?.take(3).toList() ?? [];
 
     return Scaffold(
       backgroundColor: HireIQTheme.background,
@@ -177,7 +173,7 @@ class _CandidateDashboardHomeState
                   padding: const EdgeInsets.fromLTRB(20, 28, 20, 0),
                   child: _MatchIQCard(
                     scoreAnim: _scoreAnim,
-                    score: _matchScore,
+                    score: matchScore,
                     onExplain: () =>
                         context.push('/candidate/matchiq-explanation'),
                   ),
@@ -185,10 +181,10 @@ class _CandidateDashboardHomeState
               ),
 
               // ── Quick stats ──────────────────────────────────────────────
-              const SliverToBoxAdapter(
+              SliverToBoxAdapter(
                 child: Padding(
-                  padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
-                  child: _StatCardsRow(),
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                  child: _StatCardsRow(applicationsCount: applicationsCount),
                 ),
               ),
 
@@ -208,7 +204,7 @@ class _CandidateDashboardHomeState
                 padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
                 sliver: SliverList(
                   delegate: SliverChildListDelegate(
-                    _buildJobCards(context),
+                    _buildJobCards(context, recommendedJobs),
                   ),
                 ),
               ),
@@ -229,6 +225,7 @@ class _CandidateDashboardHomeState
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(20, 16, 20, 40),
                   child: _ProfileCompletionCard(
+                    percent: completionPercent,
                     onComplete: () => context.go('/candidate/profile'),
                   ),
                 ),
@@ -388,34 +385,36 @@ class _MatchIQCard extends StatelessWidget {
 // ── Stat cards row ────────────────────────────────────────────────────────────
 
 class _StatCardsRow extends StatelessWidget {
-  const _StatCardsRow();
+  const _StatCardsRow({required this.applicationsCount});
+
+  final int applicationsCount;
 
   @override
   Widget build(BuildContext context) {
-    return const Row(
+    return Row(
       children: [
         Expanded(
           child: _StatCard(
             icon: Icons.send_outlined,
-            value: '12',
+            value: '$applicationsCount',
             label: 'Applications\nSent',
             iconColor: HireIQTheme.primaryNavy,
           ),
         ),
-        SizedBox(width: 12),
-        Expanded(
+        const SizedBox(width: 12),
+        const Expanded(
           child: _StatCard(
             icon: Icons.event_outlined,
-            value: '3',
+            value: '—',
             label: 'Interviews\nScheduled',
             iconColor: HireIQTheme.primaryTeal,
           ),
         ),
-        SizedBox(width: 12),
-        Expanded(
+        const SizedBox(width: 12),
+        const Expanded(
           child: _StatCard(
             icon: Icons.visibility_outlined,
-            value: '47',
+            value: '—',
             label: 'Profile\nViews',
             iconColor: HireIQTheme.amber,
           ),
@@ -539,8 +538,12 @@ class _SectionHeader extends StatelessWidget {
 // ── Profile completion card ───────────────────────────────────────────────────
 
 class _ProfileCompletionCard extends StatelessWidget {
-  const _ProfileCompletionCard({required this.onComplete});
+  const _ProfileCompletionCard({
+    required this.percent,
+    required this.onComplete,
+  });
 
+  final int percent;
   final VoidCallback onComplete;
 
   @override
@@ -569,7 +572,7 @@ class _ProfileCompletionCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '60% complete',
+                      '$percent% complete',
                       style: GoogleFonts.inter(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
@@ -618,11 +621,11 @@ class _ProfileCompletionCard extends StatelessWidget {
           ClipRRect(
             borderRadius:
                 BorderRadius.circular(HireIQTheme.radiusFull),
-            child: const LinearProgressIndicator(
-              value: 0.60,
+            child: LinearProgressIndicator(
+              value: percent / 100,
               minHeight: 8,
               backgroundColor: HireIQTheme.borderLight,
-              valueColor: AlwaysStoppedAnimation<Color>(
+              valueColor: const AlwaysStoppedAnimation<Color>(
                 HireIQTheme.primaryTeal,
               ),
             ),

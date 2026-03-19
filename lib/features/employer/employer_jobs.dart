@@ -3,77 +3,119 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../shared/theme.dart';
 import 'package:go_router/go_router.dart';
+import '../../providers/auth_provider.dart';
+import '../../providers/job_provider.dart';
+import '../../models/job_model.dart';
+import '../../shared/components/skeleton_loader.dart';
+import '../../shared/components/error_state.dart';
+import '../../shared/components/empty_state.dart';
 
 class EmployerMyJobs extends ConsumerWidget {
   const EmployerMyJobs({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
-      backgroundColor: HireIQTheme.background,
-      body: DefaultTabController(
-        length: 3,
-        child: CustomScrollView(
-          slivers: [
-            SliverAppBar(
-              pinned: true,
-              backgroundColor: HireIQTheme.primaryNavy,
-              foregroundColor: Colors.white,
-              centerTitle: true,
-              title: Text(
-                'My Job Listings',
-                style: GoogleFonts.inter(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white),
-              ),
-              bottom: TabBar(
-                tabs: const [
-                  Tab(text: 'Active'),
-                  Tab(text: 'Paused'),
-                  Tab(text: 'Closed'),
-                ],
-                labelColor: Colors.white,
-                unselectedLabelColor: Colors.white60,
-                indicatorColor: HireIQTheme.primaryTeal,
-                labelStyle: GoogleFonts.inter(fontWeight: FontWeight.w600),
-                unselectedLabelStyle:
-                    GoogleFonts.inter(fontWeight: FontWeight.normal),
-              ),
-            ),
-            SliverFillRemaining(
-              child: TabBarView(
-                children: [
-                  _buildJobList(context, const [
-                    _JobListing('Senior Flutter Developer', '42 Applicants',
-                        'Posted 5 days ago'),
-                    _JobListing(
-                        'UX Designer', '12 Applicants', 'Posted 2 days ago'),
-                  ]),
-                  _buildJobList(context, const [
-                    _JobListing('Backend Engineer', '8 Applicants',
-                        'Paused 1 day ago'),
-                  ]),
-                  _buildJobList(context, const [
-                    _JobListing('Product Manager', '56 Applicants',
-                        'Closed 1 month ago'),
-                  ]),
-                ],
-              ),
-            ),
-          ],
+    final authState = ref.watch(authStateProvider);
+    final uid = authState.value?.uid ?? '';
+    final jobsAsync = ref.watch(employerJobsProvider(uid));
+
+    return jobsAsync.when(
+      loading: () => Scaffold(
+        backgroundColor: HireIQTheme.background,
+        appBar: AppBar(
+          backgroundColor: HireIQTheme.primaryNavy,
+          foregroundColor: Colors.white,
+          centerTitle: true,
+          title: Text(
+            'My Job Listings',
+            style: GoogleFonts.inter(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.white),
+          ),
+        ),
+        body: const Padding(
+          padding: EdgeInsets.all(16),
+          child: SkeletonLoader(itemCount: 4),
         ),
       ),
+      error: (err, _) => Scaffold(
+        backgroundColor: HireIQTheme.background,
+        appBar: AppBar(
+          backgroundColor: HireIQTheme.primaryNavy,
+          foregroundColor: Colors.white,
+          centerTitle: true,
+          title: Text(
+            'My Job Listings',
+            style: GoogleFonts.inter(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.white),
+          ),
+        ),
+        body: ErrorState(
+          message: 'Could not load jobs',
+          onRetry: () => ref.invalidate(employerJobsProvider(uid)),
+        ),
+      ),
+      data: (jobs) {
+        final active = jobs.where((j) => j.isActive).toList();
+        final closed = jobs.where((j) => !j.isActive).toList();
+
+        return Scaffold(
+          backgroundColor: HireIQTheme.background,
+          body: DefaultTabController(
+            length: 2,
+            child: CustomScrollView(
+              slivers: [
+                SliverAppBar(
+                  pinned: true,
+                  backgroundColor: HireIQTheme.primaryNavy,
+                  foregroundColor: Colors.white,
+                  centerTitle: true,
+                  title: Text(
+                    'My Job Listings',
+                    style: GoogleFonts.inter(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white),
+                  ),
+                  bottom: TabBar(
+                    tabs: const [
+                      Tab(text: 'Active'),
+                      Tab(text: 'Closed'),
+                    ],
+                    labelColor: Colors.white,
+                    unselectedLabelColor: Colors.white60,
+                    indicatorColor: HireIQTheme.primaryTeal,
+                    labelStyle:
+                        GoogleFonts.inter(fontWeight: FontWeight.w600),
+                    unselectedLabelStyle:
+                        GoogleFonts.inter(fontWeight: FontWeight.normal),
+                  ),
+                ),
+                SliverFillRemaining(
+                  child: TabBarView(
+                    children: [
+                      _buildJobList(context, active),
+                      _buildJobList(context, closed),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildJobList(BuildContext context, List<_JobListing> jobs) {
+  Widget _buildJobList(BuildContext context, List<JobModel> jobs) {
     if (jobs.isEmpty) {
-      return Center(
-        child: Text(
-          'No jobs in this category',
-          style: GoogleFonts.inter(color: HireIQTheme.textMuted),
-        ),
+      return const EmptyState(
+        icon: Icons.work_off_outlined,
+        heading: 'No listings here',
+        body: 'Jobs in this category will appear here',
       );
     }
     return ListView.builder(
@@ -112,7 +154,7 @@ class EmployerMyJobs extends ConsumerWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        job.date,
+                        job.location,
                         style: GoogleFonts.inter(
                             fontSize: 13, color: HireIQTheme.textMuted),
                       ),
@@ -123,7 +165,7 @@ class EmployerMyJobs extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      job.applicants,
+                      '${job.applicationsCount} applicants',
                       style: GoogleFonts.inter(
                           color: HireIQTheme.primaryTeal,
                           fontWeight: FontWeight.w600,
@@ -141,11 +183,4 @@ class EmployerMyJobs extends ConsumerWidget {
       },
     );
   }
-}
-
-class _JobListing {
-  final String title;
-  final String applicants;
-  final String date;
-  const _JobListing(this.title, this.applicants, this.date);
 }

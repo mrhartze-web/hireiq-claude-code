@@ -5,6 +5,9 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../shared/theme.dart';
 import '../mobile_screens.dart';
 import '../../providers/job_provider.dart';
+import '../../shared/components/skeleton_loader.dart';
+import '../../shared/components/error_state.dart';
+import '../../shared/components/empty_state.dart';
 
 class CandidateJobFeed extends ConsumerWidget {
   const CandidateJobFeed({super.key});
@@ -106,7 +109,11 @@ class CandidateJobFeed extends ConsumerWidget {
                 child: ref.watch(activeJobsProvider).when(
                   data: (jobs) {
                     if (jobs.isEmpty) {
-                      return const _EmptyJobsState();
+                      return const EmptyState(
+                        icon: Icons.work_outline,
+                        heading: 'No jobs yet',
+                        body: 'Check back soon — new jobs are posted daily',
+                      );
                     }
                     return Column(
                       children: jobs
@@ -118,21 +125,18 @@ class CandidateJobFeed extends ConsumerWidget {
                               tags: job.skills.take(3).toList(),
                               onTap: () => context.push(
                                 MobileRoutes.candidateJobDetail
-                                    .replaceFirst(':id', '123'),
+                                    .replaceFirst(':id', job.jobId),
                               ),
                             ),
                           )
                           .toList(),
                     );
                   },
-                  loading: () => const Center(
-                    heightFactor: 5,
-                    child: CircularProgressIndicator(
-                      color: HireIQTheme.primaryTeal,
-                      strokeWidth: 2.5,
-                    ),
+                  loading: () => const SkeletonLoader(itemCount: 3),
+                  error: (err, _) => ErrorState(
+                    message: 'Could not load jobs',
+                    onRetry: () => ref.invalidate(activeJobsProvider),
                   ),
-                  error: (err, _) => _FeedErrorState(message: err.toString()),
                 ),
               ),
             ],
@@ -383,106 +387,6 @@ class _JobFeedCard extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-// ── Empty state ───────────────────────────────────────────────────────────────
-
-class _EmptyJobsState extends StatelessWidget {
-  const _EmptyJobsState();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 48),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 72,
-            height: 72,
-            decoration: BoxDecoration(
-              color: HireIQTheme.primaryTeal.withValues(alpha: 0.08),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.work_off_outlined,
-              size: 34,
-              color: HireIQTheme.primaryTeal,
-            ),
-          ),
-          const SizedBox(height: 20),
-          Text(
-            'No jobs available yet',
-            style: GoogleFonts.inter(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: HireIQTheme.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            'Check back soon — new roles are added daily',
-            textAlign: TextAlign.center,
-            style: GoogleFonts.inter(
-              fontSize: 13,
-              color: HireIQTheme.textMuted,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ── Error state ───────────────────────────────────────────────────────────────
-
-class _FeedErrorState extends StatelessWidget {
-  const _FeedErrorState({required this.message});
-
-  final String message;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 48),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 72,
-            height: 72,
-            decoration: const BoxDecoration(
-              color: HireIQTheme.errorLight,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.wifi_off_rounded,
-              size: 32,
-              color: HireIQTheme.error,
-            ),
-          ),
-          const SizedBox(height: 20),
-          Text(
-            'Could not load jobs',
-            style: GoogleFonts.inter(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: HireIQTheme.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            message,
-            textAlign: TextAlign.center,
-            style: GoogleFonts.inter(
-              fontSize: 12,
-              color: HireIQTheme.textMuted,
-            ),
-          ),
-        ],
       ),
     );
   }

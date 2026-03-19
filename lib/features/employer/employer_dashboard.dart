@@ -3,12 +3,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../shared/theme.dart';
 import 'package:go_router/go_router.dart';
+import '../../providers/auth_provider.dart';
+import '../../providers/job_provider.dart';
+import '../../shared/components/skeleton_loader.dart';
+import '../../shared/components/error_state.dart';
+import '../../shared/components/empty_state.dart';
 
 class EmployerDashboard extends ConsumerWidget {
   const EmployerDashboard({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authStateProvider);
+    final uid = authState.value?.uid ?? '';
+    final jobsAsync = ref.watch(employerJobsProvider(uid));
+
     return Scaffold(
       backgroundColor: HireIQTheme.background,
       floatingActionButton: FloatingActionButton.extended(
@@ -48,117 +57,93 @@ class EmployerDashboard extends ConsumerWidget {
             ],
           ),
           SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Dashboard Overview',
-                    style: GoogleFonts.inter(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: HireIQTheme.textPrimary),
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
+            child: jobsAsync.when(
+              loading: () => const Padding(
+                padding: EdgeInsets.all(20),
+                child: SkeletonLoader(itemCount: 3),
+              ),
+              error: (err, _) => Padding(
+                padding: const EdgeInsets.all(20),
+                child: ErrorState(
+                  message: 'Could not load dashboard',
+                  onRetry: () => ref.invalidate(employerJobsProvider(uid)),
+                ),
+              ),
+              data: (jobs) {
+                final activeJobs = jobs.where((j) => j.isActive).toList();
+                final totalApplications =
+                    jobs.fold(0, (sum, j) => sum + j.applicationsCount);
+
+                return Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
-                        child: _buildStatCard(
-                          'Total Applications',
-                          '142',
-                          Icons.people_outline,
-                          HireIQTheme.primaryTeal,
-                        ),
+                      Text(
+                        'Dashboard Overview',
+                        style: GoogleFonts.inter(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: HireIQTheme.textPrimary),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _buildStatCard(
-                          'Active Jobs',
-                          '12',
-                          Icons.work_outline,
-                          HireIQTheme.primaryNavy,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 28),
-                  Text(
-                    'Recent Activity',
-                    style: GoogleFonts.inter(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w600,
-                        color: HireIQTheme.textPrimary),
-                  ),
-                  const SizedBox(height: 12),
-                  _buildActivityItem('Senior Dev', '3 new applicants', '2 hrs ago'),
-                  _buildActivityItem(
-                      'UI Designer', 'Interview scheduled', '5 hrs ago'),
-                  _buildActivityItem(
-                      'DevOps Eng', 'Listing expired', '1 day ago'),
-                  const SizedBox(height: 28),
-                  Text(
-                    'Active Listings',
-                    style: GoogleFonts.inter(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w600,
-                        color: HireIQTheme.textPrimary),
-                  ),
-                  const SizedBox(height: 12),
-                  ...List.generate(
-                    3,
-                    (index) => GestureDetector(
-                      onTap: () => context.push('/employer/my-jobs'),
-                      child: Container(
-                        margin: const EdgeInsets.only(bottom: 12),
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: HireIQTheme.surfaceWhite,
-                          borderRadius:
-                              BorderRadius.circular(HireIQTheme.radiusLg),
-                          border: Border.all(color: HireIQTheme.borderLight),
-                          boxShadow: [
-                            BoxShadow(
-                              color: HireIQTheme.primaryNavy
-                                  .withValues(alpha: 0.04),
-                              blurRadius: 12,
-                              offset: const Offset(0, 3),
+                      const SizedBox(height: 20),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildStatCard(
+                              'Total Applications',
+                              '$totalApplications',
+                              Icons.people_outline,
+                              HireIQTheme.primaryTeal,
                             ),
-                          ],
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Software Engineer $index',
-                                    style: GoogleFonts.inter(
-                                        fontWeight: FontWeight.w600,
-                                        color: HireIQTheme.textPrimary),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    'Posted on Mar ${10 - index}, 2024',
-                                    style: GoogleFonts.inter(
-                                        fontSize: 13,
-                                        color: HireIQTheme.textMuted),
-                                  ),
-                                ],
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _buildStatCard(
+                              'Active Jobs',
+                              '${activeJobs.length}',
+                              Icons.work_outline,
+                              HireIQTheme.primaryNavy,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 28),
+                      Text(
+                        'Active Listings',
+                        style: GoogleFonts.inter(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w600,
+                            color: HireIQTheme.textPrimary),
+                      ),
+                      const SizedBox(height: 12),
+                      if (activeJobs.isEmpty)
+                        EmptyState(
+                          icon: Icons.work_off_outlined,
+                          heading: 'No active listings',
+                          body:
+                              'Post your first job to start receiving applications',
+                          ctaLabel: 'Post a job',
+                          onCtaPressed: () =>
+                              context.push('/employer/post-job'),
+                        )
+                      else
+                        ...activeJobs.take(5).map(
+                              (job) => GestureDetector(
+                                onTap: () =>
+                                    context.push('/employer/my-jobs'),
+                                child: _buildJobCard(
+                                  job.title,
+                                  job.location,
+                                  job.applicationsCount,
+                                ),
                               ),
                             ),
-                            const Icon(Icons.chevron_right,
-                                color: HireIQTheme.textMuted),
-                          ],
-                        ),
-                      ),
-                    ),
+                      const SizedBox(height: 80),
+                    ],
                   ),
-                  const SizedBox(height: 80),
-                ],
-              ),
+                );
+              },
             ),
           ),
         ],
@@ -212,13 +197,22 @@ class EmployerDashboard extends ConsumerWidget {
     );
   }
 
-  Widget _buildActivityItem(
-      String title, String subtitle, String time) {
+  Widget _buildJobCard(
+      String title, String location, int applicationsCount) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 14),
-      decoration: const BoxDecoration(
-        border:
-            Border(bottom: BorderSide(color: HireIQTheme.borderLight)),
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: HireIQTheme.surfaceWhite,
+        borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
+        border: Border.all(color: HireIQTheme.borderLight),
+        boxShadow: [
+          BoxShadow(
+            color: HireIQTheme.primaryNavy.withValues(alpha: 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -233,19 +227,27 @@ class EmployerDashboard extends ConsumerWidget {
                       fontWeight: FontWeight.w600,
                       color: HireIQTheme.textPrimary),
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: 4),
                 Text(
-                  subtitle,
+                  location,
                   style: GoogleFonts.inter(
                       fontSize: 13, color: HireIQTheme.textMuted),
                 ),
               ],
             ),
           ),
-          Text(
-            time,
-            style: GoogleFonts.inter(
-                fontSize: 12, color: HireIQTheme.textLight),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                '$applicationsCount applicants',
+                style: GoogleFonts.inter(
+                    color: HireIQTheme.primaryTeal,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13),
+              ),
+              const Icon(Icons.chevron_right, color: HireIQTheme.textMuted),
+            ],
           ),
         ],
       ),
