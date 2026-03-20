@@ -4,97 +4,138 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hireiq/shared/theme.dart';
 import 'package:hireiq/shared/components/web_layout.dart';
 
-class CandidateUpliftIqWeb extends ConsumerWidget {
+class CandidateUpliftIqWeb extends ConsumerStatefulWidget {
   const CandidateUpliftIqWeb({super.key});
+  @override
+  ConsumerState<CandidateUpliftIqWeb> createState() => _State();
+}
 
-  static const _courses = [
-    _Course('System Design Fundamentals', 'Coursera', '12h', 'Architecture', 0.42),
-    _Course('Flutter Advanced Patterns', 'Udemy', '8h', 'Mobile', 0.80),
-    _Course('AWS Cloud Practitioner', 'AWS Training', '20h', 'Cloud', 0.0),
-    _Course('Product Management Basics', 'Product School', '15h', 'Leadership', 0.0),
+class _State extends ConsumerState<CandidateUpliftIqWeb>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tab;
+  static const _labels = ['Recommendations', 'Courses', 'Resources'];
+
+  static const _recs = [
+    _URec('📚', 'Flutter Advanced Architecture', 'Coursera', 'Skill Gap: Missing BLoC pattern experience', HireIQTheme.primary),
+    _URec('✍️', 'Add 2 Portfolio Projects', 'ForgeIQ', 'Profile Gap: Employers want to see real work', HireIQTheme.warning),
+    _URec('🎯', 'Apply to 5 targeted roles this week', 'SmartApply', 'Activity: Low application volume this month', HireIQTheme.info),
+    _URec('💼', 'Practice system design interviews', 'Interview Prep', 'Interview Gap: Senior role readiness', HireIQTheme.recruiterAccent),
+    _URec('✅', 'Complete PassportIQ verification', 'PassportIQ', 'Trust Gap: Unverified profiles get 40% fewer responses', HireIQTheme.success),
   ];
 
-  static const _achievements = [
-    _Ach('🏆', 'Flutter Expert', 'Completed 5 Flutter courses', true),
-    _Ach('🚀', 'Fast Learner', 'Finished a course in under 3 days', true),
-    _Ach('⭐', 'All-Rounder', 'Skills in 5+ different areas', false),
-    _Ach('🔥', 'On a Streak', '7-day learning streak', false),
+  static const _courses = [
+    _UCourse('Flutter & Dart — Complete Course', 'Udemy', '40h', 'R499', 4.8, HireIQTheme.primaryTeal),
+    _UCourse('System Design for Mobile Apps', 'Coursera', '20h', 'Free', 4.6, HireIQTheme.info),
+    _UCourse('Firebase for Flutter', 'YouTube', '8h', 'Free', 4.4, HireIQTheme.error),
+    _UCourse('BLoC Pattern Masterclass', 'Udemy', '12h', 'R299', 4.7, HireIQTheme.primaryNavy),
   ];
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  void initState() {
+    super.initState();
+    _tab = TabController(length: _labels.length, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tab.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return WebLayout(
       child: Padding(
         padding: const EdgeInsets.all(40),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
+            const Icon(Icons.auto_awesome_rounded, color: HireIQTheme.recruiterAccent, size: 26),
+            const SizedBox(width: 10),
             Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text('UpliftIQ', style: GoogleFonts.inter(fontSize: 30, fontWeight: FontWeight.w800, color: HireIQTheme.primaryNavy)),
-              Text('AI-powered skill upskilling — grow your MatchIQ score', style: GoogleFonts.inter(fontSize: 15, color: HireIQTheme.textMuted)),
+              Text('Your personalised AI career coach', style: GoogleFonts.inter(fontSize: 15, color: HireIQTheme.textMuted)),
             ]),
-            const Spacer(),
-            Container(padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8), decoration: BoxDecoration(color: HireIQTheme.primaryNavy.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(HireIQTheme.radiusMd), border: Border.all(color: HireIQTheme.borderLight)), child: Row(children: [const Icon(Icons.auto_awesome_rounded, size: 14, color: HireIQTheme.primaryTeal), const SizedBox(width: 6), Text('MatchIQ: 94% → could reach 98%', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w700, color: HireIQTheme.primaryTeal))])),
           ]),
-          const SizedBox(height: 32),
+          const SizedBox(height: 24),
           Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            // Left: courses
-            Expanded(flex: 2, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('Recommended Courses', style: GoogleFonts.inter(fontSize: 17, fontWeight: FontWeight.w700, color: HireIQTheme.primaryNavy)),
+            // Left: tabs
+            Expanded(flex: 2, child: Column(children: [
+              TabBar(controller: _tab, labelStyle: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 13), unselectedLabelStyle: GoogleFonts.inter(fontSize: 13), labelColor: HireIQTheme.primaryNavy, unselectedLabelColor: HireIQTheme.textMuted, indicatorColor: HireIQTheme.recruiterAccent, tabs: _labels.map((l) => Tab(text: l)).toList()),
               const SizedBox(height: 14),
-              ..._courses.map((c) => Container(
-                margin: const EdgeInsets.only(bottom: 14),
+              SizedBox(height: 580, child: TabBarView(controller: _tab, children: [
+                // Recommendations tab
+                ListView(children: _recs.map((r) => Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(color: HireIQTheme.surfaceWhite, borderRadius: BorderRadius.circular(HireIQTheme.radiusLg), border: Border.all(color: HireIQTheme.borderLight)),
+                  child: Row(children: [
+                    Text(r.emoji, style: const TextStyle(fontSize: 24)),
+                    const SizedBox(width: 14),
+                    Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text(r.title, style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w700, color: HireIQTheme.textPrimary)),
+                      const SizedBox(height: 2),
+                      Text(r.rationale, style: GoogleFonts.inter(fontSize: 11, color: HireIQTheme.textMuted, height: 1.4)),
+                      const SizedBox(height: 6),
+                      Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2), decoration: BoxDecoration(color: r.tagColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(HireIQTheme.radiusFull)), child: Text(r.source, style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w700, color: r.tagColor))),
+                    ])),
+                    ElevatedButton(onPressed: () {}, style: ElevatedButton.styleFrom(backgroundColor: HireIQTheme.amber, foregroundColor: HireIQTheme.primaryNavy, elevation: 0, padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(HireIQTheme.radiusMd))), child: Text('Start', style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w700))),
+                  ]),
+                )).toList()),
+                // Courses tab
+                ListView(children: _courses.map((c) => Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(color: HireIQTheme.surfaceWhite, borderRadius: BorderRadius.circular(HireIQTheme.radiusLg), border: Border.all(color: HireIQTheme.borderLight)),
+                  child: Row(children: [
+                    Container(width: 44, height: 44, decoration: BoxDecoration(color: c.tagColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(HireIQTheme.radiusMd)), child: Center(child: Icon(Icons.play_circle_rounded, color: c.tagColor, size: 24))),
+                    const SizedBox(width: 14),
+                    Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text(c.title, style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w700, color: HireIQTheme.textPrimary)),
+                      Text('${c.provider} · ${c.duration}', style: GoogleFonts.inter(fontSize: 11, color: HireIQTheme.textMuted)),
+                      const SizedBox(height: 4),
+                      Row(children: [const Icon(Icons.star_rounded, size: 12, color: HireIQTheme.amber), const SizedBox(width: 2), Text('${c.rating}', style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w700, color: HireIQTheme.textMuted))]),
+                    ])),
+                    Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                      Text(c.price, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w800, color: c.price == 'Free' ? HireIQTheme.success : HireIQTheme.primaryNavy)),
+                      TextButton(onPressed: () {}, child: Text('Enrol', style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700, color: HireIQTheme.primaryTeal))),
+                    ]),
+                  ]),
+                )).toList()),
+                // Resources tab
+                Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [const Icon(Icons.article_rounded, size: 48, color: HireIQTheme.borderMedium), const SizedBox(height: 12), Text('Resources coming soon', style: GoogleFonts.inter(fontSize: 15, color: HireIQTheme.textMuted)), Text('Interview guides, templates and books will be available here.', style: GoogleFonts.inter(fontSize: 12, color: HireIQTheme.textLight), textAlign: TextAlign.center)])),
+              ])),
+            ])),
+            const SizedBox(width: 24),
+            // Right: career readiness
+            SizedBox(width: 300, child: Column(children: [
+              Container(
+                padding: const EdgeInsets.all(22),
+                decoration: BoxDecoration(gradient: LinearGradient(colors: [HireIQTheme.recruiterAccent, HireIQTheme.recruiterAccent.withValues(alpha: 0.7)], begin: Alignment.topLeft, end: Alignment.bottomRight), borderRadius: BorderRadius.circular(HireIQTheme.radiusLg)),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text('Career Readiness', style: GoogleFonts.inter(fontSize: 13, color: Colors.white70)),
+                  Text('72%', style: GoogleFonts.inter(fontSize: 44, fontWeight: FontWeight.w900, color: Colors.white)),
+                  ClipRRect(borderRadius: BorderRadius.circular(HireIQTheme.radiusFull), child: const LinearProgressIndicator(value: 0.72, minHeight: 10, backgroundColor: Colors.white24, valueColor: AlwaysStoppedAnimation<Color>(Colors.white))),
+                  const SizedBox(height: 14),
+                  Text('Complete 3 more items to reach 100% readiness.', style: GoogleFonts.inter(fontSize: 12, color: Colors.white70, height: 1.4)),
+                ]),
+              ),
+              const SizedBox(height: 16),
+              Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(color: HireIQTheme.surfaceWhite, borderRadius: BorderRadius.circular(HireIQTheme.radiusLg), border: Border.all(color: HireIQTheme.borderLight)),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Row(children: [
-                    Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text(c.title, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700, color: HireIQTheme.textPrimary)),
-                      Text('${c.provider} · ${c.duration}', style: GoogleFonts.inter(fontSize: 12, color: HireIQTheme.textMuted)),
-                    ])),
-                    Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: HireIQTheme.primaryNavy.withValues(alpha: 0.06), borderRadius: BorderRadius.circular(HireIQTheme.radiusFull)), child: Text(c.category, style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w700, color: HireIQTheme.primaryNavy))),
-                  ]),
+                  Text('AI Progress Update', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w700, color: HireIQTheme.primaryNavy)),
                   const SizedBox(height: 12),
-                  Row(children: [
-                    Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(HireIQTheme.radiusFull), child: LinearProgressIndicator(value: c.progress, minHeight: 8, backgroundColor: HireIQTheme.borderLight, valueColor: const AlwaysStoppedAnimation<Color>(HireIQTheme.primaryTeal)))),
-                    const SizedBox(width: 10),
-                    Text(c.progress == 0.0 ? 'Start' : '${(c.progress * 100).round()}%', style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700, color: c.progress == 0.0 ? HireIQTheme.textMuted : HireIQTheme.primaryTeal)),
-                    const SizedBox(width: 14),
-                    ElevatedButton(onPressed: () {}, style: ElevatedButton.styleFrom(backgroundColor: c.progress > 0 ? HireIQTheme.primaryNavy : HireIQTheme.amber, foregroundColor: c.progress > 0 ? Colors.white : HireIQTheme.primaryNavy, elevation: 0, padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(HireIQTheme.radiusMd))), child: Text(c.progress > 0 ? 'Continue' : 'Start', style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700))),
-                  ]),
-                ]),
-              )),
-            ])),
-            const SizedBox(width: 28),
-            // Right: achievements
-            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('Achievements', style: GoogleFonts.inter(fontSize: 17, fontWeight: FontWeight.w700, color: HireIQTheme.primaryNavy)),
-              const SizedBox(height: 14),
-              ..._achievements.map((a) => Container(
-                margin: const EdgeInsets.only(bottom: 12),
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(color: a.earned ? HireIQTheme.surfaceWhite : HireIQTheme.background, borderRadius: BorderRadius.circular(HireIQTheme.radiusLg), border: Border.all(color: a.earned ? HireIQTheme.amber.withValues(alpha: 0.3) : HireIQTheme.borderLight)),
-                child: Row(children: [
-                  Text(a.emoji, style: const TextStyle(fontSize: 24)),
-                  const SizedBox(width: 14),
-                  Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(a.title, style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w700, color: a.earned ? HireIQTheme.textPrimary : HireIQTheme.textMuted)),
-                    Text(a.desc, style: GoogleFonts.inter(fontSize: 11, color: HireIQTheme.textMuted)),
-                  ])),
-                  if (a.earned) const Icon(Icons.check_circle_rounded, color: HireIQTheme.success, size: 20),
-                ]),
-              )),
-              const SizedBox(height: 20),
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(color: HireIQTheme.primaryNavy, borderRadius: BorderRadius.circular(HireIQTheme.radiusLg)),
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('Learning Streak', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white)),
-                  const SizedBox(height: 8),
-                  Row(children: [
-                    Text('4', style: GoogleFonts.inter(fontSize: 36, fontWeight: FontWeight.w900, color: HireIQTheme.amber)),
-                    const SizedBox(width: 8),
-                    Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('days', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white)), Text('in a row', style: GoogleFonts.inter(fontSize: 12, color: Colors.white60))]),
-                  ]),
+                  ...[
+                    ('Skills', '78%', HireIQTheme.primaryTeal),
+                    ('Experience', '90%', HireIQTheme.success),
+                    ('Portfolio', '40%', HireIQTheme.warning),
+                    ('Verification', '50%', HireIQTheme.info),
+                  ].map((s) => Padding(padding: const EdgeInsets.only(bottom: 10), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Row(children: [Text(s.$1, style: GoogleFonts.inter(fontSize: 12, color: HireIQTheme.textMuted)), const Spacer(), Text(s.$2, style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w700, color: s.$3))]),
+                    const SizedBox(height: 4),
+                    ClipRRect(borderRadius: BorderRadius.circular(HireIQTheme.radiusFull), child: LinearProgressIndicator(value: double.parse(s.$2.replaceAll('%', '')) / 100, minHeight: 7, backgroundColor: HireIQTheme.borderLight, valueColor: AlwaysStoppedAnimation<Color>(s.$3))),
+                  ]))),
                 ]),
               ),
             ])),
@@ -105,5 +146,17 @@ class CandidateUpliftIqWeb extends ConsumerWidget {
   }
 }
 
-class _Course { const _Course(this.title, this.provider, this.duration, this.category, this.progress); final String title, provider, duration, category; final double progress; }
-class _Ach { const _Ach(this.emoji, this.title, this.desc, this.earned); final String emoji, title, desc; final bool earned; }
+class _URec {
+  const _URec(this.emoji, this.title, this.source, this.rationale, this.tagColor);
+  final String emoji, title, source, rationale;
+  final Color tagColor;
+}
+
+class _UCourse {
+  const _UCourse(this.title, this.provider, this.duration, this.price, this.rating, this.tagColor);
+  final String title, provider, duration, price;
+  final double rating;
+  final Color tagColor;
+}
+
+const _primary = HireIQTheme.primaryTeal;

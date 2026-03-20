@@ -10,28 +10,40 @@ class CandidateNotificationsWeb extends ConsumerStatefulWidget {
   ConsumerState<CandidateNotificationsWeb> createState() => _State();
 }
 
-class _State extends ConsumerState<CandidateNotificationsWeb> with SingleTickerProviderStateMixin {
-  late final TabController _tabs;
-  final _filters = ['All', 'Jobs', 'Applications', 'System'];
-  final Set<int> _read = {};
+class _State extends ConsumerState<CandidateNotificationsWeb>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tab;
+  static const _labels = ['All', 'Jobs', 'Applications', 'Messages', 'System'];
 
   static const _notifs = [
-    _Notif(0, 'New match found!', 'Senior Flutter Developer at TechFlow Solutions — 94% MatchIQ', '2h ago', Icons.auto_awesome_rounded, HireIQTheme.primaryTeal, 'Jobs'),
-    _Notif(1, 'Application viewed', 'Capitec Bank reviewed your application for Lead Engineer', '5h ago', Icons.visibility_outlined, HireIQTheme.info, 'Applications'),
-    _Notif(2, 'Shortlisted!', 'You\'ve been shortlisted at OUTsurance for React Native Developer', '1d ago', Icons.star_rounded, HireIQTheme.amber, 'Applications'),
-    _Notif(3, 'New message', 'Nomvula Dlamini from AgentFlow sent you a message', '1d ago', Icons.message_outlined, HireIQTheme.primaryNavy, 'Jobs'),
-    _Notif(4, 'Profile tip', 'Add 2 more skills to improve your MatchIQ score by 5%', '2d ago', Icons.lightbulb_outline_rounded, HireIQTheme.warning, 'System'),
-    _Notif(5, 'Interview scheduled', 'Standard Bank confirmed your interview for 25 Mar 2026', '3d ago', Icons.event_rounded, HireIQTheme.success, 'Applications'),
-    _Notif(6, 'Subscription renewal', 'Your Pro plan renews on 01 Apr 2026 — R299', '4d ago', Icons.credit_card_outlined, HireIQTheme.textMuted, 'System'),
+    _Notif(Icons.work_rounded, HireIQTheme.primaryTeal, 'New job match', 'Senior Flutter Developer at TechFlow Solutions — 94% match!', '2 min ago', true, 'Jobs', 'Today'),
+    _Notif(Icons.check_circle_rounded, HireIQTheme.success, 'Application update', 'Capitec Bank has shortlisted your application for Lead Mobile Engineer.', '1 hour ago', true, 'Applications', 'Today'),
+    _Notif(Icons.message_rounded, HireIQTheme.info, 'New message', 'Sarah M. from TechFlow Solutions sent you a message.', '2 hours ago', true, 'Messages', 'Today'),
+    _Notif(Icons.auto_awesome_rounded, HireIQTheme.primaryTeal, 'MatchIQ updated', 'Your MatchIQ score increased to 87% after completing your profile.', '5 hours ago', false, 'System', 'Today'),
+    _Notif(Icons.work_rounded, HireIQTheme.primaryNavy, 'Job closing soon', 'Software Engineer at Standard Bank closes in 2 days. Apply now.', 'Yesterday', false, 'Jobs', 'Yesterday'),
+    _Notif(Icons.verified_rounded, HireIQTheme.success, 'PassportIQ verified', 'Your identity has been successfully verified via PassportIQ.', 'Yesterday', false, 'System', 'Yesterday'),
+    _Notif(Icons.send_rounded, HireIQTheme.primaryTeal, 'Application sent', 'Your application to OUTsurance has been submitted successfully.', '3 days ago', false, 'Applications', 'This week'),
   ];
 
   @override
-  void initState() { super.initState(); _tabs = TabController(length: _filters.length, vsync: this); }
+  void initState() {
+    super.initState();
+    _tab = TabController(length: _labels.length, vsync: this);
+  }
+
   @override
-  void dispose() { _tabs.dispose(); super.dispose(); }
+  void dispose() {
+    _tab.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final groups = <String, List<_Notif>>{};
+    for (final n in _notifs) {
+      groups.putIfAbsent(n.group, () => []).add(n);
+    }
+
     return WebLayout(
       child: Padding(
         padding: const EdgeInsets.all(40),
@@ -39,62 +51,44 @@ class _State extends ConsumerState<CandidateNotificationsWeb> with SingleTickerP
           Row(children: [
             Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text('Notifications', style: GoogleFonts.inter(fontSize: 30, fontWeight: FontWeight.w800, color: HireIQTheme.primaryNavy)),
-              Text('Stay up to date with your job search', style: GoogleFonts.inter(fontSize: 15, color: HireIQTheme.textMuted)),
+              Text('Stay updated on your applications and opportunities', style: GoogleFonts.inter(fontSize: 15, color: HireIQTheme.textMuted)),
             ]),
             const Spacer(),
-            TextButton.icon(onPressed: () => setState(() => _read.addAll(_notifs.map((n) => n.id))), icon: const Icon(Icons.done_all_rounded, size: 16, color: HireIQTheme.primaryTeal), label: Text('Mark all read', style: GoogleFonts.inter(fontSize: 13, color: HireIQTheme.primaryTeal, fontWeight: FontWeight.w600))),
+            TextButton.icon(onPressed: () {}, icon: const Icon(Icons.done_all_rounded, size: 16), label: Text('Mark all read', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600)), style: TextButton.styleFrom(foregroundColor: HireIQTheme.primaryTeal)),
           ]),
-          const SizedBox(height: 24),
-          Container(
-            decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: HireIQTheme.borderLight))),
-            child: TabBar(
-              controller: _tabs, isScrollable: true, tabAlignment: TabAlignment.start,
-              labelStyle: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w700),
-              unselectedLabelStyle: GoogleFonts.inter(fontSize: 13),
-              labelColor: HireIQTheme.primaryNavy, unselectedLabelColor: HireIQTheme.textMuted,
-              indicatorColor: HireIQTheme.primaryTeal, indicatorWeight: 2,
-              tabs: _filters.map((f) => Tab(text: f)).toList(),
-            ),
-          ),
           const SizedBox(height: 20),
-          Container(
-            decoration: BoxDecoration(color: HireIQTheme.surfaceWhite, borderRadius: BorderRadius.circular(HireIQTheme.radiusLg), border: Border.all(color: HireIQTheme.borderLight)),
-            child: TabBarView(
-              controller: _tabs,
-              children: _filters.map((filter) {
-                final items = filter == 'All' ? _notifs : _notifs.where((n) => n.category == filter).toList();
-                return Column(mainAxisSize: MainAxisSize.min, children: items.asMap().entries.map((e) {
-                  final n = e.value;
-                  final isRead = _read.contains(n.id);
-                  final isLast = e.key == items.length - 1;
-                  return Column(children: [
-                    Container(
-                      color: isRead ? null : n.color.withValues(alpha: 0.02),
-                      child: Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Row(children: [
-                          Container(width: 44, height: 44, decoration: BoxDecoration(color: n.color.withValues(alpha: 0.1), shape: BoxShape.circle), child: Icon(n.icon, size: 20, color: n.color)),
-                          const SizedBox(width: 16),
-                          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                            Row(children: [
-                              Text(n.title, style: GoogleFonts.inter(fontSize: 14, fontWeight: isRead ? FontWeight.w500 : FontWeight.w700, color: HireIQTheme.textPrimary)),
-                              if (!isRead) Container(margin: const EdgeInsets.only(left: 8), width: 6, height: 6, decoration: const BoxDecoration(color: HireIQTheme.primaryTeal, shape: BoxShape.circle)),
-                            ]),
-                            Text(n.body, style: GoogleFonts.inter(fontSize: 13, color: HireIQTheme.textMuted)),
-                          ])),
-                          const SizedBox(width: 16),
-                          Text(n.time, style: GoogleFonts.inter(fontSize: 12, color: HireIQTheme.textMuted)),
-                          const SizedBox(width: 12),
-                          if (!isRead) TextButton(onPressed: () => setState(() => _read.add(n.id)), child: Text('Read', style: GoogleFonts.inter(fontSize: 12, color: HireIQTheme.primaryTeal))),
+          TabBar(controller: _tab, labelStyle: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 13), unselectedLabelStyle: GoogleFonts.inter(fontSize: 13), labelColor: HireIQTheme.primaryNavy, unselectedLabelColor: HireIQTheme.textMuted, indicatorColor: HireIQTheme.primaryTeal, tabs: _labels.map((l) => Tab(text: l)).toList()),
+          const SizedBox(height: 20),
+          ...groups.entries.map((g) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Padding(padding: const EdgeInsets.only(bottom: 10), child: Text(g.key, style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700, color: HireIQTheme.textMuted, letterSpacing: 0.5))),
+            Container(
+              margin: const EdgeInsets.only(bottom: 20),
+              decoration: BoxDecoration(color: HireIQTheme.surfaceWhite, borderRadius: BorderRadius.circular(HireIQTheme.radiusLg), border: Border.all(color: HireIQTheme.borderLight)),
+              child: Column(children: g.value.asMap().entries.map((e) {
+                final n = e.value;
+                final isLast = e.key == g.value.length - 1;
+                return Column(children: [
+                  Container(
+                    color: n.unread ? n.color.withValues(alpha: 0.03) : null,
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                    child: Row(children: [
+                      Container(width: 38, height: 38, decoration: BoxDecoration(color: n.color.withValues(alpha: 0.1), shape: BoxShape.circle), child: Icon(n.icon, color: n.color, size: 18)),
+                      const SizedBox(width: 14),
+                      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Row(children: [
+                          Text(n.title, style: GoogleFonts.inter(fontSize: 13, fontWeight: n.unread ? FontWeight.w700 : FontWeight.w600, color: HireIQTheme.textPrimary)),
+                          if (n.unread) Container(margin: const EdgeInsets.only(left: 8), width: 7, height: 7, decoration: BoxDecoration(color: n.color, shape: BoxShape.circle)),
                         ]),
-                      ),
-                    ),
-                    if (!isLast) const Divider(height: 1, color: HireIQTheme.borderLight),
-                  ]);
-                }).toList());
-              }).toList(),
+                        Text(n.body, style: GoogleFonts.inter(fontSize: 12, color: HireIQTheme.textMuted, height: 1.4)),
+                      ])),
+                      Text(n.time, style: GoogleFonts.inter(fontSize: 11, color: HireIQTheme.textMuted)),
+                    ]),
+                  ),
+                  if (!isLast) const Divider(height: 1, color: HireIQTheme.borderLight),
+                ]);
+              }).toList()),
             ),
-          ),
+          ])),
         ]),
       ),
     );
@@ -102,9 +96,9 @@ class _State extends ConsumerState<CandidateNotificationsWeb> with SingleTickerP
 }
 
 class _Notif {
-  const _Notif(this.id, this.title, this.body, this.time, this.icon, this.color, this.category);
-  final int id;
-  final String title, body, time, category;
+  const _Notif(this.icon, this.color, this.title, this.body, this.time, this.unread, this.category, this.group);
   final IconData icon;
   final Color color;
+  final String title, body, time, category, group;
+  final bool unread;
 }

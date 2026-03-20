@@ -4,112 +4,93 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hireiq/shared/theme.dart';
 import 'package:hireiq/shared/components/web_layout.dart';
 
-class CandidateSubscriptionUpgradeWeb extends ConsumerWidget {
+class CandidateSubscriptionUpgradeWeb extends ConsumerStatefulWidget {
   const CandidateSubscriptionUpgradeWeb({super.key});
+  @override
+  ConsumerState<CandidateSubscriptionUpgradeWeb> createState() => _State();
+}
 
-  static const _features = [
-    _Feat('Job Applications', 'Limited (5/month)', 'Unlimited'),
-    _Feat('MatchIQ Score', 'Basic', 'Full breakdown + tips'),
-    _Feat('ForgeIQ CV Builder', false, true),
-    _Feat('UpliftIQ Recommendations', false, true),
-    _Feat('PassportIQ Verification', false, true),
-    _Feat('Salary Intelligence', false, true),
-    _Feat('Priority Matching', false, true),
-    _Feat('Support', 'Email only', 'Priority + WhatsApp'),
-  ];
+class _State extends ConsumerState<CandidateSubscriptionUpgradeWeb> {
+  bool _annual = false;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return WebLayout(
       child: Padding(
         padding: const EdgeInsets.all(40),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Center(child: Column(children: [
-            Container(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6), decoration: BoxDecoration(color: HireIQTheme.amber.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(HireIQTheme.radiusFull)), child: Text('LIMITED OFFER', style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w800, color: HireIQTheme.amber))),
-            const SizedBox(height: 12),
-            Text('Unlock Your Full Potential', style: GoogleFonts.inter(fontSize: 32, fontWeight: FontWeight.w800, color: HireIQTheme.primaryNavy)),
-            const SizedBox(height: 8),
-            Text('Upgrade to Pro and get noticed by top SA employers', style: GoogleFonts.inter(fontSize: 16, color: HireIQTheme.textMuted)),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+          Text('Upgrade Your Plan', style: GoogleFonts.inter(fontSize: 32, fontWeight: FontWeight.w900, color: HireIQTheme.primaryNavy), textAlign: TextAlign.center),
+          Text('Unlock South Africa\'s most powerful AI recruitment tools', style: GoogleFonts.inter(fontSize: 16, color: HireIQTheme.textMuted), textAlign: TextAlign.center),
+          const SizedBox(height: 20),
+          // Billing toggle
+          Container(padding: const EdgeInsets.all(4), decoration: BoxDecoration(color: HireIQTheme.background, borderRadius: BorderRadius.circular(HireIQTheme.radiusFull), border: Border.all(color: HireIQTheme.borderLight)), child: Row(mainAxisSize: MainAxisSize.min, children: [
+            GestureDetector(onTap: () => setState(() => _annual = false), child: Container(padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8), decoration: BoxDecoration(color: !_annual ? HireIQTheme.surfaceWhite : Colors.transparent, borderRadius: BorderRadius.circular(HireIQTheme.radiusFull), boxShadow: !_annual ? [const BoxShadow(color: Colors.black12, blurRadius: 4)] : null), child: Text('Monthly', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w700, color: !_annual ? HireIQTheme.primaryNavy : HireIQTheme.textMuted)))),
+            GestureDetector(onTap: () => setState(() => _annual = true), child: Container(padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8), decoration: BoxDecoration(color: _annual ? HireIQTheme.surfaceWhite : Colors.transparent, borderRadius: BorderRadius.circular(HireIQTheme.radiusFull), boxShadow: _annual ? [const BoxShadow(color: Colors.black12, blurRadius: 4)] : null), child: Row(children: [Text('Annual', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w700, color: _annual ? HireIQTheme.primaryNavy : HireIQTheme.textMuted)), const SizedBox(width: 6), Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: HireIQTheme.success, borderRadius: BorderRadius.circular(HireIQTheme.radiusFull)), child: Text('Save 20%', style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.w800, color: Colors.white)))]))),
           ])),
-          const SizedBox(height: 40),
-          // Comparison grid
+          const SizedBox(height: 28),
+          // Plans row
           Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            // Free plan
-            Expanded(child: Container(
-              padding: const EdgeInsets.all(28),
-              decoration: BoxDecoration(color: HireIQTheme.surfaceWhite, borderRadius: BorderRadius.circular(HireIQTheme.radiusLg), border: Border.all(color: HireIQTheme.borderLight)),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('Free', style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w800, color: HireIQTheme.textPrimary)),
-                Text('R0 / month', style: GoogleFonts.inter(fontSize: 32, fontWeight: FontWeight.w800, color: HireIQTheme.textPrimary)),
-                const SizedBox(height: 24),
-                ..._features.map((f) => _FeatureRow(f.title, _featureStr(f.free), false)),
-                const SizedBox(height: 24),
-                SizedBox(width: double.infinity, child: OutlinedButton(onPressed: () {}, style: OutlinedButton.styleFrom(side: const BorderSide(color: HireIQTheme.borderMedium), padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(HireIQTheme.radiusMd))), child: Text('Current Plan', style: GoogleFonts.inter(fontWeight: FontWeight.w700, color: HireIQTheme.textMuted)))),
-              ]),
-            )),
-            const SizedBox(width: 20),
-            // Pro plan
-            Expanded(child: Container(
-              padding: const EdgeInsets.all(28),
-              decoration: BoxDecoration(gradient: const LinearGradient(colors: [HireIQTheme.primaryNavy, Color(0xFF243659)], begin: Alignment.topLeft, end: Alignment.bottomRight), borderRadius: BorderRadius.circular(HireIQTheme.radiusLg), border: Border.all(color: HireIQTheme.amber.withValues(alpha: 0.4))),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Row(children: [
-                  Text('Pro', style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w800, color: Colors.white)),
-                  const SizedBox(width: 10),
-                  Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: HireIQTheme.amber, borderRadius: BorderRadius.circular(HireIQTheme.radiusFull)), child: Text('POPULAR', style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w800, color: HireIQTheme.primaryNavy))),
-                ]),
-                Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                  Text('R299', style: GoogleFonts.inter(fontSize: 32, fontWeight: FontWeight.w800, color: Colors.white)),
-                  Text(' / month', style: GoogleFonts.inter(fontSize: 14, color: Colors.white60)),
-                ]),
-                const SizedBox(height: 24),
-                ..._features.map((f) => _ProFeatureRow(f.title, _featureStr(f.pro))),
-                const SizedBox(height: 24),
-                SizedBox(width: double.infinity, child: ElevatedButton(onPressed: () {}, style: ElevatedButton.styleFrom(backgroundColor: HireIQTheme.amber, foregroundColor: HireIQTheme.primaryNavy, elevation: 0, padding: const EdgeInsets.symmetric(vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(HireIQTheme.radiusMd))), child: Text('Upgrade to Pro', style: GoogleFonts.inter(fontWeight: FontWeight.w800, fontSize: 15)))),
-                const SizedBox(height: 12),
-                Center(child: Text('Cancel anytime · No contracts', style: GoogleFonts.inter(fontSize: 12, color: Colors.white54))),
-              ]),
-            )),
+            _PlanCard(name: 'Free', price: 'R0', period: 'forever', color: HireIQTheme.textMuted, current: true, annual: _annual, features: const ['3 job applications/month', 'Basic MatchIQ score', 'Profile creation', 'Community forum access']),
+            const SizedBox(width: 16),
+            _PlanCard(name: 'Pro', price: _annual ? 'R39' : 'R49', period: '/month', color: HireIQTheme.primaryTeal, recommended: true, annual: _annual, features: const ['Unlimited applications', 'Full MatchIQ score + insights', 'ForgeIQ CV Builder', 'SmartApply bulk apply', 'UpliftIQ career coaching', 'Interview prep tools', 'PassportIQ verification', 'Priority profile placement']),
+            const SizedBox(width: 16),
+            _PlanCard(name: 'Elite', price: _annual ? 'R79' : 'R99', period: '/month', color: HireIQTheme.primaryNavy, annual: _annual, features: const ['Everything in Pro', 'Dedicated career coach', 'Salary negotiation training', 'Executive job access', 'LinkedIn profile optimisation', '1-on-1 interview mock sessions', 'WildcardIQ personality report', 'Gig marketplace access']),
           ]),
-          const SizedBox(height: 32),
-          // Savings calculator
+          const SizedBox(height: 24),
+          // Feature comparison table
           Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(color: HireIQTheme.primaryTeal.withValues(alpha: 0.06), borderRadius: BorderRadius.circular(HireIQTheme.radiusLg), border: Border.all(color: HireIQTheme.primaryTeal.withValues(alpha: 0.2))),
-            child: Row(children: [
-              const Icon(Icons.calculate_rounded, color: HireIQTheme.primaryTeal, size: 28),
-              const SizedBox(width: 16),
-              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('ROI Calculator', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w700, color: HireIQTheme.primaryNavy)),
-                Text('Get hired just once — average first-month salary via HireIQ Pro: R75,000. Pro subscription: R299/month = 250× return on investment.', style: GoogleFonts.inter(fontSize: 13, color: HireIQTheme.textMuted)),
+            decoration: BoxDecoration(color: HireIQTheme.surfaceWhite, borderRadius: BorderRadius.circular(HireIQTheme.radiusLg), border: Border.all(color: HireIQTheme.borderLight)),
+            child: Table(columnWidths: const {0: FlexColumnWidth(3), 1: FlexColumnWidth(), 2: FlexColumnWidth(), 3: FlexColumnWidth()}, children: [
+              TableRow(decoration: const BoxDecoration(color: HireIQTheme.background, borderRadius: BorderRadius.vertical(top: Radius.circular(HireIQTheme.radiusLg))), children: [_FH('Feature'), _FH('Free'), _FH('Pro'), _FH('Elite')]),
+              ...[
+                ('Unlimited Applications', false, true, true),
+                ('Full MatchIQ Score', false, true, true),
+                ('ForgeIQ CV Builder', false, true, true),
+                ('Interview Prep', false, true, true),
+                ('1-on-1 Coaching', false, false, true),
+                ('Executive Job Board', false, false, true),
+              ].map((r) => TableRow(children: [
+                Padding(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12), child: Text(r.$1, style: GoogleFonts.inter(fontSize: 12, color: HireIQTheme.textPrimary))),
+                _FC(r.$2),
+                _FC(r.$3),
+                _FC(r.$4),
               ])),
-              Text('250×', style: GoogleFonts.inter(fontSize: 36, fontWeight: FontWeight.w800, color: HireIQTheme.primaryTeal)),
             ]),
           ),
         ]),
       ),
     );
   }
-
-  String _featureStr(dynamic v) => v is bool ? (v ? '✓' : '✗') : v.toString();
 }
 
-String _featureStr2(dynamic v) => v is bool ? (v ? '✓' : '✗') : v.toString();
+class _PlanCard extends StatelessWidget {
+  const _PlanCard({required this.name, required this.price, required this.period, required this.color, required this.features, required this.annual, this.current = false, this.recommended = false});
+  final String name, price, period;
+  final Color color;
+  final List<String> features;
+  final bool current, recommended, annual;
 
-Widget _FeatureRow(String title, String value, bool isPro) => Padding(
-  padding: const EdgeInsets.only(bottom: 12),
-  child: Row(children: [
-    Expanded(child: Text(title, style: GoogleFonts.inter(fontSize: 13, color: HireIQTheme.textPrimary))),
-    Text(value, style: GoogleFonts.inter(fontSize: 13, color: value == '✗' ? HireIQTheme.textMuted : HireIQTheme.textPrimary, fontWeight: FontWeight.w600)),
-  ]),
-);
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(child: Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(color: recommended ? HireIQTheme.primaryTeal : HireIQTheme.surfaceWhite, borderRadius: BorderRadius.circular(HireIQTheme.radiusLg), border: Border.all(color: recommended ? HireIQTheme.primaryTeal : HireIQTheme.borderLight, width: recommended ? 2 : 1), boxShadow: recommended ? [BoxShadow(color: HireIQTheme.primaryTeal.withValues(alpha: 0.15), blurRadius: 16, offset: const Offset(0, 4))] : null),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        if (recommended) Align(alignment: Alignment.centerRight, child: Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: HireIQTheme.amber, borderRadius: BorderRadius.circular(HireIQTheme.radiusFull)), child: Text('RECOMMENDED', style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.w900, color: HireIQTheme.primaryNavy)))),
+        Text(name, style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w900, color: recommended ? Colors.white : color)),
+        const SizedBox(height: 8),
+        Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+          Text(price, style: GoogleFonts.inter(fontSize: 36, fontWeight: FontWeight.w900, color: recommended ? Colors.white : HireIQTheme.primaryNavy)),
+          Text(period, style: GoogleFonts.inter(fontSize: 13, color: recommended ? Colors.white70 : HireIQTheme.textMuted, fontWeight: FontWeight.w500)),
+        ]),
+        const SizedBox(height: 16),
+        ElevatedButton(onPressed: () {}, style: ElevatedButton.styleFrom(backgroundColor: recommended ? HireIQTheme.amber : color.withValues(alpha: 0.1), foregroundColor: recommended ? HireIQTheme.primaryNavy : color, elevation: 0, padding: const EdgeInsets.symmetric(vertical: 12), minimumSize: const Size.fromHeight(0), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(HireIQTheme.radiusMd))), child: Text(current ? 'Current Plan' : 'Get Started', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w700))),
+        const SizedBox(height: 16),
+        ...features.map((f) => Padding(padding: const EdgeInsets.only(bottom: 8), child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [Icon(Icons.check_rounded, size: 14, color: recommended ? Colors.white70 : HireIQTheme.success), const SizedBox(width: 8), Expanded(child: Text(f, style: GoogleFonts.inter(fontSize: 12, color: recommended ? Colors.white70 : HireIQTheme.textMuted)))]))),
+      ]),
+    ));
+  }
+}
 
-Widget _ProFeatureRow(String title, String value) => Padding(
-  padding: const EdgeInsets.only(bottom: 12),
-  child: Row(children: [
-    Expanded(child: Text(title, style: GoogleFonts.inter(fontSize: 13, color: Colors.white70))),
-    Text(value, style: GoogleFonts.inter(fontSize: 13, color: HireIQTheme.success, fontWeight: FontWeight.w700)),
-  ]),
-);
-
-class _Feat { const _Feat(this.title, this.free, this.pro); final String title; final dynamic free, pro; }
+Widget _FH(String t) => Padding(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12), child: Text(t, style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w700, color: HireIQTheme.textMuted)));
+Widget _FC(bool v) => Center(child: Padding(padding: const EdgeInsets.symmetric(vertical: 12), child: Icon(v ? Icons.check_circle_rounded : Icons.remove_rounded, size: 18, color: v ? HireIQTheme.success : HireIQTheme.borderMedium)));

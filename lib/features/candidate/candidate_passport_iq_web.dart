@@ -8,10 +8,10 @@ class CandidatePassportIqWeb extends ConsumerWidget {
   const CandidatePassportIqWeb({super.key});
 
   static const _steps = [
-    _VStep('Identity Verification', 'Upload SA ID or Passport', true, HireIQTheme.success),
-    _VStep('Qualification Check', 'Tertiary certificates', true, HireIQTheme.success),
-    _VStep('Employment History', 'Work reference letters', false, HireIQTheme.warning),
-    _VStep('Criminal Clearance', 'SAPS clearance certificate', false, HireIQTheme.textMuted),
+    _VStep('Identity Verification', true, 'Your South African ID has been verified'),
+    _VStep('Education Verification', true, 'Degree from UCT confirmed with institution'),
+    _VStep('Employment Verification', false, 'Upload payslips or letters from past employers'),
+    _VStep('Reference Verification', false, 'References must be contacted via PassportIQ'),
   ];
 
   @override
@@ -19,103 +19,95 @@ class CandidatePassportIqWeb extends ConsumerWidget {
     return WebLayout(
       child: Padding(
         padding: const EdgeInsets.all(40),
-        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          // Left: verification status
-          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Row(children: [
-              const Icon(Icons.verified_user_rounded, color: HireIQTheme.primaryTeal, size: 32),
-              const SizedBox(width: 12),
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('PassportIQ', style: GoogleFonts.inter(fontSize: 30, fontWeight: FontWeight.w800, color: HireIQTheme.primaryNavy)),
-                Text('Verified credentials boost your MatchIQ by up to 15%', style: GoogleFonts.inter(fontSize: 14, color: HireIQTheme.textMuted)),
-              ]),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            const Icon(Icons.verified_rounded, color: HireIQTheme.primaryTeal, size: 28),
+            const SizedBox(width: 10),
+            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('PassportIQ', style: GoogleFonts.inter(fontSize: 30, fontWeight: FontWeight.w800, color: HireIQTheme.primaryNavy)),
+              Text('Verified credentials that build recruiter trust', style: GoogleFonts.inter(fontSize: 15, color: HireIQTheme.textMuted)),
             ]),
-            const SizedBox(height: 32),
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(colors: [HireIQTheme.primaryNavy, Color(0xFF243659)], begin: Alignment.topLeft, end: Alignment.bottomRight),
-                borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
-              ),
-              child: Row(children: [
-                Stack(alignment: Alignment.center, children: [
-                  SizedBox(width: 90, height: 90, child: CircularProgressIndicator(value: 0.5, strokeWidth: 8, backgroundColor: Colors.white24, color: HireIQTheme.amber)),
-                  Text('50%', style: GoogleFonts.inter(fontSize: 22, fontWeight: FontWeight.w800, color: Colors.white)),
-                ]),
-                const SizedBox(width: 24),
-                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('Verification Progress', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white)),
-                  Text('2 of 4 verifications complete', style: GoogleFonts.inter(fontSize: 13, color: Colors.white60)),
-                  const SizedBox(height: 8),
-                  Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), decoration: BoxDecoration(color: HireIQTheme.amber.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(HireIQTheme.radiusFull)), child: Text('PassportIQ Partial', style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700, color: HireIQTheme.amber))),
-                ])),
-              ]),
-            ),
-            const SizedBox(height: 24),
-            Text('Verification Steps', style: GoogleFonts.inter(fontSize: 17, fontWeight: FontWeight.w700, color: HireIQTheme.primaryNavy)),
-            const SizedBox(height: 14),
-            ..._steps.asMap().entries.map((e) {
-              final s = e.value;
-              return Container(
-                margin: const EdgeInsets.only(bottom: 12),
-                padding: const EdgeInsets.all(18),
+          ]),
+          const SizedBox(height: 28),
+          Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            // Left: status overview
+            Expanded(child: Column(children: [
+              Container(
+                padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(color: HireIQTheme.surfaceWhite, borderRadius: BorderRadius.circular(HireIQTheme.radiusLg), border: Border.all(color: HireIQTheme.borderLight)),
-                child: Row(children: [
-                  Container(width: 36, height: 36, decoration: BoxDecoration(color: s.color.withValues(alpha: 0.1), shape: BoxShape.circle), child: Center(child: Icon(s.done ? Icons.check_rounded : Icons.lock_outline_rounded, size: 16, color: s.color))),
-                  const SizedBox(width: 14),
-                  Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(s.title, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700, color: HireIQTheme.textPrimary)),
-                    Text(s.subtitle, style: GoogleFonts.inter(fontSize: 12, color: HireIQTheme.textMuted)),
-                  ])),
-                  if (!s.done) Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), decoration: BoxDecoration(color: HireIQTheme.amber, borderRadius: BorderRadius.circular(HireIQTheme.radiusFull)), child: Text('Upload', style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w700, color: HireIQTheme.primaryNavy))),
-                ]),
-              );
-            }),
-          ])),
-          const SizedBox(width: 28),
-          // Right: upload area
-          Expanded(child: Column(children: [
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(color: HireIQTheme.surfaceWhite, borderRadius: BorderRadius.circular(HireIQTheme.radiusLg), border: Border.all(color: HireIQTheme.borderLight)),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('Upload Documents', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w700, color: HireIQTheme.primaryNavy)),
-                const SizedBox(height: 20),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(40),
-                  decoration: BoxDecoration(color: HireIQTheme.primaryTeal.withValues(alpha: 0.04), borderRadius: BorderRadius.circular(HireIQTheme.radiusMd), border: Border.all(color: HireIQTheme.primaryTeal.withValues(alpha: 0.3), style: BorderStyle.solid)),
-                  child: Column(children: [
-                    const Icon(Icons.cloud_upload_outlined, size: 48, color: HireIQTheme.primaryTeal),
-                    const SizedBox(height: 12),
-                    Text('Drag and drop documents here', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, color: HireIQTheme.textPrimary)),
-                    Text('or click to browse', style: GoogleFonts.inter(fontSize: 12, color: HireIQTheme.textMuted)),
-                    const SizedBox(height: 16),
-                    ElevatedButton(onPressed: () {}, style: ElevatedButton.styleFrom(backgroundColor: HireIQTheme.amber, foregroundColor: HireIQTheme.primaryNavy, elevation: 0, padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(HireIQTheme.radiusMd))), child: Text('Choose File', style: GoogleFonts.inter(fontWeight: FontWeight.w700))),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Row(children: [
+                    Text('Verification Status', style: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w700, color: HireIQTheme.primaryNavy)),
+                    const Spacer(),
+                    Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5), decoration: BoxDecoration(color: HireIQTheme.warning.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(HireIQTheme.radiusFull)), child: Text('Partially Verified', style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w700, color: HireIQTheme.warning))),
                   ]),
-                ),
-                const SizedBox(height: 16),
-                Text('Accepted: PDF, JPG, PNG · Max 10MB per file', style: GoogleFonts.inter(fontSize: 11, color: HireIQTheme.textMuted)),
-              ]),
-            ),
-            const SizedBox(height: 20),
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(color: HireIQTheme.success.withValues(alpha: 0.06), borderRadius: BorderRadius.circular(HireIQTheme.radiusLg), border: Border.all(color: HireIQTheme.success.withValues(alpha: 0.2))),
-              child: Row(children: [
-                const Icon(Icons.shield_rounded, color: HireIQTheme.success, size: 24),
-                const SizedBox(width: 14),
-                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('Your data is secure', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w700, color: HireIQTheme.textPrimary)),
-                  Text('Documents are encrypted and only shared with employers you apply to.', style: GoogleFonts.inter(fontSize: 12, color: HireIQTheme.textMuted)),
-                ])),
-              ]),
-            ),
-          ])),
+                  const SizedBox(height: 4),
+                  Row(children: [
+                    Container(width: 12, height: 12, decoration: const BoxDecoration(color: HireIQTheme.warning, shape: BoxShape.circle)),
+                    const SizedBox(width: 8),
+                    Text('2 of 4 verifications complete', style: GoogleFonts.inter(fontSize: 12, color: HireIQTheme.textMuted)),
+                  ]),
+                  const SizedBox(height: 18),
+                  ClipRRect(borderRadius: BorderRadius.circular(HireIQTheme.radiusFull), child: const LinearProgressIndicator(value: 0.5, minHeight: 10, backgroundColor: HireIQTheme.borderLight, valueColor: AlwaysStoppedAnimation<Color>(HireIQTheme.warning))),
+                  const SizedBox(height: 20),
+                  ..._steps.asMap().entries.map((e) {
+                    final step = e.value;
+                    final isLast = e.key == _steps.length - 1;
+                    return Column(children: [
+                      Padding(padding: const EdgeInsets.symmetric(vertical: 14), child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Container(width: 36, height: 36, decoration: BoxDecoration(color: step.done ? HireIQTheme.success.withValues(alpha: 0.1) : HireIQTheme.background, shape: BoxShape.circle, border: Border.all(color: step.done ? HireIQTheme.success : HireIQTheme.borderMedium)), child: Icon(step.done ? Icons.check_rounded : Icons.hourglass_empty_rounded, color: step.done ? HireIQTheme.success : HireIQTheme.textMuted, size: 18)),
+                        const SizedBox(width: 14),
+                        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          Text(step.title, style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w700, color: HireIQTheme.textPrimary)),
+                          Text(step.description, style: GoogleFonts.inter(fontSize: 12, color: HireIQTheme.textMuted, height: 1.4)),
+                        ])),
+                        if (step.done) Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: HireIQTheme.success.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(HireIQTheme.radiusFull)), child: Text('Verified', style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w700, color: HireIQTheme.success))),
+                      ])),
+                      if (!isLast) const Divider(height: 1, color: HireIQTheme.borderLight),
+                    ]);
+                  }),
+                ]),
+              ),
+            ])),
+            const SizedBox(width: 24),
+            // Right: document upload zones
+            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('Upload Documents', style: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w700, color: HireIQTheme.primaryNavy)),
+              const SizedBox(height: 12),
+              ...['Employment Letters / Payslips', 'Reference Contact Details'].asMap().entries.map((e) => Container(
+                margin: const EdgeInsets.only(bottom: 14),
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(color: HireIQTheme.surfaceWhite, borderRadius: BorderRadius.circular(HireIQTheme.radiusLg), border: Border.all(color: HireIQTheme.borderMedium, width: 1.5), ),
+                child: Column(children: [
+                  Icon(Icons.cloud_upload_rounded, color: HireIQTheme.primaryTeal, size: 36),
+                  const SizedBox(height: 10),
+                  Text(e.value, style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w700, color: HireIQTheme.textPrimary)),
+                  const SizedBox(height: 4),
+                  Text('Drag & drop files or click to browse', style: GoogleFonts.inter(fontSize: 11, color: HireIQTheme.textMuted)),
+                  Text('PDF, JPG, PNG — max 10MB', style: GoogleFonts.inter(fontSize: 10, color: HireIQTheme.textLight)),
+                  const SizedBox(height: 14),
+                  ElevatedButton(onPressed: () {}, style: ElevatedButton.styleFrom(backgroundColor: HireIQTheme.primaryTeal, foregroundColor: Colors.white, elevation: 0, padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(HireIQTheme.radiusMd))), child: Text('Upload File', style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700))),
+                ]),
+              )),
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(color: HireIQTheme.primaryTeal.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(HireIQTheme.radiusLg), border: Border.all(color: HireIQTheme.primaryTeal.withValues(alpha: 0.2))),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Row(children: [const Icon(Icons.verified_rounded, color: HireIQTheme.primaryTeal, size: 16), const SizedBox(width: 6), Text('PassportIQ Badge', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w700, color: HireIQTheme.primaryNavy))]),
+                  const SizedBox(height: 8),
+                  Text('Fully verified candidates receive a PassportIQ badge visible to all employers — increasing interview chances by 2.5×.', style: GoogleFonts.inter(fontSize: 12, color: HireIQTheme.textMuted, height: 1.5)),
+                ]),
+              ),
+            ])),
+          ]),
         ]),
       ),
     );
   }
 }
 
-class _VStep { const _VStep(this.title, this.subtitle, this.done, this.color); final String title, subtitle; final bool done; final Color color; }
+class _VStep {
+  const _VStep(this.title, this.done, this.description);
+  final String title, description;
+  final bool done;
+}

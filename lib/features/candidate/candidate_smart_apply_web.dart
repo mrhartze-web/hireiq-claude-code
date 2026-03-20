@@ -11,19 +11,16 @@ class CandidateSmartApplyWeb extends ConsumerStatefulWidget {
 }
 
 class _State extends ConsumerState<CandidateSmartApplyWeb> {
-  int _step = 0;
-  bool _applying = false;
-
-  final _steps = ['Select Jobs', 'Review & Customise', 'Submit Applications'];
+  final Set<int> _selected = {0, 1, 2};
 
   static const _jobs = [
-    _SmartJob('Senior Flutter Developer', 'TechFlow Solutions', 94),
-    _SmartJob('Lead Mobile Engineer', 'Capitec Bank', 88),
-    _SmartJob('Software Engineer III', 'Standard Bank', 82),
-    _SmartJob('React Native Developer', 'OUTsurance', 79),
+    _SAJob('Senior Flutter Developer', 'TechFlow Solutions', 'Cape Town', 94, 'R85k–R120k'),
+    _SAJob('Lead Mobile Engineer', 'Capitec Bank', 'Johannesburg', 91, 'R95k–R130k'),
+    _SAJob('Software Engineer III', 'Standard Bank', 'Remote', 88, 'R80k–R110k'),
+    _SAJob('React Native Dev', 'OUTsurance', 'Cape Town', 84, 'R70k–R95k'),
+    _SAJob('Frontend Developer', 'Nedbank', 'Johannesburg', 81, 'R65k–R90k'),
+    _SAJob('Mobile Architect', 'Discovery', 'Cape Town', 79, 'R110k–R145k'),
   ];
-
-  final _selected = <int>{0, 1};
 
   @override
   Widget build(BuildContext context) {
@@ -31,83 +28,72 @@ class _State extends ConsumerState<CandidateSmartApplyWeb> {
       child: Padding(
         padding: const EdgeInsets.all(40),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('SmartApply', style: GoogleFonts.inter(fontSize: 30, fontWeight: FontWeight.w800, color: HireIQTheme.primaryNavy)),
-          Text('AI-powered batch applications — apply to multiple jobs at once', style: GoogleFonts.inter(fontSize: 15, color: HireIQTheme.textMuted)),
-          const SizedBox(height: 28),
-          // Stepper
-          Row(children: _steps.asMap().entries.map((e) {
-            final idx = e.key;
-            final isActive = idx == _step;
-            final isDone = idx < _step;
-            return Expanded(child: Row(children: [
-              CircleAvatar(radius: 14, backgroundColor: isActive ? HireIQTheme.primaryTeal : isDone ? HireIQTheme.success : HireIQTheme.borderMedium, child: isDone ? const Icon(Icons.check_rounded, size: 14, color: Colors.white) : Text('${idx + 1}', style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.white))),
-              const SizedBox(width: 8),
-              Text(e.value, style: GoogleFonts.inter(fontSize: 13, fontWeight: isActive ? FontWeight.w700 : FontWeight.w500, color: isActive ? HireIQTheme.primaryNavy : HireIQTheme.textMuted)),
-              if (idx < _steps.length - 1) Expanded(child: Container(height: 1.5, margin: const EdgeInsets.symmetric(horizontal: 12), color: HireIQTheme.borderLight)),
-            ]));
-          }).toList()),
-          const SizedBox(height: 28),
-          // Content area
-          Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            // Jobs list
-            Expanded(child: Container(
-              decoration: BoxDecoration(color: HireIQTheme.surfaceWhite, borderRadius: BorderRadius.circular(HireIQTheme.radiusLg), border: Border.all(color: HireIQTheme.borderLight)),
-              child: Column(children: [
-                Container(padding: const EdgeInsets.all(16), decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: HireIQTheme.borderLight))), child: Row(children: [Text('AI-matched jobs for you', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700, color: HireIQTheme.primaryNavy)), const Spacer(), Text('${_selected.length} selected', style: GoogleFonts.inter(fontSize: 13, color: HireIQTheme.primaryTeal, fontWeight: FontWeight.w600))])),
-                ..._jobs.asMap().entries.map((e) {
-                  final j = e.value;
-                  final isChecked = _selected.contains(e.key);
-                  return Column(children: [
-                    Padding(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14), child: Row(children: [
-                      Checkbox(value: isChecked, onChanged: (v) => setState(() => v! ? _selected.add(e.key) : _selected.remove(e.key)), activeColor: HireIQTheme.primaryTeal, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4))),
-                      const SizedBox(width: 10),
-                      Container(width: 40, height: 40, decoration: BoxDecoration(color: HireIQTheme.primaryNavy.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(HireIQTheme.radiusSm)), child: Center(child: Text(j.company.substring(0, 2), style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w800, color: HireIQTheme.primaryNavy)))),
-                      const SizedBox(width: 12),
-                      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text(j.title, style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w700, color: HireIQTheme.textPrimary)),
-                        Text(j.company, style: GoogleFonts.inter(fontSize: 12, color: HireIQTheme.textMuted)),
-                      ])),
-                      Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: HireIQTheme.primaryTeal.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(HireIQTheme.radiusFull)), child: Text('${j.matchiq}%', style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w700, color: HireIQTheme.primaryTeal))),
-                    ])),
-                    if (e.key < _jobs.length - 1) const Divider(height: 1, color: HireIQTheme.borderLight),
-                  ]);
-                }),
-              ]),
-            )),
-            const SizedBox(width: 24),
-            // Action panel
-            SizedBox(width: 320, child: Column(children: [
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(color: HireIQTheme.surfaceWhite, borderRadius: BorderRadius.circular(HireIQTheme.radiusLg), border: Border.all(color: HireIQTheme.borderLight)),
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Row(children: [const Icon(Icons.auto_awesome_rounded, color: HireIQTheme.primaryTeal, size: 18), const SizedBox(width: 8), Text('AI Cover Letter', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w700, color: HireIQTheme.primaryNavy))]),
-                  const SizedBox(height: 12),
-                  Text('SmartApply generates a personalised cover letter for each selected role, tailored to the job requirements and your profile.', style: GoogleFonts.inter(fontSize: 13, color: HireIQTheme.textMuted, height: 1.55)),
-                  const SizedBox(height: 20),
-                  Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: HireIQTheme.primaryTeal.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(HireIQTheme.radiusMd), border: Border.all(color: HireIQTheme.primaryTeal.withValues(alpha: 0.2))), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text('Ready to apply:', style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700, color: HireIQTheme.primaryNavy)),
-                    const SizedBox(height: 8),
-                    Text('• ${_selected.length} jobs selected', style: GoogleFonts.inter(fontSize: 13, color: HireIQTheme.textPrimary)),
-                    Text('• AI cover letters will be generated', style: GoogleFonts.inter(fontSize: 13, color: HireIQTheme.textPrimary)),
-                    Text('• Profile auto-attached', style: GoogleFonts.inter(fontSize: 13, color: HireIQTheme.textPrimary)),
-                  ])),
-                  const SizedBox(height: 20),
-                  SizedBox(width: double.infinity, child: ElevatedButton.icon(
-                    onPressed: _selected.isEmpty ? null : () async { setState(() => _applying = true); await Future.delayed(const Duration(seconds: 2)); if (mounted) setState(() { _applying = false; _step = 2; }); },
-                    icon: _applying ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: HireIQTheme.primaryNavy)) : const Icon(Icons.send_rounded, size: 16),
-                    label: Text(_applying ? 'Submitting...' : 'SmartApply Now', style: GoogleFonts.inter(fontWeight: FontWeight.w800, fontSize: 14)),
-                    style: ElevatedButton.styleFrom(backgroundColor: HireIQTheme.amber, foregroundColor: HireIQTheme.primaryNavy, elevation: 0, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(HireIQTheme.radiusMd))),
-                  )),
-                  if (_step == 2) ...[const SizedBox(height: 14), Container(padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: HireIQTheme.success.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(HireIQTheme.radiusMd)), child: Row(children: [const Icon(Icons.check_circle_rounded, color: HireIQTheme.success, size: 18), const SizedBox(width: 8), Text('Applications submitted!', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w700, color: HireIQTheme.success))]))],
-                ]),
-              ),
-            ])),
+          Row(children: [
+            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(children: [const Icon(Icons.smart_button_rounded, color: HireIQTheme.primaryTeal, size: 22), const SizedBox(width: 8), Text('SmartApply', style: GoogleFonts.inter(fontSize: 30, fontWeight: FontWeight.w800, color: HireIQTheme.primaryNavy))]),
+              Text('Apply to multiple high-match jobs with one click', style: GoogleFonts.inter(fontSize: 15, color: HireIQTheme.textMuted)),
+            ]),
+            const Spacer(),
+            ElevatedButton.icon(onPressed: () {}, icon: const Icon(Icons.rocket_launch_rounded, size: 16), label: Text('Apply to ${_selected.length} Jobs', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w700)), style: ElevatedButton.styleFrom(backgroundColor: HireIQTheme.amber, foregroundColor: HireIQTheme.primaryNavy, elevation: 0, padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(HireIQTheme.radiusMd)))),
           ]),
+          const SizedBox(height: 20),
+          // Summary strip
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+            decoration: BoxDecoration(color: HireIQTheme.primaryTeal.withValues(alpha: 0.06), borderRadius: BorderRadius.circular(HireIQTheme.radiusMd), border: Border.all(color: HireIQTheme.primaryTeal.withValues(alpha: 0.2))),
+            child: Row(children: [
+              const Icon(Icons.auto_awesome_rounded, color: HireIQTheme.primaryTeal, size: 16),
+              const SizedBox(width: 8),
+              Text('SmartApply uses your ForgeIQ CV and tailors the cover letter for each role automatically.', style: GoogleFonts.inter(fontSize: 12, color: HireIQTheme.textMuted)),
+              const Spacer(),
+              Text('${_selected.length} selected · avg match ${_selected.isEmpty ? "0" : (_jobs.where((j) => _selected.contains(_jobs.indexOf(j))).map((j) => j.matchiq).fold(0, (a, b) => a + b) ~/ _selected.length)}%', style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700, color: HireIQTheme.primaryTeal)),
+            ]),
+          ),
+          const SizedBox(height: 16),
+          // Job selection table
+          Container(
+            decoration: BoxDecoration(color: HireIQTheme.surfaceWhite, borderRadius: BorderRadius.circular(HireIQTheme.radiusLg), border: Border.all(color: HireIQTheme.borderLight)),
+            child: Column(children: [
+              Container(padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12), decoration: const BoxDecoration(color: HireIQTheme.background, borderRadius: BorderRadius.vertical(top: Radius.circular(HireIQTheme.radiusLg))),
+                child: Row(children: [const SizedBox(width: 36), const SizedBox(width: 14), _SAH('Job Title', 3), _SAH('Company', 2), _SAH('Location'), _SAH('Salary', 2), _SAH('MatchIQ')])),
+              const Divider(height: 1, color: HireIQTheme.borderLight),
+              ..._jobs.asMap().entries.map((e) {
+                final j = e.value;
+                final i = e.key;
+                final isLast = i == _jobs.length - 1;
+                final sel = _selected.contains(i);
+                return Column(children: [
+                  InkWell(
+                    onTap: () => setState(() => sel ? _selected.remove(i) : _selected.add(i)),
+                    child: Container(
+                      color: sel ? HireIQTheme.primaryTeal.withValues(alpha: 0.03) : null,
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                      child: Row(children: [
+                        SizedBox(width: 36, child: Checkbox(value: sel, onChanged: (_) => setState(() => sel ? _selected.remove(i) : _selected.add(i)), activeColor: HireIQTheme.primaryTeal, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)))),
+                        const SizedBox(width: 14),
+                        Expanded(flex: 3, child: Text(j.title, style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w700, color: HireIQTheme.textPrimary))),
+                        Expanded(flex: 2, child: Text(j.company, style: GoogleFonts.inter(fontSize: 12, color: HireIQTheme.textMuted))),
+                        Expanded(child: Text(j.location, style: GoogleFonts.inter(fontSize: 12, color: HireIQTheme.textMuted))),
+                        Expanded(flex: 2, child: Text(j.salary, style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700, color: HireIQTheme.primaryNavy))),
+                        Expanded(child: Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: HireIQTheme.primaryTeal.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(HireIQTheme.radiusFull)), child: Row(mainAxisSize: MainAxisSize.min, children: [const Icon(Icons.auto_awesome_rounded, size: 10, color: HireIQTheme.primaryTeal), const SizedBox(width: 3), Text('${j.matchiq}%', style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w700, color: HireIQTheme.primaryTeal))]))),
+                      ]),
+                    ),
+                  ),
+                  if (!isLast) const Divider(height: 1, color: HireIQTheme.borderLight),
+                ]);
+              }),
+            ]),
+          ),
         ]),
       ),
     );
   }
 }
 
-class _SmartJob { const _SmartJob(this.title, this.company, this.matchiq); final String title, company; final int matchiq; }
+class _SAJob {
+  const _SAJob(this.title, this.company, this.location, this.matchiq, this.salary);
+  final String title, company, location, salary;
+  final int matchiq;
+}
+
+Widget _SAH(String t, [int flex = 1]) => Expanded(flex: flex, child: Text(t, style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w700, color: HireIQTheme.textMuted)));

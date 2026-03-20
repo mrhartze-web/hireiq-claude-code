@@ -4,93 +4,101 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hireiq/shared/theme.dart';
 import 'package:hireiq/shared/components/web_layout.dart';
 
-class CandidateSecuritySettingsWeb extends ConsumerWidget {
+class CandidateSecuritySettingsWeb extends ConsumerStatefulWidget {
   const CandidateSecuritySettingsWeb({super.key});
+  @override
+  ConsumerState<CandidateSecuritySettingsWeb> createState() => _State();
+}
+
+class _State extends ConsumerState<CandidateSecuritySettingsWeb> {
+  bool _mfa = true;
 
   static const _sessions = [
-    _Session('Chrome · macOS', 'Cape Town, SA', '2m ago', true),
-    _Session('Safari · iPhone 14', 'Cape Town, SA', '1d ago', false),
-    _Session('Chrome · Windows', 'Johannesburg, SA', '5d ago', false),
+    _Session('Chrome · macOS', 'Cape Town, SA', 'Now', true),
+    _Session('Safari · iPhone 15', 'Cape Town, SA', '2h ago', false),
+    _Session('Firefox · Windows', 'Johannesburg, SA', '3 days ago', false),
   ];
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return WebLayout(
       child: Padding(
         padding: const EdgeInsets.all(40),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('Security Centre', style: GoogleFonts.inter(fontSize: 30, fontWeight: FontWeight.w800, color: HireIQTheme.primaryNavy)),
-          Text('Manage your password and active sessions', style: GoogleFonts.inter(fontSize: 15, color: HireIQTheme.textMuted)),
-          const SizedBox(height: 32),
+          Text('Security', style: GoogleFonts.inter(fontSize: 30, fontWeight: FontWeight.w800, color: HireIQTheme.primaryNavy)),
+          Text('Protect your HireIQ account', style: GoogleFonts.inter(fontSize: 15, color: HireIQTheme.textMuted)),
+          const SizedBox(height: 28),
           Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            // Left: Password + 2FA
+            // Left
             Expanded(child: Column(children: [
-              _WebCard('Change Password', [
-                _Field('Current Password', true),
-                const SizedBox(height: 14),
-                _Field('New Password', true),
-                const SizedBox(height: 14),
-                _Field('Confirm Password', true),
-                const SizedBox(height: 20),
-                SizedBox(width: double.infinity, child: ElevatedButton(onPressed: () {}, style: ElevatedButton.styleFrom(backgroundColor: HireIQTheme.primaryNavy, foregroundColor: Colors.white, elevation: 0, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(HireIQTheme.radiusMd))), child: Text('Update Password', style: GoogleFonts.inter(fontWeight: FontWeight.w700)))),
-              ]),
-              const SizedBox(height: 20),
+              // Password
+              _SecCard('Change Password', Column(children: [
+                TextField(obscureText: true, controller: TextEditingController(text: '•••••••••••'), decoration: InputDecoration(labelText: 'Current Password', border: OutlineInputBorder(borderRadius: BorderRadius.circular(HireIQTheme.radiusMd)), contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14), suffixIcon: const Icon(Icons.visibility_off_rounded, size: 16))),
+                const SizedBox(height: 12),
+                TextField(obscureText: true, decoration: InputDecoration(labelText: 'New Password', border: OutlineInputBorder(borderRadius: BorderRadius.circular(HireIQTheme.radiusMd)), contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14), suffixIcon: const Icon(Icons.visibility_off_rounded, size: 16))),
+                const SizedBox(height: 12),
+                TextField(obscureText: true, decoration: InputDecoration(labelText: 'Confirm New Password', border: OutlineInputBorder(borderRadius: BorderRadius.circular(HireIQTheme.radiusMd)), contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14))),
+                const SizedBox(height: 16),
+                Align(alignment: Alignment.centerLeft, child: ElevatedButton(onPressed: () {}, style: ElevatedButton.styleFrom(backgroundColor: HireIQTheme.amber, foregroundColor: HireIQTheme.primaryNavy, elevation: 0, padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(HireIQTheme.radiusMd))), child: Text('Update Password', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w700)))),
+              ])),
+              const SizedBox(height: 18),
+              // MFA
+              _SecCard('Two-Factor Authentication', Row(children: [
+                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(_mfa ? '2FA is enabled' : '2FA is disabled', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w700, color: _mfa ? HireIQTheme.success : HireIQTheme.error)),
+                  Text('Add an extra layer of security with an authenticator app', style: GoogleFonts.inter(fontSize: 12, color: HireIQTheme.textMuted)),
+                ])),
+                Switch(value: _mfa, onChanged: (v) => setState(() => _mfa = v), activeTrackColor: HireIQTheme.primaryTeal),
+              ])),
+            ])),
+            const SizedBox(width: 24),
+            // Right: sessions
+            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Container(
-                padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(color: HireIQTheme.surfaceWhite, borderRadius: BorderRadius.circular(HireIQTheme.radiusLg), border: Border.all(color: HireIQTheme.borderLight)),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Row(children: [
-                    const Icon(Icons.security_rounded, color: HireIQTheme.primaryTeal, size: 20),
-                    const SizedBox(width: 8),
-                    Text('Two-Factor Authentication', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w700, color: HireIQTheme.primaryNavy)),
+                  Padding(padding: const EdgeInsets.fromLTRB(20, 18, 20, 14), child: Row(children: [
+                    Text('Active Sessions', style: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w700, color: HireIQTheme.primaryNavy)),
                     const Spacer(),
-                    Switch(value: false, onChanged: (_) {}, activeTrackColor: HireIQTheme.primaryTeal),
+                    TextButton(onPressed: () {}, child: Text('Sign out all', style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600, color: HireIQTheme.error))),
+                  ])),
+                  const Divider(height: 1, color: HireIQTheme.borderLight),
+                  ..._sessions.asMap().entries.map((e) {
+                    final s = e.value;
+                    final isLast = e.key == _sessions.length - 1;
+                    return Column(children: [
+                      Padding(padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14), child: Row(children: [
+                        Container(width: 38, height: 38, decoration: BoxDecoration(color: s.current ? HireIQTheme.success.withValues(alpha: 0.1) : HireIQTheme.background, shape: BoxShape.circle), child: Icon(Icons.devices_rounded, color: s.current ? HireIQTheme.success : HireIQTheme.textMuted, size: 20)),
+                        const SizedBox(width: 12),
+                        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          Row(children: [Text(s.device, style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w700, color: HireIQTheme.textPrimary)), if (s.current) Container(margin: const EdgeInsets.only(left: 8), padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2), decoration: BoxDecoration(color: HireIQTheme.success.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(HireIQTheme.radiusFull)), child: Text('Current', style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w700, color: HireIQTheme.success)))]),
+                          Text('${s.location} · ${s.lastSeen}', style: GoogleFonts.inter(fontSize: 11, color: HireIQTheme.textMuted)),
+                        ])),
+                        if (!s.current) TextButton(onPressed: () {}, child: Text('Revoke', style: GoogleFonts.inter(fontSize: 12, color: HireIQTheme.error, fontWeight: FontWeight.w600))),
+                      ])),
+                      if (!isLast) const Divider(height: 1, color: HireIQTheme.borderLight),
+                    ]);
+                  }),
+                ]),
+              ),
+              const SizedBox(height: 18),
+              // Security score
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(color: HireIQTheme.surfaceWhite, borderRadius: BorderRadius.circular(HireIQTheme.radiusLg), border: Border.all(color: HireIQTheme.borderLight)),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text('Account Security Score', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700, color: HireIQTheme.primaryNavy)),
+                  const SizedBox(height: 12),
+                  Row(children: [
+                    Text('85%', style: GoogleFonts.inter(fontSize: 28, fontWeight: FontWeight.w900, color: HireIQTheme.success)),
+                    const SizedBox(width: 12),
+                    Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(HireIQTheme.radiusFull), child: const LinearProgressIndicator(value: 0.85, minHeight: 12, backgroundColor: HireIQTheme.borderLight, valueColor: AlwaysStoppedAnimation<Color>(HireIQTheme.success)))),
                   ]),
                   const SizedBox(height: 8),
-                  Text('Add an extra layer of security. When enabled, you\'ll be asked for a verification code on each sign-in.', style: GoogleFonts.inter(fontSize: 13, color: HireIQTheme.textMuted)),
+                  Text('Enable 2FA and remove inactive sessions to reach 100%.', style: GoogleFonts.inter(fontSize: 12, color: HireIQTheme.textMuted)),
                 ]),
               ),
             ])),
-            const SizedBox(width: 28),
-            // Right: Active sessions table
-            Expanded(child: Container(
-              decoration: BoxDecoration(color: HireIQTheme.surfaceWhite, borderRadius: BorderRadius.circular(HireIQTheme.radiusLg), border: Border.all(color: HireIQTheme.borderLight)),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Row(children: [
-                    Text('Active Sessions', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w700, color: HireIQTheme.primaryNavy)),
-                    const Spacer(),
-                    TextButton(onPressed: () {}, child: Text('Revoke all other sessions', style: GoogleFonts.inter(fontSize: 12, color: HireIQTheme.error, fontWeight: FontWeight.w600))),
-                  ]),
-                ),
-                const Divider(height: 1, color: HireIQTheme.borderLight),
-                Container(padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12), color: HireIQTheme.background, child: Row(children: [
-                  _STH('Device / Browser', flex: 2), _STH('Location', flex: 2), _STH('Last Active', flex: 2), _STH('', flex: 1),
-                ])),
-                const Divider(height: 1, color: HireIQTheme.borderLight),
-                ..._sessions.asMap().entries.map((e) {
-                  final s = e.value;
-                  final isLast = e.key == _sessions.length - 1;
-                  return Column(children: [
-                    Padding(padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16), child: Row(children: [
-                      Expanded(flex: 2, child: Row(children: [
-                        Icon(Icons.computer_rounded, size: 16, color: s.isCurrent ? HireIQTheme.primaryTeal : HireIQTheme.textMuted),
-                        const SizedBox(width: 8),
-                        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                          Text(s.device, style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: HireIQTheme.textPrimary)),
-                          if (s.isCurrent) Text('Current session', style: GoogleFonts.inter(fontSize: 11, color: HireIQTheme.success)),
-                        ])),
-                      ])),
-                      Expanded(flex: 2, child: Text(s.location, style: GoogleFonts.inter(fontSize: 13, color: HireIQTheme.textMuted))),
-                      Expanded(flex: 2, child: Text(s.lastActive, style: GoogleFonts.inter(fontSize: 13, color: HireIQTheme.textMuted))),
-                      Expanded(child: s.isCurrent ? const SizedBox.shrink() : TextButton(onPressed: () {}, child: Text('Revoke', style: GoogleFonts.inter(fontSize: 12, color: HireIQTheme.error, fontWeight: FontWeight.w600)))),
-                    ])),
-                    if (!isLast) const Divider(height: 1, color: HireIQTheme.borderLight),
-                  ]);
-                }),
-              ]),
-            )),
           ]),
         ]),
       ),
@@ -98,7 +106,10 @@ class CandidateSecuritySettingsWeb extends ConsumerWidget {
   }
 }
 
-class _Session { const _Session(this.device, this.location, this.lastActive, this.isCurrent); final String device, location, lastActive; final bool isCurrent; }
-Widget _STH(String l, {int flex = 1}) => Expanded(flex: flex, child: Text(l, style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w700, color: HireIQTheme.textMuted)));
-Widget _Field(String label, bool obscure) => TextField(obscureText: obscure, decoration: InputDecoration(labelText: label, labelStyle: GoogleFonts.inter(fontSize: 13, color: HireIQTheme.textMuted), border: OutlineInputBorder(borderRadius: BorderRadius.circular(HireIQTheme.radiusMd)), contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14)));
-Widget _WebCard(String title, List<Widget> children) => Container(padding: const EdgeInsets.all(24), decoration: BoxDecoration(color: HireIQTheme.surfaceWhite, borderRadius: BorderRadius.circular(HireIQTheme.radiusLg), border: Border.all(color: HireIQTheme.borderLight)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w700, color: HireIQTheme.primaryNavy)), const SizedBox(height: 20), ...children]));
+class _Session {
+  const _Session(this.device, this.location, this.lastSeen, this.current);
+  final String device, location, lastSeen;
+  final bool current;
+}
+
+Widget _SecCard(String title, Widget child) => Container(padding: const EdgeInsets.all(22), decoration: BoxDecoration(color: HireIQTheme.surfaceWhite, borderRadius: BorderRadius.circular(HireIQTheme.radiusLg), border: Border.all(color: HireIQTheme.borderLight)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, style: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w700, color: HireIQTheme.primaryNavy)), const Divider(height: 20, color: HireIQTheme.borderLight), child]));
