@@ -373,6 +373,9 @@ final routerProvider = Provider<GoRouter>((ref) {
               path: MobileRoutes.candidateDashboard,
               builder: (context, state) => const CandidateJobFeed()),
           GoRoute(
+              path: MobileRoutes.candidateJobFeed,
+              builder: (context, state) => const CandidateJobFeed()),
+          GoRoute(
               path: MobileRoutes.candidateProfile,
               builder: (context, state) => const CandidateProfile()),
           GoRoute(
