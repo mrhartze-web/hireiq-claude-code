@@ -1,41 +1,92 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../shared/theme.dart';
-import '../../providers/auth_provider.dart';
-import '../../providers/job_provider.dart';
-import '../../providers/application_provider.dart';
-import '../../models/application_model.dart';
-import '../../shared/components/skeleton_loader.dart';
+import '../../shared/components/empty_state.dart';
 
-class EmployerCandidatePipeline extends ConsumerWidget {
+class EmployerCandidatePipeline extends ConsumerStatefulWidget {
   const EmployerCandidatePipeline({super.key});
 
-  static const _columns = [
-    'applied',
-    'reviewing',
-    'shortlisted',
-    'interview',
-    'offer',
+  @override
+  ConsumerState<EmployerCandidatePipeline> createState() =>
+      _EmployerCandidatePipelineState();
+}
+
+class _EmployerCandidatePipelineState
+    extends ConsumerState<EmployerCandidatePipeline>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabs;
+  static const _stages = ['Applied', 'Shortlisted', 'Interviewing', 'Offer'];
+
+  static const _candidates = [
+    _Candidate(
+      name: 'Thabo Nkosi',
+      role: 'Senior Flutter Developer',
+      matchScore: 91,
+      stage: 'Applied',
+      appliedDate: '18 Mar 2026',
+      location: 'Johannesburg',
+    ),
+    _Candidate(
+      name: 'Nomsa Dlamini',
+      role: 'Senior Flutter Developer',
+      matchScore: 87,
+      stage: 'Applied',
+      appliedDate: '19 Mar 2026',
+      location: 'Cape Town',
+    ),
+    _Candidate(
+      name: 'Craig Botha',
+      role: 'Senior Flutter Developer',
+      matchScore: 84,
+      stage: 'Shortlisted',
+      appliedDate: '15 Mar 2026',
+      location: 'Pretoria',
+    ),
+    _Candidate(
+      name: 'Zanele Mokoena',
+      role: 'Senior Flutter Developer',
+      matchScore: 79,
+      stage: 'Shortlisted',
+      appliedDate: '14 Mar 2026',
+      location: 'Durban',
+    ),
+    _Candidate(
+      name: 'Sipho van Rooyen',
+      role: 'Senior Flutter Developer',
+      matchScore: 92,
+      stage: 'Interviewing',
+      appliedDate: '10 Mar 2026',
+      location: 'Cape Town',
+    ),
+    _Candidate(
+      name: 'Ayanda Khumalo',
+      role: 'Senior Flutter Developer',
+      matchScore: 88,
+      stage: 'Offer',
+      appliedDate: '5 Mar 2026',
+      location: 'Johannesburg',
+    ),
   ];
 
-  static const _columnLabels = {
-    'applied': 'Applied',
-    'reviewing': 'Reviewing',
-    'shortlisted': 'Shortlisted',
-    'interview': 'Interviewing',
-    'offer': 'Offered',
-  };
+  @override
+  void initState() {
+    super.initState();
+    _tabs = TabController(length: _stages.length, vsync: this);
+  }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final uid = ref.watch(authStateProvider).value?.uid ?? '';
-    final jobsAsync = ref.watch(employerJobsProvider(uid));
+  void dispose() {
+    _tabs.dispose();
+    super.dispose();
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: HireIQTheme.background,
-      body: CustomScrollView(
-        slivers: [
+      body: NestedScrollView(
+        headerSliverBuilder: (context, _) => [
           SliverAppBar(
             pinned: true,
             backgroundColor: HireIQTheme.primaryNavy,
@@ -50,83 +101,107 @@ class EmployerCandidatePipeline extends ConsumerWidget {
             ),
             actions: [
               IconButton(
-                icon: const Icon(Icons.settings, color: Colors.white),
+                icon: const Icon(Icons.tune_rounded,
+                    size: 20, color: Colors.white),
                 onPressed: () {},
               ),
             ],
-          ),
-          SliverToBoxAdapter(
-            child: jobsAsync.when(
-              loading: () => const Padding(
-                padding: EdgeInsets.all(20),
-                child: SkeletonLoader(itemCount: 3),
-              ),
-              error: (_, __) => const Center(
-                child: Padding(
-                  padding: EdgeInsets.all(40),
-                  child: Text('Could not load pipeline'),
-                ),
-              ),
-              data: (jobs) {
-                // Collect all applications across all jobs
-                final Map<String, List<ApplicationModel>> columnMap = {
-                  for (final col in _columns) col: [],
-                };
-
-                for (final job in jobs) {
-                  final appsAsync =
-                      ref.watch(jobApplicationsProvider(job.jobId));
-                  final apps = appsAsync.valueOrNull ?? [];
-                  for (final app in apps) {
-                    final col = app.status.toLowerCase();
-                    if (columnMap.containsKey(col)) {
-                      columnMap[col]!.add(app);
-                    } else {
-                      columnMap['applied']!.add(app);
-                    }
-                  }
-                }
-
-                return SizedBox(
-                  height: MediaQuery.of(context).size.height - 120,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: _columns.map((col) {
-                        final apps = columnMap[col]!;
-                        return _PipelineColumn(
-                          title: _columnLabels[col]!,
-                          applications: apps,
-                        );
-                      }).toList(),
-                    ),
+            bottom: TabBar(
+              controller: _tabs,
+              isScrollable: true,
+              labelStyle: GoogleFonts.inter(
+                  fontSize: 13, fontWeight: FontWeight.w700),
+              unselectedLabelStyle: GoogleFonts.inter(
+                  fontSize: 13, fontWeight: FontWeight.w500),
+              labelColor: Colors.white,
+              unselectedLabelColor: Colors.white.withValues(alpha: 0.5),
+              indicatorColor: HireIQTheme.amber,
+              indicatorWeight: 3,
+              tabs: _stages.map((s) {
+                final count =
+                    _candidates.where((c) => c.stage == s).length;
+                return Tab(
+                  child: Row(
+                    children: [
+                      Text(s),
+                      const SizedBox(width: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 7, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.2),
+                          borderRadius:
+                              BorderRadius.circular(HireIQTheme.radiusFull),
+                        ),
+                        child: Text(
+                          '$count',
+                          style: GoogleFonts.inter(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white),
+                        ),
+                      ),
+                    ],
                   ),
                 );
-              },
+              }).toList(),
             ),
           ),
         ],
+        body: TabBarView(
+          controller: _tabs,
+          children: _stages.map((stage) {
+            final filtered =
+                _candidates.where((c) => c.stage == stage).toList();
+            if (filtered.isEmpty) {
+              return const EmptyState(
+                icon: Icons.people_outline_rounded,
+                heading: 'No candidates in this stage',
+                body:
+                    'Move candidates through the pipeline to see them here.',
+              );
+            }
+            return ListView.separated(
+              padding: const EdgeInsets.all(16),
+              itemCount: filtered.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 12),
+              itemBuilder: (context, i) =>
+                  _CandidatePipelineCard(candidate: filtered[i]),
+            );
+          }).toList(),
+        ),
       ),
     );
   }
 }
 
-class _PipelineColumn extends StatelessWidget {
-  const _PipelineColumn({
-    required this.title,
-    required this.applications,
+class _Candidate {
+  const _Candidate({
+    required this.name,
+    required this.role,
+    required this.matchScore,
+    required this.stage,
+    required this.appliedDate,
+    required this.location,
   });
 
-  final String title;
-  final List<ApplicationModel> applications;
+  final String name;
+  final String role;
+  final int matchScore;
+  final String stage;
+  final String appliedDate;
+  final String location;
+}
+
+class _CandidatePipelineCard extends StatelessWidget {
+  const _CandidatePipelineCard({required this.candidate});
+  final _Candidate candidate;
 
   @override
   Widget build(BuildContext context) {
+    final c = candidate;
     return Container(
-      width: 280,
-      margin: const EdgeInsets.only(right: 16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: HireIQTheme.surfaceWhite,
         borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
@@ -140,66 +215,104 @@ class _PipelineColumn extends StatelessWidget {
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Container(
-            padding:
-                const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-            decoration: const BoxDecoration(
-              border: Border(
-                  bottom: BorderSide(color: HireIQTheme.borderLight)),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  title,
+          Row(
+            children: [
+              CircleAvatar(
+                radius: 22,
+                backgroundColor:
+                    HireIQTheme.primaryTeal.withValues(alpha: 0.12),
+                child: Text(
+                  c.name.split(' ').map((w) => w[0]).take(2).join(),
                   style: GoogleFonts.inter(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 15,
-                      color: HireIQTheme.primaryNavy),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
+                      color: HireIQTheme.primaryTeal),
                 ),
-                Container(
-                  width: 28,
-                  height: 28,
-                  decoration: BoxDecoration(
-                    color: HireIQTheme.primaryNavy.withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    '${applications.length}',
-                    style: GoogleFonts.inter(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
-                        color: HireIQTheme.primaryNavy),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.all(12),
-              children: applications.isEmpty
-                  ? [
-                      Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(32.0),
-                          child: Text(
-                            'No candidates\nin this stage',
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.inter(
-                                color: HireIQTheme.textMuted,
-                                height: 1.5),
-                          ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      c.name,
+                      style: GoogleFonts.inter(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: HireIQTheme.primaryNavy),
+                    ),
+                    const SizedBox(height: 2),
+                    Row(
+                      children: [
+                        const Icon(Icons.location_on_outlined,
+                            size: 12, color: HireIQTheme.textMuted),
+                        const SizedBox(width: 2),
+                        Text(
+                          c.location,
+                          style: GoogleFonts.inter(
+                              fontSize: 12, color: HireIQTheme.textMuted),
                         ),
-                      )
-                    ]
-                  : applications
-                      .map((app) => _KanbanCard(application: app))
-                      .toList(),
-            ),
+                        const SizedBox(width: 8),
+                        const Icon(Icons.calendar_today_outlined,
+                            size: 12, color: HireIQTheme.textMuted),
+                        const SizedBox(width: 2),
+                        Text(
+                          c.appliedDate,
+                          style: GoogleFonts.inter(
+                              fontSize: 12, color: HireIQTheme.textMuted),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  color: HireIQTheme.primaryTeal.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(HireIQTheme.radiusFull),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.auto_awesome_rounded,
+                        size: 11, color: HireIQTheme.primaryTeal),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${c.matchScore}%',
+                      style: GoogleFonts.inter(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: HireIQTheme.primaryTeal),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          const Divider(height: 1, color: HireIQTheme.borderLight),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _ActionBtn(
+                  label: 'View CV',
+                  icon: Icons.description_outlined,
+                  onTap: () {},
+                  isPrimary: false,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _ActionBtn(
+                  label: 'Advance',
+                  icon: Icons.arrow_forward_rounded,
+                  onTap: () {},
+                  isPrimary: true,
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -207,90 +320,53 @@ class _PipelineColumn extends StatelessWidget {
   }
 }
 
-class _KanbanCard extends StatelessWidget {
-  const _KanbanCard({required this.application});
+class _ActionBtn extends StatelessWidget {
+  const _ActionBtn({
+    required this.label,
+    required this.icon,
+    required this.onTap,
+    required this.isPrimary,
+  });
 
-  final ApplicationModel application;
+  final String label;
+  final IconData icon;
+  final VoidCallback onTap;
+  final bool isPrimary;
 
   @override
   Widget build(BuildContext context) {
-    final shortId = application.candidateUid.length > 6
-        ? application.candidateUid.substring(0, 6)
-        : application.candidateUid;
-    final initial = shortId.isNotEmpty ? shortId[0].toUpperCase() : 'C';
-    final score = application.matchIQScore ?? 0.0;
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: HireIQTheme.background,
-        borderRadius: BorderRadius.circular(HireIQTheme.radiusMd),
-        border: Border.all(color: HireIQTheme.borderLight),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 16,
-                backgroundColor:
-                    HireIQTheme.primaryTeal.withValues(alpha: 0.1),
-                child: Text(
-                  initial,
-                  style: GoogleFonts.inter(
-                      color: HireIQTheme.primaryTeal,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  'Candidate #$shortId',
-                  style: GoogleFonts.inter(
-                      fontWeight: FontWeight.w600,
-                      color: HireIQTheme.primaryNavy),
-                ),
-              ),
-            ],
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 9),
+        decoration: BoxDecoration(
+          color: isPrimary ? HireIQTheme.primaryNavy : HireIQTheme.background,
+          borderRadius: BorderRadius.circular(HireIQTheme.radiusMd),
+          border: Border.all(
+            color:
+                isPrimary ? HireIQTheme.primaryNavy : HireIQTheme.borderMedium,
           ),
-          const SizedBox(height: 6),
-          Text(
-            'Applied ${_relativeDate(application.appliedAt)}',
-            style: GoogleFonts.inter(
-                color: HireIQTheme.textMuted, fontSize: 12),
-          ),
-          if (score > 0) ...[
-            const SizedBox(height: 10),
-            Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: HireIQTheme.primaryTeal.withValues(alpha: 0.1),
-                borderRadius:
-                    BorderRadius.circular(HireIQTheme.radiusSm),
-              ),
-              child: Text(
-                '${score.toInt()}% Match',
-                style: GoogleFonts.inter(
-                    color: HireIQTheme.primaryTeal,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 14,
+              color: isPrimary ? Colors.white : HireIQTheme.textMuted,
+            ),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: isPrimary ? Colors.white : HireIQTheme.textMuted,
               ),
             ),
           ],
-        ],
+        ),
       ),
     );
-  }
-
-  static String _relativeDate(DateTime date) {
-    final diff = DateTime.now().difference(date);
-    if (diff.inDays == 0) return 'today';
-    if (diff.inDays == 1) return 'yesterday';
-    if (diff.inDays < 7) return '${diff.inDays}d ago';
-    return '${(diff.inDays / 7).floor()}w ago';
   }
 }

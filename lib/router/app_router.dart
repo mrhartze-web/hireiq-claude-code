@@ -137,7 +137,7 @@ import '../features/recruiter/recruiter_pipeline.dart';
 import '../features/recruiter/recruiter_briefs.dart';
 import '../features/recruiter/recruiter_cv_vault.dart';
 import '../features/recruiter/recruiter_settings.dart';
-import '../features/recruiter/signal_iq_report.dart';
+import '../features/recruiter/recruiter_signal_iq_report.dart';
 import '../features/recruiter/recruiter_shortlist.dart';
 import '../features/recruiter/enterprise_diversity_report.dart';
 import '../features/recruiter/recruiter_brief_builder.dart';
@@ -410,8 +410,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               builder: (context, state) => const CandidateGigFeed()),
           GoRoute(
             path: MobileRoutes.candidateGigDetail,
-            builder: (context, state) =>
-                CandidateGigDetail(gigId: state.pathParameters['id'] ?? 'g1'),
+            builder: (context, state) => const CandidateGigDetail(),
           ),
           GoRoute(
               path: MobileRoutes.candidatePassportProcessing,
@@ -485,7 +484,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               builder: (context, state) => const CandidateSubscriptionUpgrade()),
           GoRoute(
               path: MobileRoutes.candidateCVUploadPath,
-              builder: (context, state) => const CandidateCVUpload()),
+              builder: (context, state) => const CandidateCvUpload()),
 
           // New Candidate Blueprint Screens
           GoRoute(
@@ -540,7 +539,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               builder: (context, state) => const EnterpriseDashboard()),
           GoRoute(
               path: MobileRoutes.employerJobs,
-              builder: (context, state) => const EmployerMyJobs()),
+              builder: (context, state) => const EmployerJobs()),
           GoRoute(
               path: MobileRoutes.employerPostJob,
               builder: (context, state) => const EmployerPostJob()),
@@ -555,10 +554,10 @@ final routerProvider = Provider<GoRouter>((ref) {
               builder: (context, state) => const EmployerTeamManagement()),
           GoRoute(
               path: MobileRoutes.employerPayments,
-              builder: (context, state) => const ReleasePaymentScreen()),
+              builder: (context, state) => const EmployerPayments()),
           GoRoute(
               path: MobileRoutes.employerDispute,
-              builder: (context, state) => const OpenDisputeScreen()),
+              builder: (context, state) => const EmployerDispute()),
           GoRoute(
               path: MobileRoutes.employerReview,
               builder: (context, state) => const LeaveReviewScreen()),
@@ -689,7 +688,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               builder: (context, state) => const RecruiterBriefs()),
           GoRoute(
               path: MobileRoutes.recruiterSignalIQ,
-              builder: (context, state) => const SignalIQReport()),
+              builder: (context, state) => const RecruiterSignalIqReport()),
           GoRoute(
               path: MobileRoutes.recruiterShortlist,
               builder: (context, state) => const RecruiterShortlist()),
@@ -743,7 +742,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               builder: (context, state) => const RecruiterOnboardingStep3()),
           GoRoute(
               path: '/recruiter/shield-iq-flag',
-              builder: (context, state) => const ShieldIQFlagScreen()),
+              builder: (context, state) => const ShieldIqFlagScreen()),
         ],
       ),
 
@@ -961,10 +960,10 @@ final routerProvider = Provider<GoRouter>((ref) {
               builder: (context, state) => const AdminDashboard()),
           GoRoute(
               path: MobileRoutes.adminUsers,
-              builder: (context, state) => const AdminUsersManagement()),
+              builder: (context, state) => const AdminUsers()),
           GoRoute(
               path: MobileRoutes.adminRevenue,
-              builder: (context, state) => const AdminRevenueDashboard()),
+              builder: (context, state) => const AdminRevenue()),
           GoRoute(
               path: MobileRoutes.adminSystemHealth,
               builder: (context, state) => const AdminSystemHealth()),

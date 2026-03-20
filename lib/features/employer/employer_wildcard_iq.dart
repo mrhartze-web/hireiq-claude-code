@@ -1,15 +1,43 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../shared/theme.dart';
 
-class EmployerWildcardIq extends StatelessWidget {
+class EmployerWildcardIq extends ConsumerStatefulWidget {
   const EmployerWildcardIq({super.key});
+
+  @override
+  ConsumerState<EmployerWildcardIq> createState() => _EmployerWildcardIqState();
+}
+
+class _EmployerWildcardIqState extends ConsumerState<EmployerWildcardIq> {
+  bool _discovered = false;
+
+  static const _wildcards = [
+    _Wildcard(
+      name: 'Lungelo Dube',
+      currentRole: 'Marketing Manager',
+      hiddenStrength: 'Built internal analytics tools for 3 years',
+      matchScore: 88,
+      reason:
+          'Lungelo\'s unreported technical background makes them an exceptional Flutter dev candidate.',
+    ),
+    _Wildcard(
+      name: 'Priya Naicker',
+      currentRole: 'Civil Engineer',
+      hiddenStrength: 'Self-taught iOS and Flutter developer, 2 published apps',
+      matchScore: 84,
+      reason:
+          'Non-traditional background with proven mobile shipping experience — a rare WildcardIQ catch.',
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: HireIQTheme.background,
       body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
         slivers: [
           SliverAppBar(
             pinned: true,
@@ -17,117 +45,150 @@ class EmployerWildcardIq extends StatelessWidget {
             foregroundColor: Colors.white,
             centerTitle: true,
             title: Text(
-              'WildcardIQ Analysis',
+              'WildcardIQ',
               style: GoogleFonts.inter(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: Colors.white),
             ),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.download, color: Colors.white),
-                onPressed: () {},
-              ),
-            ],
           ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [
-                          HireIQTheme.primaryNavy,
-                          Color(0xFF243659),
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 48),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate([
+                // ── Hero Explainer ────────────────────────────────────────
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF7C3AED), Color(0xFF9D5CF6)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.casino_rounded,
+                              color: Colors.white, size: 22),
+                          const SizedBox(width: 10),
+                          Text(
+                            'WildcardIQ Candidates',
+                            style: GoogleFonts.inter(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.white),
+                          ),
                         ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
                       ),
-                      borderRadius:
-                          BorderRadius.circular(HireIQTheme.radiusXl),
-                    ),
-                    child: Row(
-                      children: [
+                      const SizedBox(height: 12),
+                      Text(
+                        'Candidates with non-traditional backgrounds hiding exceptional talent. Our AI identifies hidden strengths that standard CVs miss. Average hire success rate: 91%.',
+                        style: GoogleFonts.inter(
+                            fontSize: 13,
+                            color: Colors.white.withValues(alpha: 0.8),
+                            height: 1.55),
+                      ),
+                      const SizedBox(height: 16),
+                      if (!_discovered)
+                        ElevatedButton.icon(
+                          onPressed: () => setState(() => _discovered = true),
+                          icon: const Icon(Icons.waving_hand_rounded, size: 16),
+                          label: Text(
+                            'Discover Wildcards for My Role',
+                            style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 13),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: const Color(0xFF7C3AED),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                    HireIQTheme.radiusMd)),
+                          ),
+                        )
+                      else
                         Container(
-                          padding: const EdgeInsets.all(12),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 8),
                           decoration: BoxDecoration(
-                            color: HireIQTheme.primaryTeal
-                                .withValues(alpha: 0.2),
-                            shape: BoxShape.circle,
+                            color: Colors.white.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(
+                                HireIQTheme.radiusFull),
                           ),
-                          child: const Icon(Icons.psychology,
-                              color: HireIQTheme.primaryTeal, size: 36),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment:
-                                CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Hidden Potential',
-                                style: GoogleFonts.inter(
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                "We analyzed Sarah's profile and found unconventional strong matches for this role.",
-                                style: GoogleFonts.inter(
-                                    color: Colors.white70,
-                                    fontSize: 13,
-                                    height: 1.4),
-                              ),
-                            ],
+                          child: Text(
+                            '✓ Showing wildcards for Senior Flutter Developer',
+                            style: GoogleFonts.inter(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white),
                           ),
                         ),
-                      ],
-                    ),
+                    ],
                   ),
-                  const SizedBox(height: 28),
-                  _buildInsightCard(
-                    'Transferable Skills',
-                    'Although Sarah lacks direct FinTech experience, her work in highly regulated healthcare data systems demonstrates the exact security compliance knowledge required.',
-                    Icons.swap_horiz,
+                ),
+                const SizedBox(height: 24),
+
+                if (_discovered) ...[
+                  Text(
+                    'Your Wildcard Matches',
+                    style: GoogleFonts.inter(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: HireIQTheme.primaryNavy),
                   ),
-                  _buildInsightCard(
-                    'Self-Taught Velocity',
-                    'Her GitHub activity shows she mastered Go in under 3 months while contributing to complex open-source projects, indicating extremely fast onboarding potential.',
-                    Icons.speed,
-                  ),
-                  _buildInsightCard(
-                    'Leadership Capacity',
-                    'While strictly an individual contributor by title, semantic analysis of her peer reviews indicates she unofficially mentored 3 junior developers over the past year.',
-                    Icons.groups,
-                  ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 12),
+                  ..._wildcards.map((w) => Padding(
+                        padding: const EdgeInsets.only(bottom: 14),
+                        child: _WildcardCard(wildcard: w),
+                      )),
                 ],
-              ),
+              ]),
             ),
           ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildInsightCard(
-      String title, String description, IconData icon) {
+class _Wildcard {
+  const _Wildcard({
+    required this.name,
+    required this.currentRole,
+    required this.hiddenStrength,
+    required this.matchScore,
+    required this.reason,
+  });
+
+  final String name;
+  final String currentRole;
+  final String hiddenStrength;
+  final int matchScore;
+  final String reason;
+}
+
+class _WildcardCard extends StatelessWidget {
+  const _WildcardCard({required this.wildcard});
+  final _Wildcard wildcard;
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: HireIQTheme.surfaceWhite,
         borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
-        border: Border.all(color: HireIQTheme.borderLight),
+        border: Border.all(
+            color: const Color(0xFF7C3AED).withValues(alpha: 0.25)),
         boxShadow: [
           BoxShadow(
-            color: HireIQTheme.primaryNavy.withValues(alpha: 0.04),
-            blurRadius: 12,
-            offset: const Offset(0, 3),
+            color: const Color(0xFF7C3AED).withValues(alpha: 0.06),
+            blurRadius: 14,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -136,32 +197,135 @@ class EmployerWildcardIq extends StatelessWidget {
         children: [
           Row(
             children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color:
-                      HireIQTheme.primaryTeal.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(icon, color: HireIQTheme.primaryTeal),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
+              CircleAvatar(
+                radius: 22,
+                backgroundColor:
+                    const Color(0xFF7C3AED).withValues(alpha: 0.1),
                 child: Text(
-                  title,
+                  wildcard.name
+                      .split(' ')
+                      .map((w) => w[0])
+                      .take(2)
+                      .join(),
                   style: GoogleFonts.inter(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 15,
-                      color: HireIQTheme.primaryNavy),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                      color: const Color(0xFF7C3AED)),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      wildcard.name,
+                      style: GoogleFonts.inter(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: HireIQTheme.primaryNavy),
+                    ),
+                    Text(
+                      'Currently: ${wildcard.currentRole}',
+                      style: GoogleFonts.inter(
+                          fontSize: 12, color: HireIQTheme.textMuted),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF7C3AED).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(HireIQTheme.radiusFull),
+                ),
+                child: Text(
+                  '${wildcard.matchScore}%',
+                  style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF7C3AED)),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 12),
-          Text(
-            description,
-            style: GoogleFonts.inter(
-                color: HireIQTheme.textMuted, height: 1.6),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0xFF7C3AED).withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(HireIQTheme.radiusMd),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.auto_awesome_rounded,
+                        size: 13, color: Color(0xFF7C3AED)),
+                    const SizedBox(width: 5),
+                    Text(
+                      'Hidden Strength',
+                      style: GoogleFonts.inter(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: const Color(0xFF7C3AED)),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  wildcard.hiddenStrength,
+                  style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: HireIQTheme.textPrimary),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  wildcard.reason,
+                  style: GoogleFonts.inter(
+                      fontSize: 12,
+                      color: HireIQTheme.textMuted,
+                      height: 1.4),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () {},
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: const Color(0xFF7C3AED),
+                    side: const BorderSide(color: Color(0xFF7C3AED)),
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(HireIQTheme.radiusMd)),
+                  ),
+                  child: Text('View Profile',
+                      style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 12)),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF7C3AED),
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(HireIQTheme.radiusMd)),
+                  ),
+                  child: Text('Contact',
+                      style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 12)),
+                ),
+              ),
+            ],
           ),
         ],
       ),
