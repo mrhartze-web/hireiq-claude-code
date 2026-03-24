@@ -195,5 +195,18 @@ service cloud.firestore {
       allow read:  if isAuthenticated();
       allow write: if isOwner(resource.data.uid) || isAdmin();
     }
+
+    // ── subscriptions ───────────────────────────────────────────────────────────
+    // Users can read their own subscription documents.
+    // Any authenticated user can create (triggered by initiateSubscription).
+    // Updates are reserved for Cloud Functions (payment webhooks).
+    // Deletes are not permitted.
+    match /subscriptions/{subscriptionId} {
+      allow read:   if request.auth != null &&
+                       resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null;
+      allow update: if false;
+      allow delete: if false;
+    }
   }
 }

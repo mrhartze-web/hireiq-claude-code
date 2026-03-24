@@ -1,6 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../providers/auth_provider.dart';
+import '../../providers/subscription_provider.dart';
+import '../../services/payments/subscription_service.dart';
 import '../../shared/theme.dart';
 
 class CandidateBillingSettings extends ConsumerStatefulWidget {
@@ -13,10 +17,12 @@ class CandidateBillingSettings extends ConsumerStatefulWidget {
 
 class _CandidateBillingSettingsState
     extends ConsumerState<CandidateBillingSettings> {
-  String _currentPlan = 'Professional';
+  bool _isUpgrading = false;
 
+  // Candidate plans sourced from SubscriptionService
   static const _plans = [
     _Plan(
+      id: 'candidate_free',
       name: 'Free',
       price: 'R0',
       period: 'Forever',
@@ -25,47 +31,102 @@ class _CandidateBillingSettingsState
         'Basic MatchIQ score',
         'Standard job alerts',
       ],
-      isCurrent: false,
       isRecommended: false,
     ),
     _Plan(
-      name: 'Professional',
-      price: 'R199',
+      id: 'candidate_pro',
+      name: 'Pro',
+      price: 'R29',
       period: 'per month',
       features: [
         'Unlimited applications',
         'Full MatchIQ AI matching',
         'ForgeIQ CV builder',
-        'Priority job alerts',
-        'Salary benchmarks',
+        'PassportIQ verification',
+        'UpliftIQ learning path',
       ],
-      isCurrent: true,
       isRecommended: true,
-    ),
-    _Plan(
-      name: 'Elite',
-      price: 'R499',
-      period: 'per month',
-      features: [
-        'Everything in Professional',
-        '1-on-1 career coaching',
-        'ShieldIQ deal protection',
-        'Guaranteed interview prep',
-        'Dedicated account manager',
-      ],
-      isCurrent: false,
-      isRecommended: false,
     ),
   ];
 
   static const _invoices = [
-    _Invoice(date: 'Mar 2026', amount: 'R199.00', status: 'Paid'),
-    _Invoice(date: 'Feb 2026', amount: 'R199.00', status: 'Paid'),
-    _Invoice(date: 'Jan 2026', amount: 'R199.00', status: 'Paid'),
+    _Invoice(date: 'Mar 2026', amount: 'R29.00', status: 'Paid'),
+    _Invoice(date: 'Feb 2026', amount: 'R29.00', status: 'Paid'),
+    _Invoice(date: 'Jan 2026', amount: 'R29.00', status: 'Paid'),
   ];
+
+  String _activePlanId(String? subscriptionTier) {
+    if (subscriptionTier == null ||
+        subscriptionTier == 'free' ||
+        subscriptionTier == 'candidate_free') {
+      return 'candidate_free';
+    }
+    return subscriptionTier;
+  }
+
+  String _monthName(int month) {
+    const months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ];
+    return months[month - 1];
+  }
+
+  Future<void> _upgrade(String planId) async {
+    final user = ref.read(authStateProvider).value;
+    if (user == null) return;
+    setState(() => _isUpgrading = true);
+    try {
+      await SubscriptionService().initiateSubscription(
+        userId: user.uid,
+        planId: planId,
+        userEmail: user.email ?? '',
+      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+              'Redirecting to secure payment — powered by Peach Payments'),
+          backgroundColor: HireIQTheme.primaryNavy,
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Payment error: ${e.toString()}'),
+          backgroundColor: HireIQTheme.error,
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _isUpgrading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final uid = ref.watch(authStateProvider).value?.uid ?? '';
+    final userAsync = ref.watch(currentUserProvider);
+    final activeSubAsync = ref.watch(activeSubscriptionProvider(uid));
+
+    final subscriptionTier = userAsync.value?.subscriptionTier;
+    final subscriptionStatus = userAsync.value?.subscriptionStatus ?? 'inactive';
+    final activePlanId = _activePlanId(subscriptionTier);
+    final isActive = subscriptionStatus == 'active';
+
+    // Next billing date from Firestore subscription record
+    String nextBillingText = '';
+    double nextBillingAmount = 29.0;
+    activeSubAsync.whenData((sub) {
+      if (sub != null && sub['nextBillingDate'] is Timestamp) {
+        final d = (sub['nextBillingDate'] as Timestamp).toDate();
+        nextBillingText =
+            '${d.day.toString().padLeft(2, '0')} ${_monthName(d.month)} ${d.year}';
+        nextBillingAmount =
+            (sub['amount'] as num?)?.toDouble() ?? nextBillingAmount;
+      }
+    });
+
     return Scaffold(
       backgroundColor: HireIQTheme.background,
       appBar: AppBar(
@@ -83,7 +144,50 @@ class _CandidateBillingSettingsState
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Plans ─────────────────────────────────────────────────────
+            // ── Subscription status badge ─────────────────────────────
+            if (userAsync.value != null) ...[
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  color: isActive
+                      ? HireIQTheme.success.withValues(alpha: 0.08)
+                      : HireIQTheme.amber.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(HireIQTheme.radiusMd),
+                  border: Border.all(
+                    color: isActive
+                        ? HireIQTheme.success.withValues(alpha: 0.25)
+                        : HireIQTheme.amber.withValues(alpha: 0.25),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      isActive
+                          ? Icons.check_circle_outline_rounded
+                          : Icons.info_outline_rounded,
+                      size: 16,
+                      color: isActive ? HireIQTheme.success : HireIQTheme.amber,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      isActive
+                          ? 'Subscription active'
+                          : 'No active subscription',
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color:
+                            isActive ? HireIQTheme.success : HireIQTheme.amber,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+            ],
+
+            // ── Plans ─────────────────────────────────────────────────
             Text(
               'Choose Your Plan',
               style: GoogleFonts.inter(
@@ -94,16 +198,13 @@ class _CandidateBillingSettingsState
             const SizedBox(height: 12),
             ..._plans.map((p) => _PlanCard(
                   plan: p,
-                  isSelected: _currentPlan == p.name,
-                  onSelect: () {
-                    if (!p.isCurrent) {
-                      setState(() => _currentPlan = p.name);
-                    }
-                  },
+                  isCurrent: p.id == activePlanId,
+                  isUpgrading: _isUpgrading && p.id == 'candidate_pro',
+                  onUpgrade: () => _upgrade(p.id),
                 )),
             const SizedBox(height: 24),
 
-            // ── Payment Method ────────────────────────────────────────────
+            // ── Payment Method ────────────────────────────────────────
             Text(
               'Payment Method',
               style: GoogleFonts.inter(
@@ -180,45 +281,47 @@ class _CandidateBillingSettingsState
             ),
             const SizedBox(height: 24),
 
-            // ── Next Billing Date ─────────────────────────────────────────
-            Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: HireIQTheme.primaryTeal.withValues(alpha: 0.08),
-                borderRadius: BorderRadius.circular(HireIQTheme.radiusMd),
-                border: Border.all(
-                    color: HireIQTheme.primaryTeal.withValues(alpha: 0.25)),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.calendar_today_outlined,
-                      size: 16, color: HireIQTheme.primaryTeal),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      'Next charge: R199.00 on 01 Apr 2026',
-                      style: GoogleFonts.inter(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: HireIQTheme.primaryTeal),
+            // ── Next Billing Date ─────────────────────────────────────
+            if (isActive && nextBillingText.isNotEmpty) ...[
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: HireIQTheme.primaryTeal.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(HireIQTheme.radiusMd),
+                  border: Border.all(
+                      color: HireIQTheme.primaryTeal.withValues(alpha: 0.25)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.calendar_today_outlined,
+                        size: 16, color: HireIQTheme.primaryTeal),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        'Next charge: R${nextBillingAmount.toStringAsFixed(2)} on $nextBillingText',
+                        style: GoogleFonts.inter(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: HireIQTheme.primaryTeal),
+                      ),
                     ),
-                  ),
-                  TextButton(
-                    onPressed: () {},
-                    child: Text(
-                      'Cancel',
-                      style: GoogleFonts.inter(
-                          fontSize: 12,
-                          color: HireIQTheme.error,
-                          fontWeight: FontWeight.w600),
+                    TextButton(
+                      onPressed: () {},
+                      child: Text(
+                        'Cancel',
+                        style: GoogleFonts.inter(
+                            fontSize: 12,
+                            color: HireIQTheme.error,
+                            fontWeight: FontWeight.w600),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 24),
+              const SizedBox(height: 24),
+            ],
 
-            // ── Invoice History ───────────────────────────────────────────
+            // ── Invoice History ───────────────────────────────────────
             Text(
               'Invoice History',
               style: GoogleFonts.inter(
@@ -254,6 +357,32 @@ class _CandidateBillingSettingsState
                 }).toList(),
               ),
             ),
+            const SizedBox(height: 28),
+
+            // ── Peach Payments trust note ─────────────────────────────
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: HireIQTheme.background,
+                borderRadius: BorderRadius.circular(HireIQTheme.radiusMd),
+                border: Border.all(color: HireIQTheme.borderLight),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.lock,
+                      size: 14, color: HireIQTheme.textMuted),
+                  const SizedBox(width: 6),
+                  Text(
+                    'Payments secured by Peach Payments',
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      color: HireIQTheme.textMuted,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -261,21 +390,23 @@ class _CandidateBillingSettingsState
   }
 }
 
+// ── Plan model ────────────────────────────────────────────────────────────────
+
 class _Plan {
   const _Plan({
+    required this.id,
     required this.name,
     required this.price,
     required this.period,
     required this.features,
-    required this.isCurrent,
     required this.isRecommended,
   });
 
+  final String id;
   final String name;
   final String price;
   final String period;
   final List<String> features;
-  final bool isCurrent;
   final bool isRecommended;
 }
 
@@ -287,16 +418,20 @@ class _Invoice {
   final String status;
 }
 
+// ── Plan card ─────────────────────────────────────────────────────────────────
+
 class _PlanCard extends StatelessWidget {
   const _PlanCard({
     required this.plan,
-    required this.isSelected,
-    required this.onSelect,
+    required this.isCurrent,
+    required this.isUpgrading,
+    required this.onUpgrade,
   });
 
   final _Plan plan;
-  final bool isSelected;
-  final VoidCallback onSelect;
+  final bool isCurrent;
+  final bool isUpgrading;
+  final VoidCallback onUpgrade;
 
   @override
   Widget build(BuildContext context) {
@@ -308,15 +443,13 @@ class _PlanCard extends StatelessWidget {
         color: HireIQTheme.surfaceWhite,
         borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
         border: Border.all(
-          color: isSelected
-              ? HireIQTheme.primaryNavy
-              : HireIQTheme.borderLight,
-          width: isSelected ? 2 : 1,
+          color: isCurrent ? HireIQTheme.primaryNavy : HireIQTheme.borderLight,
+          width: isCurrent ? 2 : 1,
         ),
         boxShadow: [
           BoxShadow(
             color: HireIQTheme.primaryNavy
-                .withValues(alpha: isSelected ? 0.08 : 0.04),
+                .withValues(alpha: isCurrent ? 0.08 : 0.04),
             blurRadius: 12,
             offset: const Offset(0, 3),
           ),
@@ -346,8 +479,7 @@ class _PlanCard extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 8, vertical: 2),
                             decoration: BoxDecoration(
-                              color: HireIQTheme.amber
-                                  .withValues(alpha: 0.15),
+                              color: HireIQTheme.amber.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(
                                   HireIQTheme.radiusFull),
                             ),
@@ -365,14 +497,13 @@ class _PlanCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     RichText(
                       text: TextSpan(
-                        style: GoogleFonts.inter(
-                            color: HireIQTheme.primaryNavy),
+                        style:
+                            GoogleFonts.inter(color: HireIQTheme.primaryNavy),
                         children: [
                           TextSpan(
                             text: plan.price,
                             style: GoogleFonts.inter(
-                                fontSize: 22,
-                                fontWeight: FontWeight.w800),
+                                fontSize: 22, fontWeight: FontWeight.w800),
                           ),
                           TextSpan(
                             text: ' ${plan.period}',
@@ -385,7 +516,7 @@ class _PlanCard extends StatelessWidget {
                   ],
                 ),
               ),
-              if (plan.isCurrent)
+              if (isCurrent)
                 Container(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 12, vertical: 6),
@@ -404,7 +535,7 @@ class _PlanCard extends StatelessWidget {
                 )
               else
                 ElevatedButton(
-                  onPressed: onSelect,
+                  onPressed: isUpgrading ? null : onUpgrade,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: isRecommended
                         ? HireIQTheme.amber
@@ -419,11 +550,18 @@ class _PlanCard extends StatelessWidget {
                         borderRadius:
                             BorderRadius.circular(HireIQTheme.radiusMd)),
                   ),
-                  child: Text(
-                    isSelected ? 'Selected' : 'Upgrade',
-                    style:
-                        GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 13),
-                  ),
+                  child: isUpgrading
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: Colors.white),
+                        )
+                      : Text(
+                          'Upgrade',
+                          style: GoogleFonts.inter(
+                              fontWeight: FontWeight.w700, fontSize: 13),
+                        ),
                 ),
             ],
           ),
@@ -451,6 +589,8 @@ class _PlanCard extends StatelessWidget {
   }
 }
 
+// ── Invoice row ───────────────────────────────────────────────────────────────
+
 class _InvoiceRow extends StatelessWidget {
   const _InvoiceRow({required this.invoice});
   final _Invoice invoice;
@@ -461,11 +601,12 @@ class _InvoiceRow extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       child: Row(
         children: [
-          const Icon(Icons.receipt_outlined, size: 18, color: HireIQTheme.textMuted),
+          const Icon(Icons.receipt_outlined,
+              size: 18, color: HireIQTheme.textMuted),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              'Professional Plan — ${invoice.date}',
+              'Candidate Pro — ${invoice.date}',
               style: GoogleFonts.inter(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
