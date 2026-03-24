@@ -59,6 +59,7 @@ import '../features/candidate/candidate_complete_profile.dart';
 import '../features/candidate/candidate_forge_iq.dart';
 import '../features/candidate/candidate_interview_prep.dart';
 import '../features/candidate/candidate_matchiq_explanation.dart';
+import '../features/candidate/candidate_matchiq_explanation_web.dart';
 import '../features/candidate/candidate_messages_inbox.dart';
 import '../features/candidate/candidate_notifications.dart';
 import '../features/candidate/candidate_onboarding_welcome.dart';
@@ -782,7 +783,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           builder: (context, state) => const CandidateUpliftIqWeb()),
       GoRoute(
           path: '/web/candidate/matchiq-explanation',
-          builder: (context, state) => const CandidateMatchiqExplanationWeb()),
+          builder: (context, state) => const CandidateMatchIqExplanationWeb()),
       GoRoute(
           path: '/web/candidate/gig-dashboard',
           builder: (context, state) => const CandidateGigDashboardWeb()),
