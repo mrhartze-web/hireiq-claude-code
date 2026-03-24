@@ -8,6 +8,7 @@ import '../../shared/components/skeleton_loader.dart';
 import '../../shared/components/error_state.dart';
 import '../../shared/components/empty_state.dart';
 import 'package:go_router/go_router.dart';
+import '../mobile_screens.dart';
 
 class CandidateProfile extends ConsumerWidget {
   const CandidateProfile({super.key});
@@ -76,6 +77,14 @@ class CandidateProfile extends ConsumerWidget {
                     ),
                   ),
                   centerTitle: true,
+                  actions: [
+                    IconButton(
+                      icon: const Icon(Icons.edit_outlined,
+                          color: Colors.white, size: 20),
+                      onPressed: () =>
+                          context.push(MobileRoutes.candidateEditProfile),
+                    ),
+                  ],
                   flexibleSpace: FlexibleSpaceBar(
                     collapseMode: CollapseMode.pin,
                     background: Container(
@@ -160,7 +169,17 @@ class CandidateProfile extends ConsumerWidget {
                         _MatchIQBadge(
                           score: profile.matchIQScore.toStringAsFixed(0),
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 16),
+
+                        // Profile completion bar
+                        if (profile.profileCompletionPercent < 100)
+                          _ProfileCompletionBar(
+                            percent: profile.profileCompletionPercent,
+                            onTap: () => context.push(
+                                MobileRoutes.candidateEditProfile),
+                          ),
+                        if (profile.profileCompletionPercent < 100)
+                          const SizedBox(height: 16),
 
                         // Info card
                         _InfoCard(children: [
@@ -249,6 +268,80 @@ class CandidateProfile extends ConsumerWidget {
           ),
         );
       },
+    );
+  }
+}
+
+// ── Profile completion bar ────────────────────────────────────────────────────
+
+class _ProfileCompletionBar extends StatelessWidget {
+  const _ProfileCompletionBar({required this.percent, required this.onTap});
+
+  final int percent;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: HireIQTheme.surfaceWhite,
+          borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
+          border: Border.all(color: HireIQTheme.borderLight),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Profile Completion',
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: HireIQTheme.textPrimary,
+                  ),
+                ),
+                Row(
+                  children: [
+                    Text(
+                      '$percent%',
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: HireIQTheme.primaryTeal,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    const Icon(Icons.chevron_right_rounded,
+                        size: 16, color: HireIQTheme.textMuted),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: LinearProgressIndicator(
+                value: percent / 100,
+                minHeight: 6,
+                backgroundColor: HireIQTheme.borderLight,
+                valueColor: const AlwaysStoppedAnimation<Color>(
+                    HireIQTheme.primaryTeal),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Complete your profile to attract more employers',
+              style: GoogleFonts.inter(
+                  fontSize: 11, color: HireIQTheme.textMuted),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
