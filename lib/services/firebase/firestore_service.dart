@@ -199,4 +199,22 @@ class FirestoreService {
       .collection('savedJobs')
       .doc(jobId)
       .delete();
+
+  Future<bool> checkAlreadyApplied(String candidateUid, String jobId) async {
+    final snap = await _db
+        .collection('applications')
+        .where('candidateUid', isEqualTo: candidateUid)
+        .where('jobId', isEqualTo: jobId)
+        .limit(1)
+        .get();
+    return snap.docs.isNotEmpty;
+  }
+
+  Future<String> submitApplication(ApplicationModel application) =>
+      createApplication(application);
+
+  Future<void> incrementApplicationsCount(String jobId) async =>
+      await _db.collection('jobs').doc(jobId).update({
+        'applicationsCount': FieldValue.increment(1),
+      });
 }
