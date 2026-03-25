@@ -623,11 +623,51 @@ exports.sendNotification = functions.https.onCall(async (data, context) => {
   if (!context.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'Must be logged in');
   }
+
   const { recipientUid, title, body, actionRoute } = data;
-  await admin.firestore().collection('notifications').add({
-    recipientUid, title, body, actionRoute,
+  const db = admin.firestore();
+  const messaging = admin.messaging();
+
+  // Get recipient FCM token
+  const userSnap = await db.collection('users').doc(recipientUid).get();
+  if (!userSnap.exists) return { sent: false };
+
+  const fcmToken = userSnap.data().fcmToken;
+
+  // Store notification in Firestore
+  await db.collection('notifications').add({
+    recipientUid,
+    title,
+    body,
+    type: 'general',
     isRead: false,
+    actionRoute: actionRoute || null,
     createdAt: admin.firestore.FieldValue.serverTimestamp(),
   });
-  return { success: true };
+
+  // Send FCM push if token exists
+  if (fcmToken) {
+    try {
+      await messaging.send({
+        token: fcmToken,
+        notification: { title, body },
+        data: {
+          actionRoute: actionRoute || '',
+          click_action: 'FLUTTER_NOTIFICATION_CLICK',
+        },
+        android: {
+          notification: {
+            channelId: 'hireiq_channel',
+            priority: 'high',
+          },
+        },
+      });
+      return { sent: true, method: 'fcm' };
+    } catch (e) {
+      console.error('FCM send failed:', e);
+      return { sent: true, method: 'firestore_only' };
+    }
+  }
+
+  return { sent: true, method: 'firestore_only' };
 });

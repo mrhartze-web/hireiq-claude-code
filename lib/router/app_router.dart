@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/auth_provider.dart';
+import '../services/firebase/notification_service.dart';
 import '../features/mobile_screens.dart';
 import '../features/web_screens.dart';
 import '../shared/navigation/role_navigation_bar.dart';
@@ -998,7 +999,7 @@ final routerProvider = Provider<GoRouter>((ref) {
 });
 
 /// A shared shell layout that wraps the child widget.
-class MainShell extends ConsumerWidget {
+class MainShell extends ConsumerStatefulWidget {
   final Widget child;
   final String title;
   final UserRole role;
@@ -1011,27 +1012,53 @@ class MainShell extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MainShell> createState() => _MainShellState();
+}
+
+class _MainShellState extends ConsumerState<MainShell> {
+  bool _notificationsInitialised = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Defer so ref.listen works after first build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _listenForAuth();
+    });
+  }
+
+  void _listenForAuth() {
+    ref.listenManual(authStateProvider, (_, next) {
+      final user = next.value;
+      if (user != null && !_notificationsInitialised) {
+        _notificationsInitialised = true;
+        NotificationService().initialise(user.uid);
+      }
+    }, fireImmediately: true);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final isAdmin = ref.watch(cachedRoleProvider) == 'admin';
     return Scaffold(
       body: isAdmin
           ? Stack(
               children: [
-                child,
+                widget.child,
                 Positioned(
                   bottom: 0,
                   left: 0,
                   right: 0,
-                  child: AdminModeBar(currentSection: role),
+                  child: AdminModeBar(currentSection: widget.role),
                 ),
               ],
             )
-          : child,
+          : widget.child,
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _PersonaBar(role: role),
-          RoleNavigationBar(role: role),
+          _PersonaBar(role: widget.role),
+          RoleNavigationBar(role: widget.role),
         ],
       ),
     );
