@@ -1,3 +1,4 @@
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -25,6 +26,11 @@ class _CandidateDashboardHomeState
   late final AnimationController _scoreController;
   late final Animation<double> _scoreAnim;
 
+  // Live score returned by the matchIQ Cloud Function.
+  // Null until the function responds — falls back to profile score.
+  int? _liveFunctionScore;
+  bool _isFetchingScore = false;
+
   @override
   void initState() {
     super.initState();
@@ -37,12 +43,48 @@ class _CandidateDashboardHomeState
       curve: Curves.easeOutCubic,
     );
     _scoreController.forward();
+    // Call matchIQ after first frame so providers have time to load
+    WidgetsBinding.instance.addPostFrameCallback((_) => _callMatchIQ());
   }
 
   @override
   void dispose() {
     _scoreController.dispose();
     super.dispose();
+  }
+
+  /// Calls the matchIQ Cloud Function for the first available job.
+  /// Updates [_liveFunctionScore] on success; silently falls back on error.
+  Future<void> _callMatchIQ() async {
+    final user = ref.read(authStateProvider).value;
+    if (user == null) return;
+
+    final jobs = ref.read(activeJobsProvider).valueOrNull;
+    if (jobs == null || jobs.isEmpty) return;
+
+    final firstJobId = jobs.first.jobId;
+    if (firstJobId.isEmpty) return;
+
+    setState(() => _isFetchingScore = true);
+    try {
+      final callable = FirebaseFunctions.instanceFor(region: 'us-central1')
+          .httpsCallable('matchIQ');
+      final result = await callable.call<Map<String, dynamic>>({
+        'jobId': firstJobId,
+        'candidateUid': user.uid,
+      });
+      if (mounted) {
+        setState(() {
+          _liveFunctionScore =
+              (result.data['score'] as num?)?.toInt();
+        });
+      }
+    } catch (e) {
+      // Non-fatal: profile score remains as fallback
+      debugPrint('MatchIQ function: $e');
+    } finally {
+      if (mounted) setState(() => _isFetchingScore = false);
+    }
   }
 
   String get _greeting {
@@ -56,6 +98,7 @@ class _CandidateDashboardHomeState
     _scoreController.reset();
     await Future.delayed(const Duration(milliseconds: 600));
     if (mounted) _scoreController.forward();
+    await _callMatchIQ();
   }
 
   List<Widget> _buildJobCards(BuildContext context, List<JobModel> jobs) {
@@ -85,7 +128,9 @@ class _CandidateDashboardHomeState
     final profileData = user != null
         ? ref.watch(candidateProfileProvider(user.uid)).valueOrNull
         : null;
-    final matchScore = profileData?.matchIQScore.toInt() ?? 0;
+    // Use live function score if available; fall back to stored profile score
+    final matchScore =
+        _liveFunctionScore ?? profileData?.matchIQScore.toInt() ?? 0;
     final completionPercent = profileData?.profileCompletionPercent ?? 0;
     final applicationsCount = user != null
         ? (ref
@@ -174,6 +219,8 @@ class _CandidateDashboardHomeState
                   child: _MatchIQCard(
                     scoreAnim: _scoreAnim,
                     score: matchScore,
+                    isLive: _liveFunctionScore != null,
+                    isFetching: _isFetchingScore,
                     onExplain: () =>
                         context.push('/candidate/matchiq-explanation'),
                   ),
@@ -245,11 +292,15 @@ class _MatchIQCard extends StatelessWidget {
     required this.scoreAnim,
     required this.score,
     required this.onExplain,
+    this.isLive = false,
+    this.isFetching = false,
   });
 
   final Animation<double> scoreAnim;
   final int score;
   final VoidCallback onExplain;
+  final bool isLive;
+  final bool isFetching;
 
   Color get _ringColor {
     if (score >= 80) return HireIQTheme.success;
@@ -375,6 +426,57 @@ class _MatchIQCard extends StatelessWidget {
                 decorationColor: HireIQTheme.primaryTeal,
               ),
             ),
+          ),
+          const SizedBox(height: 10),
+          // Live score indicator
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (isFetching) ...[
+                const SizedBox(
+                  width: 10,
+                  height: 10,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 1.5,
+                    color: HireIQTheme.textMuted,
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  'Calculating score...',
+                  style: GoogleFonts.inter(
+                    fontSize: 11,
+                    color: HireIQTheme.textMuted,
+                  ),
+                ),
+              ] else if (isLive) ...[
+                Container(
+                  width: 7,
+                  height: 7,
+                  decoration: const BoxDecoration(
+                    color: HireIQTheme.success,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 5),
+                Text(
+                  'Live score',
+                  style: GoogleFonts.inter(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                    color: HireIQTheme.success,
+                  ),
+                ),
+              ] else ...[
+                Text(
+                  'Profile score',
+                  style: GoogleFonts.inter(
+                    fontSize: 11,
+                    color: HireIQTheme.textMuted,
+                  ),
+                ),
+              ],
+            ],
           ),
         ],
       ),
