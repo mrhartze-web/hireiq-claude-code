@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../models/job_model.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/employer_provider.dart';
 import '../../services/firebase/firestore_service.dart';
 import '../../shared/theme.dart';
 
@@ -34,6 +35,19 @@ class _EmployerPostJobState extends ConsumerState<EmployerPostJob> {
 
   String _jobType = 'Full-time';
   String _experienceLevel = 'Mid Level';
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final uid = ref.read(authStateProvider).value?.uid;
+      if (uid == null) return;
+      final employer = await ref.read(employerProfileProvider(uid).future);
+      if (mounted && employer != null && employer.companyName.isNotEmpty) {
+        _companyCtrl.text = employer.companyName;
+      }
+    });
+  }
 
   @override
   void dispose() {

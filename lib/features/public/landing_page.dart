@@ -22,6 +22,7 @@ class _LandingPageState extends State<LandingPage> {
       showNavBar: false,
       showFooter: false,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _WhiteNavBar(),
           _HeroSection(),

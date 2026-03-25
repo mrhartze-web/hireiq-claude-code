@@ -751,6 +751,26 @@ final routerProvider = Provider<GoRouter>((ref) {
         ],
       ),
 
+      // ── Convenience redirects (short aliases → canonical paths) ────────────
+      GoRoute(
+          path: '/candidate/dashboard',
+          redirect: (_, __) => MobileRoutes.candidateHome),
+      GoRoute(
+          path: '/candidate/match-iq',
+          redirect: (_, __) => MobileRoutes.candidateWildcard),
+      GoRoute(
+          path: '/candidate/forge-iq',
+          redirect: (_, __) => MobileRoutes.candidateForgeIq),
+      GoRoute(
+          path: '/candidate/uplift-iq',
+          redirect: (_, __) => MobileRoutes.candidateUplift),
+      GoRoute(
+          path: '/candidate/passport-iq',
+          redirect: (_, __) => MobileRoutes.candidatePassportProcessing),
+      GoRoute(
+          path: '/recruiter/brief-builder',
+          redirect: (_, __) => MobileRoutes.recruiterBriefBuilder),
+
       // --- Web Routes ---
       GoRoute(
           path: '/web/candidate/dashboard-home',

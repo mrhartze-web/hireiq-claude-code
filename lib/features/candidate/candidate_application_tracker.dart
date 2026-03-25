@@ -50,6 +50,18 @@ class ApplicationTracker extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: HireIQTheme.background,
+      appBar: AppBar(
+        backgroundColor: HireIQTheme.primaryNavy,
+        foregroundColor: Colors.white,
+        centerTitle: true,
+        title: Text(
+          'My Applications',
+          style: GoogleFonts.inter(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Colors.white),
+        ),
+      ),
       body: SafeArea(
         bottom: false,
         child: applicationsAsync.when(

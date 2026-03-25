@@ -42,7 +42,7 @@ class RecruiterDashboard extends ConsumerWidget {
             foregroundColor: Colors.white,
             centerTitle: true,
             title: Text(
-              'HireIQ',
+              'Recruiter Console',
               style: GoogleFonts.inter(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,

@@ -105,8 +105,8 @@ class _EmployerJobsState extends ConsumerState<EmployerJobs>
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {},
-        backgroundColor: HireIQTheme.amber,
-        foregroundColor: HireIQTheme.primaryNavy,
+        backgroundColor: HireIQTheme.primaryNavy,
+        foregroundColor: Colors.white,
         icon: const Icon(Icons.add),
         label: Text(
           'Post Job',

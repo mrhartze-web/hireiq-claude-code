@@ -72,7 +72,6 @@ class FirestoreService {
   Stream<List<JobModel>> getActiveJobs() => _db
       .collection('jobs')
       .where('isActive', isEqualTo: true)
-      .orderBy('postedAt', descending: true)
       .snapshots()
       .map((s) => s.docs.map((d) => JobModel.fromJson(d.data())).toList());
 
