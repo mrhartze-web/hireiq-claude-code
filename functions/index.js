@@ -1,6 +1,9 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+const Anthropic = require('@anthropic-ai/sdk');
 admin.initializeApp();
+
+const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
 
 // ── Shared scoring helper ──────────────────────────────────────────────────────
 
@@ -265,10 +268,107 @@ exports.forgeIQ = functions.https.onCall(async (data, context) => {
   if (!context.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'Must be logged in');
   }
-  return {
-    optimisedCV: 'Placeholder CV string',
-    suggestions: ['Add more metrics', 'Highlight leadership'],
-  };
+
+  const { jobId, type = 'cv' } = data;
+  const candidateUid = context.auth.uid;
+
+  if (!anthropicApiKey) {
+    throw new functions.https.HttpsError(
+      'failed-precondition', 'Anthropic API key not configured'
+    );
+  }
+
+  const db = admin.firestore();
+
+  // Fetch candidate profile
+  const candidateSnap = await db.collection('candidates').doc(candidateUid).get();
+  if (!candidateSnap.exists) {
+    throw new functions.https.HttpsError('not-found', 'Candidate profile not found');
+  }
+  const candidate = candidateSnap.data();
+
+  // Optionally fetch target job
+  let job = null;
+  if (jobId) {
+    const jobSnap = await db.collection('jobs').doc(jobId).get();
+    if (jobSnap.exists) job = jobSnap.data();
+  }
+
+  // Build context strings
+  const candidateContext = `
+Name: ${candidate.fullName || candidate.name || 'Candidate'}
+Current Role: ${candidate.currentRole || 'Not specified'}
+Years of Experience: ${candidate.yearsExperience || 0}
+Location: ${candidate.location || 'Not specified'}
+Skills: ${(candidate.skills || []).join(', ') || 'Not specified'}
+Education: ${candidate.education || 'Not specified'}
+Bio: ${candidate.bio || candidate.summary || 'Not specified'}
+`.trim();
+
+  const jobContext = job
+    ? `
+Target Role: ${job.title || 'Not specified'}
+Company: ${job.company || 'Not specified'}
+Required Skills: ${(job.skills || []).join(', ') || 'Not specified'}
+Experience Level: ${job.experienceLevel || 'Not specified'}
+Description: ${(job.description || '').slice(0, 600)}
+`.trim()
+    : '';
+
+  let prompt;
+  if (type === 'cover_letter') {
+    prompt = `You are an expert career coach. Write a professional cover letter for the following candidate${job ? ' applying for the specified role' : ''}.
+
+CANDIDATE PROFILE:
+${candidateContext}
+${jobContext ? `\nTARGET ROLE:\n${jobContext}` : ''}
+
+Write a compelling, ATS-optimised cover letter. Use a professional tone. Keep it to 3–4 paragraphs. Do not use placeholder text like [Your Name].`;
+  } else {
+    prompt = `You are an expert CV writer and career coach. Generate a professional, ATS-optimised CV for the following candidate${job ? ' tailored for the target role' : ''}.
+
+CANDIDATE PROFILE:
+${candidateContext}
+${jobContext ? `\nTARGET ROLE:\n${jobContext}` : ''}
+
+Format the CV with these ALL CAPS section headers on their own lines:
+PROFESSIONAL SUMMARY
+EXPERIENCE
+EDUCATION
+SKILLS
+CERTIFICATIONS (only if relevant)
+
+Under each section write well-structured, achievement-focused content. Use metrics where possible. Do not include placeholder text.`;
+  }
+
+  const anthropic = new Anthropic({ apiKey: anthropicApiKey });
+
+  const message = await anthropic.messages.create({
+    model: 'claude-sonnet-4-20250514',
+    max_tokens: 1500,
+    messages: [{ role: 'user', content: prompt }],
+  });
+
+  const content = message.content[0]?.text || '';
+  const generatedAt = admin.firestore.FieldValue.serverTimestamp();
+
+  // Store in generated_cvs collection
+  const cvRef = await db.collection('generated_cvs').add({
+    candidateUid,
+    jobId: jobId || null,
+    type,
+    content,
+    generatedAt,
+  });
+
+  // Update candidate doc
+  await db.collection('candidates').doc(candidateUid).update({
+    hasGeneratedCV: true,
+    lastCVGeneratedAt: generatedAt,
+    updatedAt: generatedAt,
+  });
+
+  return { cvId: cvRef.id, content, generatedAt: new Date().toISOString() };
 });
 
 // ── wildcardIQ ─────────────────────────────────────────────────────────────────
