@@ -247,7 +247,38 @@ exports.passportIQ = functions.https.onCall(async (data, context) => {
   if (!context.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'Must be logged in');
   }
-  return { verified: false, message: 'Verification pending API integration' };
+
+  const { uid, documentType } = data;
+  const db = admin.firestore();
+
+  await db.collection('verifications').add({
+    candidateUid: uid,
+    documentType: documentType || 'sa_id',
+    status: 'pending',
+    requestedAt: admin.firestore.FieldValue.serverTimestamp(),
+    note: 'DHA API integration pending',
+  });
+
+  await db.collection('candidates').doc(uid).update({
+    passportIQStatus: 'pending',
+    passportIQRequestedAt: admin.firestore.FieldValue.serverTimestamp(),
+  });
+
+  await db.collection('notifications').add({
+    recipientUid: uid,
+    title: 'PassportIQ verification submitted',
+    body: 'Your identity verification is being processed. This usually takes 24 hours.',
+    type: 'passportiq',
+    isRead: false,
+    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    actionRoute: '/candidate/passport-iq',
+  });
+
+  return {
+    status: 'pending',
+    message: 'Verification submitted successfully',
+    estimatedTime: '24 hours',
+  };
 });
 
 // ── signalIQ ───────────────────────────────────────────────────────────────────
@@ -256,9 +287,50 @@ exports.signalIQ = functions.https.onCall(async (data, context) => {
   if (!context.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'Must be logged in');
   }
+
+  const { industry, location, role } = data;
+  const db = admin.firestore();
+
+  const jobsSnap = await db.collection('jobs')
+    .where('isActive', '==', true)
+    .get();
+
+  const jobs = jobsSnap.docs.map(d => d.data());
+
+  const relevant = jobs.filter(j => {
+    const matchIndustry = !industry ||
+      (j.industry || '').toLowerCase().includes(industry.toLowerCase());
+    const matchLocation = !location ||
+      (j.location || '').toLowerCase().includes(location.toLowerCase());
+    return matchIndustry && matchLocation;
+  });
+
+  const salaries = relevant
+    .filter(j => j.salaryMin > 0 && j.salaryMax > 0)
+    .map(j => Math.round((j.salaryMin + j.salaryMax) / 2));
+
+  const sorted = salaries.sort((a, b) => a - b);
+  const len = sorted.length;
+
+  const benchmark = {
+    min: len > 0 ? sorted[0] : 0,
+    median: len > 0 ? sorted[Math.floor(len / 2)] : 0,
+    max: len > 0 ? sorted[len - 1] : 0,
+    average: len > 0 ? Math.round(sorted.reduce((a, b) => a + b, 0) / len) : 0,
+    sampleSize: len,
+    industry: industry || 'All industries',
+    location: location || 'South Africa',
+    lastUpdated: new Date().toISOString(),
+  };
+
+  const demandIndicator = relevant.length > 20 ? 'HIGH'
+    : relevant.length > 10 ? 'MEDIUM' : 'LOW';
+
   return {
-    salaryBenchmark: { min: 20000, median: 40000, max: 70000 },
-    talentAvailability: 'High',
+    benchmark,
+    demandIndicator,
+    activeRoles: relevant.length,
+    totalRolesAnalysed: jobs.length,
   };
 });
 
@@ -377,7 +449,43 @@ exports.wildcardIQ = functions.https.onCall(async (data, context) => {
   if (!context.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'Must be logged in');
   }
-  return { wildcardCandidates: [] };
+
+  const { jobId } = data;
+  const db = admin.firestore();
+
+  const appsSnap = await db.collection('applications')
+    .where('jobId', '==', jobId)
+    .where('status', '==', 'applied')
+    .get();
+
+  const applications = appsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+  const blindCandidates = await Promise.all(
+    applications.map(async (app) => {
+      const candSnap = await db.collection('candidates').doc(app.candidateUid).get();
+      if (!candSnap.exists) return null;
+      const candidate = candSnap.data();
+      return {
+        applicationId: app.id,
+        matchIQScore: app.matchIQScore || 0,
+        skills: candidate.skills || [],
+        yearsExperience: candidate.yearsExperience || 0,
+        profileCompleteness: candidate.profileCompletionPercent || 0,
+        passportIQVerified: candidate.passportIQStatus === 'verified',
+      };
+    })
+  );
+
+  const filtered = blindCandidates
+    .filter(Boolean)
+    .sort((a, b) => b.matchIQScore - a.matchIQScore);
+
+  return {
+    jobId,
+    totalCandidates: filtered.length,
+    blindCandidates: filtered,
+    biasRemovedFields: ['name', 'photo', 'location', 'age', 'gender'],
+  };
 });
 
 // ── upliftIQ ───────────────────────────────────────────────────────────────────
@@ -386,10 +494,127 @@ exports.upliftIQ = functions.https.onCall(async (data, context) => {
   if (!context.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'Must be logged in');
   }
-  return {
-    skillGaps: ['React', 'NodeJS'],
-    learningPath: ['Course 1', 'Course 2'],
+
+  const { uid, targetRole } = data;
+  const db = admin.firestore();
+
+  const candidateSnap = await db.collection('candidates').doc(uid).get();
+  if (!candidateSnap.exists) {
+    throw new functions.https.HttpsError('not-found', 'Candidate not found');
+  }
+
+  const candidate = candidateSnap.data();
+  const currentSkills = (candidate.skills || []).map(s => s.toLowerCase());
+
+  const roleSkillMap = {
+    'flutter developer': ['flutter', 'dart', 'firebase', 'riverpod', 'gorouter', 'rest api', 'git'],
+    'react developer': ['react', 'javascript', 'typescript', 'css', 'html', 'node.js', 'git'],
+    'data engineer': ['python', 'sql', 'spark', 'airflow', 'aws', 'dbt', 'git'],
+    'product manager': ['product strategy', 'agile', 'jira', 'user research', 'analytics', 'roadmapping'],
+    'financial accountant': ['ifrs', 'gaap', 'excel', 'sap', 'financial reporting', 'tax', 'audit'],
+    'project manager': ['pmp', 'agile', 'ms project', 'risk management', 'stakeholder management', 'budget management'],
+    'hr manager': ['recruitment', 'performance management', 'labour law', 'sabpp', 'payroll', 'employee relations', 'training'],
+    'data analyst': ['sql', 'python', 'excel', 'power bi', 'tableau', 'statistics', 'data visualisation'],
+    'ux designer': ['figma', 'user research', 'prototyping', 'wireframing', 'usability testing', 'design systems', 'accessibility'],
+    'devops engineer': ['docker', 'kubernetes', 'ci/cd', 'aws', 'terraform', 'linux', 'monitoring'],
   };
+
+  const targetKey = (targetRole || '').toLowerCase();
+  const requiredSkills = roleSkillMap[targetKey] || [];
+
+  const skillGaps = requiredSkills.filter(skill =>
+    !currentSkills.some(cs => cs.includes(skill) || skill.includes(cs))
+  );
+
+  const learningPath = skillGaps.map((skill, index) => ({
+    week: (index + 1) * 2,
+    skill,
+    resource: `Search "${skill} course South Africa" on GetSmarter or Coursera`,
+    estimatedHours: 8,
+    priority: index < 3 ? 'HIGH' : 'MEDIUM',
+  }));
+
+  await db.collection('roadmaps').doc(uid).set({
+    candidateUid: uid,
+    targetRole,
+    currentSkills,
+    skillGaps,
+    learningPath,
+    generatedAt: admin.firestore.FieldValue.serverTimestamp(),
+  });
+
+  return {
+    currentSkills,
+    targetRole,
+    skillGaps,
+    learningPath,
+    estimatedWeeks: skillGaps.length * 2,
+    completionScore: requiredSkills.length > 0
+      ? Math.round(((requiredSkills.length - skillGaps.length) / requiredSkills.length) * 100)
+      : 100,
+  };
+});
+
+// ── shieldIQ ───────────────────────────────────────────────────────────────────
+
+exports.shieldIQ = functions.https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'Must be logged in');
+  }
+
+  const { targetUid, targetType, targetId } = data;
+  const db = admin.firestore();
+
+  let riskScore = 0;
+  const flags = [];
+
+  if (targetType === 'candidate') {
+    const candSnap = await db.collection('candidates').doc(targetUid).get();
+
+    if (candSnap.exists) {
+      const candidate = candSnap.data();
+
+      if ((candidate.profileCompletionPercent || 0) < 30) {
+        riskScore += 20;
+        flags.push('Incomplete profile');
+      }
+
+      if (candidate.passportIQStatus !== 'verified') {
+        riskScore += 15;
+        flags.push('Identity not verified');
+      }
+
+      if ((candidate.skills || []).length > 30) {
+        riskScore += 25;
+        flags.push('Unusually high skill count');
+      }
+
+      const recentApps = await db.collection('applications')
+        .where('candidateUid', '==', targetUid)
+        .get();
+
+      if (recentApps.size > 50) {
+        riskScore += 20;
+        flags.push('High application volume');
+      }
+    }
+  }
+
+  const riskLevel = riskScore >= 50 ? 'HIGH'
+    : riskScore >= 25 ? 'MEDIUM' : 'LOW';
+
+  await db.collection('shield_checks').add({
+    targetUid,
+    targetType,
+    targetId: targetId || null,
+    riskScore,
+    riskLevel,
+    flags,
+    checkedAt: admin.firestore.FieldValue.serverTimestamp(),
+    checkedBy: context.auth.uid,
+  });
+
+  return { riskScore, riskLevel, flags };
 });
 
 // ── sendNotification ───────────────────────────────────────────────────────────

@@ -220,5 +220,32 @@ service cloud.firestore {
       allow delete: if request.auth != null &&
                        resource.data.candidateUid == request.auth.uid;
     }
+
+    // ── verifications ───────────────────────────────────────────────────────────
+    // Candidates read their own verification records.
+    // All writes are reserved for Cloud Functions (Admin SDK).
+    match /verifications/{verificationId} {
+      allow read: if request.auth != null &&
+                     resource.data.candidateUid == request.auth.uid;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    // ── roadmaps ────────────────────────────────────────────────────────────────
+    // Candidates read their own roadmap (doc id == uid).
+    // All writes are reserved for Cloud Functions (Admin SDK).
+    match /roadmaps/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    // ── shield_checks ───────────────────────────────────────────────────────────
+    // Any authenticated user can read shield check results (employers, recruiters, admins).
+    // All writes are reserved for Cloud Functions (Admin SDK).
+    match /shield_checks/{checkId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
   }
 }
