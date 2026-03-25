@@ -168,9 +168,28 @@ import '../features/admin/admin_recruiter_management.dart';
 import '../features/admin/admin_system_settings.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
+  // Short-path aliases handled in onException because GoRouter's global
+  // redirect only fires for registered routes, not unknown paths.
+  const _routeAliases = {
+    '/candidate/dashboard'    : '/candidate/home',
+    '/candidate/match-iq'     : '/candidate/wildcard',
+    '/candidate/forge-iq'     : '/candidate/candidate-forge-iq',
+    '/candidate/uplift-iq'    : '/candidate/uplift',
+    '/candidate/passport-iq'  : '/candidate/passport/processing',
+    '/recruiter/brief-builder': '/recruiter/recruiter-brief-builder',
+  };
+
   return GoRouter(
     initialLocation: MobileRoutes.splash,
     debugLogDiagnostics: true,
+    onException: (context, state, router) {
+      final canonical = _routeAliases[state.uri.path];
+      if (canonical != null) {
+        router.go(canonical);
+      } else {
+        router.go('/error-404');
+      }
+    },
     redirect: (context, state) {
       // ── Use synchronous currentUser — never null while stream warms up ───
       final currentUser = FirebaseAuth.instance.currentUser;
@@ -528,6 +547,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
               path: '/candidate/gig/freelancer/:id',
               builder: (context, state) => const GigFreelancerProfileScreen()),
+
         ],
       ),
 
@@ -748,28 +768,9 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
               path: '/recruiter/shield-iq-flag',
               builder: (context, state) => const ShieldIqFlagScreen()),
+
         ],
       ),
-
-      // ── Convenience redirects (short aliases → canonical paths) ────────────
-      GoRoute(
-          path: '/candidate/dashboard',
-          redirect: (_, __) => MobileRoutes.candidateHome),
-      GoRoute(
-          path: '/candidate/match-iq',
-          redirect: (_, __) => MobileRoutes.candidateWildcard),
-      GoRoute(
-          path: '/candidate/forge-iq',
-          redirect: (_, __) => MobileRoutes.candidateForgeIq),
-      GoRoute(
-          path: '/candidate/uplift-iq',
-          redirect: (_, __) => MobileRoutes.candidateUplift),
-      GoRoute(
-          path: '/candidate/passport-iq',
-          redirect: (_, __) => MobileRoutes.candidatePassportProcessing),
-      GoRoute(
-          path: '/recruiter/brief-builder',
-          redirect: (_, __) => MobileRoutes.recruiterBriefBuilder),
 
       // --- Web Routes ---
       GoRoute(
