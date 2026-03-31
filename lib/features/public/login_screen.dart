@@ -112,234 +112,328 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: HireIQTheme.background,
-      appBar: AppBar(
-        backgroundColor: HireIQTheme.background,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        leading: const BackButton(color: HireIQTheme.primaryNavy),
-        centerTitle: true,
-        title: Text(
-          'Sign in',
-          style: GoogleFonts.inter(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: HireIQTheme.primaryNavy,
-          ),
+      backgroundColor: HireIQTheme.surfaceWhite,
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final isMobile = constraints.maxWidth < 600;
+          if (isMobile) {
+            return _buildMobileLayout();
+          }
+          return _buildDesktopLayout();
+        },
+      ),
+    );
+  }
+
+  // ── Mobile layout ──────────────────────────────────────────────────────────
+
+  Widget _buildMobileLayout() {
+    return SafeArea(
+      child: SingleChildScrollView(
+        physics: const ClampingScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 24),
+            // Back button row
+            GestureDetector(
+              onTap: () => context.canPop() ? context.pop() : context.go('/'),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.arrow_back_rounded,
+                      size: 20, color: HireIQTheme.primaryNavy),
+                  const SizedBox(width: 6),
+                  Text(
+                    'Back',
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: HireIQTheme.primaryNavy,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 28),
+            Text(
+              'Welcome back.',
+              style: GoogleFonts.inter(
+                fontSize: 28,
+                fontWeight: FontWeight.w700,
+                color: HireIQTheme.primaryNavy,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Sign in to your HireIQ account.',
+              style: GoogleFonts.inter(
+                fontSize: 15,
+                color: HireIQTheme.textMuted,
+              ),
+            ),
+            const SizedBox(height: 32),
+            _buildForm(),
+            const SizedBox(height: 40),
+            _buildSignUpLink(),
+            const SizedBox(height: 32),
+          ],
         ),
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const ClampingScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 24),
+    );
+  }
 
-              // Heading
-              Text(
-                'Welcome back.',
-                style: GoogleFonts.inter(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w700,
-                  color: HireIQTheme.primaryNavy,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                'Sign in to your HireIQ account.',
-                style: GoogleFonts.inter(
-                  fontSize: 15,
-                  color: HireIQTheme.textMuted,
-                ),
-              ),
+  // ── Desktop layout ─────────────────────────────────────────────────────────
 
-              const SizedBox(height: 32),
-
-              // Form
-              Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Error banner
-                    if (_error != null) ...[
-                      _ErrorBanner(message: _error!),
-                      const SizedBox(height: 16),
-                    ],
-
-                    // Email
-                    _FieldLabel(label: 'Email address'),
-                    const SizedBox(height: 6),
-                    _LoginField(
-                      controller: _emailController,
-                      focusNode: _emailFocus,
-                      nextFocus: _passwordFocus,
-                      hint: 'you@example.com',
-                      keyboardType: TextInputType.emailAddress,
-                      prefixIcon: Icons.mail_outline_rounded,
-                      validator: (v) {
-                        if (v == null || v.trim().isEmpty) {
-                          return 'Email is required';
-                        }
-                        if (!v.contains('@')) return 'Enter a valid email';
-                        return null;
-                      },
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // Password
-                    _FieldLabel(label: 'Password'),
-                    const SizedBox(height: 6),
-                    _LoginField(
-                      controller: _passwordController,
-                      focusNode: _passwordFocus,
-                      hint: '••••••••',
-                      obscureText: _obscurePassword,
-                      prefixIcon: Icons.lock_outline_rounded,
-                      suffixIcon: _obscurePassword
-                          ? Icons.visibility_outlined
-                          : Icons.visibility_off_outlined,
-                      onSuffixTap: () => setState(
-                          () => _obscurePassword = !_obscurePassword),
-                      onSubmitted: (_) => _signIn(),
-                      validator: (v) {
-                        if (v == null || v.isEmpty) {
-                          return 'Password is required';
-                        }
-                        return null;
-                      },
-                    ),
-
-                    const SizedBox(height: 10),
-
-                    // Forgot password
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: GestureDetector(
-                        onTap: () => context.push('/forgot-password'),
-                        child: Text(
-                          'Forgot password?',
-                          style: GoogleFonts.inter(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                            color: HireIQTheme.primaryTeal,
-                          ),
-                        ),
+  Widget _buildDesktopLayout() {
+    return Row(
+      children: [
+        // Left panel — 42%
+        Expanded(
+          flex: 42,
+          child: Container(
+            color: HireIQTheme.primaryNavy,
+            padding: const EdgeInsets.fromLTRB(48, 56, 48, 48),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Wordmark
+                RichText(
+                  text: TextSpan(children: [
+                    TextSpan(
+                      text: 'Hire',
+                      style: GoogleFonts.inter(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                        letterSpacing: -0.5,
                       ),
                     ),
-
-                    const SizedBox(height: 24),
-
-                    // Sign in button (teal)
-                    _SignInButton(
-                      isLoading: _isLoading,
-                      onTap: _signIn,
+                    TextSpan(
+                      text: 'IQ',
+                      style: GoogleFonts.inter(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w800,
+                        color: HireIQTheme.primaryTeal,
+                        letterSpacing: -0.5,
+                      ),
                     ),
-
-                    const SizedBox(height: 20),
-
-                    // Or divider
-                    Row(
-                      children: [
-                        const Expanded(
-                          child: Divider(
-                            color: HireIQTheme.borderLight,
-                            thickness: 1,
-                          ),
-                        ),
-                        Padding(
-                          padding:
-                              const EdgeInsets.symmetric(horizontal: 12),
-                          child: Text(
-                            'or continue with',
-                            style: GoogleFonts.inter(
-                              fontSize: 12,
-                              color: HireIQTheme.textMuted,
-                            ),
-                          ),
-                        ),
-                        const Expanded(
-                          child: Divider(
-                            color: HireIQTheme.borderLight,
-                            thickness: 1,
-                          ),
-                        ),
-                      ],
+                  ]),
+                ),
+                const SizedBox(height: 48),
+                Text(
+                  'Good to have you back.',
+                  style: GoogleFonts.inter(
+                    fontSize: 38,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                    letterSpacing: -1,
+                    height: 1.15,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  "Your verified profile, matched opportunities, and hiring pipeline are waiting for you.",
+                  style: GoogleFonts.inter(
+                    fontSize: 17,
+                    color: Colors.white.withValues(alpha: 0.80),
+                    height: 1.55,
+                  ),
+                ),
+                const SizedBox(height: 40),
+                const _DesktopBenefitRow(text: 'Your verified identity stays active'),
+                const SizedBox(height: 20),
+                const _DesktopBenefitRow(
+                    text: 'AI-matched opportunities updated daily'),
+                const SizedBox(height: 20),
+                const _DesktopBenefitRow(
+                    text: 'Credentials and badges you own for life'),
+                const Spacer(),
+                Row(
+                  children: [
+                    Text(
+                      "Don't have an account? ",
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        color: Colors.white.withValues(alpha: 0.70),
+                      ),
                     ),
-
-                    const SizedBox(height: 16),
-
-                    // Google button
-                    _GoogleButton(
-                      isLoading: _isGoogleLoading,
-                      onTap: _signInWithGoogle,
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // Biometrics row
                     GestureDetector(
-                      onTap: () {},
-                      child: Center(
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.remove_red_eye_outlined,
-                              color: HireIQTheme.textMuted,
-                              size: 18,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Use biometrics',
-                              style: GoogleFonts.inter(
-                                fontSize: 13,
-                                color: HireIQTheme.textMuted,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
+                      onTap: () => context.go('/signup'),
+                      child: Text(
+                        'Create one free →',
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                          decoration: TextDecoration.underline,
                         ),
                       ),
                     ),
                   ],
                 ),
-              ),
-
-              const SizedBox(height: 40),
-
-              // Sign up link
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              ],
+            ),
+          ),
+        ),
+        // Right panel — 58%
+        Expanded(
+          flex: 58,
+          child: Container(
+            color: Colors.white,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(56, 48, 56, 48),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Don't have an account? ",
+                    'Sign in',
                     style: GoogleFonts.inter(
-                      fontSize: 14,
+                      fontSize: 32,
+                      fontWeight: FontWeight.w800,
+                      color: HireIQTheme.primaryNavy,
+                      letterSpacing: -0.6,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Welcome back to HireIQ.',
+                    style: GoogleFonts.inter(
+                      fontSize: 16,
                       color: HireIQTheme.textMuted,
                     ),
                   ),
-                  GestureDetector(
-                    onTap: () => context.push('/signup'),
-                    child: Text(
-                      'Create one free',
-                      style: GoogleFonts.inter(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: HireIQTheme.primaryTeal,
-                      ),
-                    ),
-                  ),
+                  const SizedBox(height: 36),
+                  _buildForm(),
+                  const SizedBox(height: 28),
+                  _buildSignUpLink(),
                 ],
               ),
-
-              const SizedBox(height: 32),
-            ],
+            ),
           ),
         ),
+      ],
+    );
+  }
+
+  // ── Shared form ────────────────────────────────────────────────────────────
+
+  Widget _buildForm() {
+    return Form(
+      key: _formKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (_error != null) ...[
+            _ErrorBanner(message: _error!),
+            const SizedBox(height: 16),
+          ],
+          const _FieldLabel(label: 'Email address'),
+          const SizedBox(height: 6),
+          _LoginField(
+            controller: _emailController,
+            focusNode: _emailFocus,
+            nextFocus: _passwordFocus,
+            hint: 'you@example.com',
+            keyboardType: TextInputType.emailAddress,
+            prefixIcon: Icons.mail_outline_rounded,
+            validator: (v) {
+              if (v == null || v.trim().isEmpty) return 'Email is required';
+              if (!v.contains('@')) return 'Enter a valid email';
+              return null;
+            },
+          ),
+          const SizedBox(height: 16),
+          const _FieldLabel(label: 'Password'),
+          const SizedBox(height: 6),
+          _LoginField(
+            controller: _passwordController,
+            focusNode: _passwordFocus,
+            hint: '••••••••',
+            obscureText: _obscurePassword,
+            prefixIcon: Icons.lock_outline_rounded,
+            suffixIcon: _obscurePassword
+                ? Icons.visibility_outlined
+                : Icons.visibility_off_outlined,
+            onSuffixTap: () =>
+                setState(() => _obscurePassword = !_obscurePassword),
+            onSubmitted: (_) => _signIn(),
+            validator: (v) {
+              if (v == null || v.isEmpty) return 'Password is required';
+              return null;
+            },
+          ),
+          const SizedBox(height: 10),
+          Align(
+            alignment: Alignment.centerRight,
+            child: GestureDetector(
+              onTap: () => context.push('/forgot-password'),
+              child: Text(
+                'Forgot password?',
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: HireIQTheme.primaryTeal,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
+          _SignInButton(isLoading: _isLoading, onTap: _signIn),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              const Expanded(
+                child: Divider(color: HireIQTheme.borderLight, thickness: 1),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Text(
+                  'or continue with',
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    color: HireIQTheme.textMuted,
+                  ),
+                ),
+              ),
+              const Expanded(
+                child: Divider(color: HireIQTheme.borderLight, thickness: 1),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          _GoogleButton(isLoading: _isGoogleLoading, onTap: _signInWithGoogle),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSignUpLink() {
+    return Center(
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            "Don't have an account? ",
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              color: HireIQTheme.textMuted,
+            ),
+          ),
+          GestureDetector(
+            onTap: () => context.push('/signup'),
+            child: Text(
+              'Create one free',
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: HireIQTheme.primaryTeal,
+                decoration: TextDecoration.underline,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -722,4 +816,44 @@ class _GoogleGPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+// ── Desktop benefit row ────────────────────────────────────────────────────────
+
+class _DesktopBenefitRow extends StatelessWidget {
+  const _DesktopBenefitRow({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 24,
+          height: 24,
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            color: HireIQTheme.primaryTeal,
+          ),
+          child: const Icon(
+            Icons.check_rounded,
+            size: 14,
+            color: Colors.white,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            text,
+            style: GoogleFonts.inter(
+              fontSize: 15,
+              color: Colors.white.withValues(alpha: 0.85),
+              height: 1.4,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }
