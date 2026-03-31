@@ -84,9 +84,7 @@ class _LandingNav extends StatelessWidget {
             ),
           ],
         ),
-        child: isMobile
-            ? _MobileNavRow()
-            : _DesktopNavRow(),
+        child: isMobile ? _MobileNavRow() : _DesktopNavRow(),
       );
     });
   }
@@ -135,8 +133,7 @@ class _DesktopNavRow extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 shape: RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.circular(HireIQTheme.radiusMd),
+                  borderRadius: BorderRadius.circular(HireIQTheme.radiusMd),
                 ),
               ),
               child: Text(
@@ -223,8 +220,7 @@ class _MobileNavRow extends StatelessWidget {
                   elevation: 0,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(HireIQTheme.radiusMd),
+                    borderRadius: BorderRadius.circular(HireIQTheme.radiusMd),
                   ),
                 ),
                 child: Text(
@@ -240,8 +236,8 @@ class _MobileNavRow extends StatelessWidget {
     );
   }
 
-  Widget _sheetLink(BuildContext sheetCtx, BuildContext outerCtx,
-      String label, String route) {
+  Widget _sheetLink(BuildContext sheetCtx, BuildContext outerCtx, String label,
+      String route) {
     return InkWell(
       onTap: () {
         Navigator.pop(sheetCtx);
@@ -360,9 +356,10 @@ class _HeroSection extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 6),
                         decoration: BoxDecoration(
-                          color: HireIQTheme.primaryTeal.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(
-                              HireIQTheme.radiusFull),
+                          color:
+                              HireIQTheme.primaryTeal.withValues(alpha: 0.15),
+                          borderRadius:
+                              BorderRadius.circular(HireIQTheme.radiusFull),
                           border: Border.all(
                             color:
                                 HireIQTheme.primaryTeal.withValues(alpha: 0.35),
@@ -447,16 +444,14 @@ class _HeroPrimaryBtn extends StatelessWidget {
         backgroundColor: HireIQTheme.primaryTeal,
         foregroundColor: Colors.white,
         elevation: 0,
-        padding:
-            const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(HireIQTheme.radiusMd),
         ),
       ),
       child: Text(
         'Get started free',
-        style:
-            GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600),
+        style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600),
       ),
     );
   }
@@ -470,16 +465,14 @@ class _HeroSecondaryBtn extends StatelessWidget {
       style: OutlinedButton.styleFrom(
         foregroundColor: Colors.white,
         side: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
-        padding:
-            const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(HireIQTheme.radiusMd),
         ),
       ),
       child: Text(
         'View pricing',
-        style:
-            GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w500),
+        style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w500),
       ),
     );
   }
@@ -523,8 +516,8 @@ class _StatsBar extends StatelessWidget {
       final isMobile = constraints.maxWidth < 600;
       return Container(
         color: HireIQTheme.primaryTeal,
-        padding: EdgeInsets.symmetric(
-            horizontal: isMobile ? 24 : 48, vertical: 28),
+        padding:
+            EdgeInsets.symmetric(horizontal: isMobile ? 24 : 48, vertical: 28),
         child: isMobile
             ? Wrap(
                 spacing: 32,
@@ -584,8 +577,8 @@ class _UserJourneySection extends StatelessWidget {
       final isMobile = constraints.maxWidth < 600;
       return Container(
         color: HireIQTheme.surfaceWhite,
-        padding: EdgeInsets.symmetric(
-            horizontal: isMobile ? 24 : 48, vertical: 80),
+        padding:
+            EdgeInsets.symmetric(horizontal: isMobile ? 24 : 48, vertical: 80),
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 1100),
@@ -846,8 +839,7 @@ class _JourneyCard extends StatelessWidget {
                 elevation: 0,
                 padding: const EdgeInsets.symmetric(vertical: 13),
                 shape: RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.circular(HireIQTheme.radiusMd),
+                  borderRadius: BorderRadius.circular(HireIQTheme.radiusMd),
                 ),
               ),
               child: Text(
@@ -878,7 +870,7 @@ const _kIqCards = <(IconData, String, String, String, Color)>[
   (
     Icons.verified_user_outlined,
     'PassportIQ',
-    'Secure identity and qualification verification using blockchain-backed credentials.',
+    'Identity verified directly with South Africa\'s Department of Home Affairs in real time.',
     'Candidates',
     Color(0xFF7C3AED),
   ),
@@ -932,8 +924,8 @@ class _EcosystemSection extends StatelessWidget {
 
       return Container(
         color: HireIQTheme.background,
-        padding: EdgeInsets.symmetric(
-            horizontal: isMobile ? 24 : 48, vertical: 80),
+        padding:
+            EdgeInsets.symmetric(horizontal: isMobile ? 24 : 48, vertical: 80),
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 1100),
@@ -1054,12 +1046,10 @@ class _IqCard extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.1),
-              borderRadius:
-                  BorderRadius.circular(HireIQTheme.radiusFull),
+              borderRadius: BorderRadius.circular(HireIQTheme.radiusFull),
             ),
             child: Text(
               target,
@@ -1095,8 +1085,8 @@ class _PricingSection extends StatelessWidget {
       final isMobile = constraints.maxWidth < 600;
       return Container(
         color: HireIQTheme.surfaceWhite,
-        padding: EdgeInsets.symmetric(
-            horizontal: isMobile ? 24 : 48, vertical: 80),
+        padding:
+            EdgeInsets.symmetric(horizontal: isMobile ? 24 : 48, vertical: 80),
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 1000),
@@ -1128,8 +1118,7 @@ class _PricingSection extends StatelessWidget {
                 Container(
                   decoration: BoxDecoration(
                     color: HireIQTheme.background,
-                    borderRadius:
-                        BorderRadius.circular(HireIQTheme.radiusMd),
+                    borderRadius: BorderRadius.circular(HireIQTheme.radiusMd),
                     border: Border.all(color: HireIQTheme.borderLight),
                   ),
                   padding: const EdgeInsets.all(4),
@@ -1190,8 +1179,7 @@ class _PricingTab extends StatelessWidget {
       onTap: () => onTap(index),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
-        padding:
-            const EdgeInsets.symmetric(horizontal: 20, vertical: 9),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 9),
         decoration: BoxDecoration(
           color: isSelected ? HireIQTheme.primaryNavy : Colors.transparent,
           borderRadius: BorderRadius.circular(9),
@@ -1200,8 +1188,7 @@ class _PricingTab extends StatelessWidget {
           label,
           style: GoogleFonts.inter(
             fontSize: 14,
-            fontWeight:
-                isSelected ? FontWeight.w600 : FontWeight.w500,
+            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
             color: isSelected ? Colors.white : HireIQTheme.textSecondary,
           ),
         ),
@@ -1225,7 +1212,7 @@ class _CandidatePricing extends StatelessWidget {
         period: '/month',
         subtitle: 'Get started with no commitment',
         features: const [
-          'Browse unlimited job listings',
+          'Browse all job listings',
           '3 applications per month',
           'Basic MatchIQ score preview',
           'Public profile',
@@ -1237,12 +1224,12 @@ class _CandidatePricing extends StatelessWidget {
       ),
       _PricingCard(
         name: 'Pro',
-        price: 'R299',
+        price: 'R29',
         period: '/month',
         subtitle: 'For serious job seekers',
-        pricingNote: null,
+        pricingNote: 'founding price — standard R49 after Milestone 3',
         features: const [
-          '15 applications per day', // Correction 1
+          '15 applications per day',
           'Full MatchIQ match scores',
           'ForgeIQ AI CV builder',
           'PassportIQ verification',
@@ -1254,6 +1241,24 @@ class _CandidatePricing extends StatelessWidget {
         isHighlighted: true,
         highlightLabel: 'Most popular',
         accentColor: HireIQTheme.primaryTeal,
+      ),
+      _PricingCard(
+        name: 'Founding Member',
+        price: 'R999',
+        period: '/once',
+        subtitle: 'Lifetime access — one payment',
+        pricingNote: 'founding price — locked for life',
+        features: const [
+          'Unlimited applications',
+          'All Pro features forever',
+          'Early access to new features',
+          'Founding member badge',
+          'Direct feedback channel',
+        ],
+        ctaLabel: 'Become a founder',
+        ctaRoute: '/role-selection',
+        isHighlighted: false,
+        accentColor: HireIQTheme.primaryNavy,
       ),
     ];
 
@@ -1269,8 +1274,7 @@ class _CandidatePricing extends StatelessWidget {
             children: cards
                 .map((c) => Expanded(
                     child: Padding(
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 8),
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: c)))
                 .toList(),
           );
@@ -1288,10 +1292,10 @@ class _EmployerPricing extends StatelessWidget {
     final cards = [
       _PricingCard(
         name: 'Starter',
-        price: 'R499',
+        price: 'R799',
         period: '/month',
         subtitle: 'Launch your first hire',
-        pricingNote: 'standard R1,299 at Milestone 1', // Correction 2
+        pricingNote: 'standard R1,299 at Milestone 1',
         features: const [
           'Up to 3 active job posts',
           'MatchIQ candidate scoring',
@@ -1305,9 +1309,10 @@ class _EmployerPricing extends StatelessWidget {
       ),
       _PricingCard(
         name: 'Growth',
-        price: 'R999',
+        price: 'R3,999',
         period: '/month',
         subtitle: 'Scale your hiring team',
+        pricingNote: 'founding price — locked for life',
         features: const [
           'Up to 10 active job posts',
           'SignalIQ market intelligence',
@@ -1324,7 +1329,7 @@ class _EmployerPricing extends StatelessWidget {
       ),
       _PricingCard(
         name: 'Enterprise',
-        price: 'Custom',
+        price: 'Contact us',
         period: '',
         subtitle: 'For large hiring teams',
         features: const [
@@ -1354,8 +1359,7 @@ class _EmployerPricing extends StatelessWidget {
             children: cards
                 .map((c) => Expanded(
                     child: Padding(
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 8),
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: c)))
                 .toList(),
           );
@@ -1373,10 +1377,10 @@ class _RecruiterPricing extends StatelessWidget {
     final cards = [
       _PricingCard(
         name: 'Solo',
-        price: 'R2,999',
+        price: 'R999',
         period: '/month',
         subtitle: 'Individual recruiter',
-        pricingNote: 'standard R1,999 at Milestone 1', // Correction 3
+        pricingNote: 'standard R1,999 at Milestone 1',
         features: const [
           'Full brief builder',
           'CV vault (unlimited candidates)',
@@ -1391,9 +1395,10 @@ class _RecruiterPricing extends StatelessWidget {
       ),
       _PricingCard(
         name: 'Agency',
-        price: 'R19,999',
+        price: 'R7,999',
         period: '/month',
         subtitle: 'Multi-seat agency desk',
+        pricingNote: 'founding price — locked for life',
         highlightLabel: 'Agency plan',
         features: const [
           'Everything in Solo',
@@ -1422,8 +1427,7 @@ class _RecruiterPricing extends StatelessWidget {
             children: cards
                 .map((c) => Expanded(
                     child: Padding(
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 8),
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: c)))
                 .toList(),
           );
@@ -1464,12 +1468,12 @@ class _PricingCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
-        color: isHighlighted ? HireIQTheme.primaryNavy : HireIQTheme.surfaceWhite,
+        color:
+            isHighlighted ? HireIQTheme.primaryNavy : HireIQTheme.surfaceWhite,
         borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
         border: Border.all(
-          color: isHighlighted
-              ? HireIQTheme.primaryNavy
-              : HireIQTheme.borderLight,
+          color:
+              isHighlighted ? HireIQTheme.primaryNavy : HireIQTheme.borderLight,
           width: isHighlighted ? 2 : 1,
         ),
         boxShadow: [
@@ -1487,12 +1491,10 @@ class _PricingCard extends StatelessWidget {
           // Highlight badge
           if (highlightLabel != null) ...[
             Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
                 color: accentColor,
-                borderRadius:
-                    BorderRadius.circular(HireIQTheme.radiusFull),
+                borderRadius: BorderRadius.circular(HireIQTheme.radiusFull),
               ),
               child: Text(
                 highlightLabel!,
@@ -1591,9 +1593,8 @@ class _PricingCard extends StatelessWidget {
                   Icon(
                     Icons.check_rounded,
                     size: 16,
-                    color: isHighlighted
-                        ? HireIQTheme.primaryTeal
-                        : accentColor,
+                    color:
+                        isHighlighted ? HireIQTheme.primaryTeal : accentColor,
                   ),
                   const SizedBox(width: 10),
                   Expanded(
@@ -1627,8 +1628,7 @@ class _PricingCard extends StatelessWidget {
                 elevation: 0,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.circular(HireIQTheme.radiusMd),
+                  borderRadius: BorderRadius.circular(HireIQTheme.radiusMd),
                 ),
               ),
               child: Text(
@@ -1657,8 +1657,8 @@ class _FounderQuoteSection extends StatelessWidget {
       final isMobile = constraints.maxWidth < 600;
       return Container(
         color: HireIQTheme.primaryNavy,
-        padding: EdgeInsets.symmetric(
-            horizontal: isMobile ? 24 : 48, vertical: 80),
+        padding:
+            EdgeInsets.symmetric(horizontal: isMobile ? 24 : 48, vertical: 80),
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 720),
@@ -1754,8 +1754,8 @@ class _CtaBanner extends StatelessWidget {
       return Container(
         width: double.infinity,
         color: HireIQTheme.primaryTeal,
-        padding: EdgeInsets.symmetric(
-            horizontal: isMobile ? 24 : 48, vertical: 72),
+        padding:
+            EdgeInsets.symmetric(horizontal: isMobile ? 24 : 48, vertical: 72),
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 640),
@@ -1791,8 +1791,7 @@ class _CtaBanner extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 40, vertical: 16),
                     shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(HireIQTheme.radiusMd),
+                      borderRadius: BorderRadius.circular(HireIQTheme.radiusMd),
                     ),
                   ),
                   child: Text(
@@ -1826,8 +1825,8 @@ class _LandingFooter extends StatelessWidget {
       final isMobile = constraints.maxWidth < 600;
       return Container(
         color: const Color(0xFF0F1E33),
-        padding: EdgeInsets.symmetric(
-            horizontal: isMobile ? 24 : 64, vertical: 64),
+        padding:
+            EdgeInsets.symmetric(horizontal: isMobile ? 24 : 64, vertical: 64),
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 1100),
@@ -1842,16 +1841,11 @@ class _LandingFooter extends StatelessWidget {
                           _FooterBrand(),
                           const SizedBox(height: 36),
                           _FooterCol(
-                              heading: 'Platform',
-                              links: _kPlatformLinks),
+                              heading: 'Platform', links: _kPlatformLinks),
                           const SizedBox(height: 28),
-                          _FooterCol(
-                              heading: 'Company',
-                              links: _kCompanyLinks),
+                          _FooterCol(heading: 'Company', links: _kCompanyLinks),
                           const SizedBox(height: 28),
-                          _FooterCol(
-                              heading: 'Legal',
-                              links: _kLegalLinks),
+                          _FooterCol(heading: 'Legal', links: _kLegalLinks),
                         ],
                       )
                     : Row(
@@ -1862,27 +1856,23 @@ class _LandingFooter extends StatelessWidget {
                           Expanded(
                               flex: 2,
                               child: _FooterCol(
-                                  heading: 'Platform',
-                                  links: _kPlatformLinks)),
+                                  heading: 'Platform', links: _kPlatformLinks)),
                           const SizedBox(width: 32),
                           Expanded(
                               flex: 2,
                               child: _FooterCol(
-                                  heading: 'Company',
-                                  links: _kCompanyLinks)),
+                                  heading: 'Company', links: _kCompanyLinks)),
                           const SizedBox(width: 32),
                           Expanded(
                               flex: 2,
                               child: _FooterCol(
-                                  heading: 'Legal',
-                                  links: _kLegalLinks)),
+                                  heading: 'Legal', links: _kLegalLinks)),
                         ],
                       ),
 
                 const SizedBox(height: 48),
                 Container(
-                    height: 1,
-                    color: Colors.white.withValues(alpha: 0.08)),
+                    height: 1, color: Colors.white.withValues(alpha: 0.08)),
                 const SizedBox(height: 24),
 
                 // Bottom bar
@@ -2004,7 +1994,8 @@ class _SocialBtn extends StatelessWidget {
             color: Colors.white.withValues(alpha: 0.1),
           ),
         ),
-        child: Icon(icon, size: 16, color: Colors.white.withValues(alpha: 0.55)),
+        child:
+            Icon(icon, size: 16, color: Colors.white.withValues(alpha: 0.55)),
       ),
     );
   }
