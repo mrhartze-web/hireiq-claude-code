@@ -241,7 +241,7 @@ class _ActiveJobsTable extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             color: HireIQTheme.background,
-            child: Row(
+            child: const Row(
               children: [
                 _TableHeaderCell(label: 'Role', flex: 2),
                 _TableHeaderCell(label: 'Applicants'),
