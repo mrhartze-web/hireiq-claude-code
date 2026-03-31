@@ -72,7 +72,7 @@ class _RecruiterOnboardingStep3State
             Align(
               alignment: Alignment.centerRight,
               child: Text(
-                'Step 3 of 3',
+                'Step 4 of 4',
                 style: GoogleFonts.inter(
                   color: HireIQTheme.textMuted,
                   fontSize: 12,

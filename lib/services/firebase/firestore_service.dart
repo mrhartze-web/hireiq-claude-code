@@ -216,4 +216,53 @@ class FirestoreService {
       await _db.collection('jobs').doc(jobId).update({
         'applicationsCount': FieldValue.increment(1),
       });
+
+  // ── Recruiter phone verification ─────────────────────────────────────────────
+
+  /// Returns true if any recruiter doc (other than [excludeUid]) already has
+  /// this [phoneHash], preventing duplicate phone registrations.
+  Future<bool> checkPhoneHashExists(String phoneHash,
+      {required String excludeUid}) async {
+    final snap = await _db
+        .collection('recruiters')
+        .where('phoneNumberHash', isEqualTo: phoneHash)
+        .limit(2)
+        .get();
+    return snap.docs.any((d) => d.id != excludeUid);
+  }
+
+  /// Persists phone verification data to the recruiter document.
+  Future<void> storePhoneVerification({
+    required String uid,
+    required String phoneHash,
+    required DateTime verifiedAt,
+    required bool emailVerified,
+  }) async =>
+      await _db.collection('recruiters').doc(uid).set(
+        {
+          'phoneNumberHash': phoneHash,
+          'phoneVerifiedAt': verifiedAt,
+          'emailVerified': emailVerified,
+          'updatedAt': FieldValue.serverTimestamp(),
+        },
+        SetOptions(merge: true),
+      );
+
+  // ── First-placement waiver guard ─────────────────────────────────────────────
+
+  /// Returns true when this recruiter has already used their free placement.
+  Future<bool> hasUsedFirstPlacementFree(String recruiterUid) async {
+    final doc =
+        await _db.collection('recruiters').doc(recruiterUid).get();
+    if (!doc.exists) return false;
+    return doc.data()?['firstPlacementFreeUsed'] as bool? ?? false;
+  }
+
+  /// Marks the recruiter's first-placement waiver as consumed.
+  /// No-op if already set to avoid double-writes.
+  Future<void> markFirstPlacementFreeUsed(String recruiterUid) async =>
+      await _db.collection('recruiters').doc(recruiterUid).update({
+        'firstPlacementFreeUsed': true,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
 }

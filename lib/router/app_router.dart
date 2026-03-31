@@ -239,16 +239,19 @@ final routerProvider = Provider<GoRouter>((ref) {
           path.startsWith('/employer') ||
           path.startsWith('/recruiter') ||
           path.startsWith('/admin') ||
-          path.startsWith('/enterprise');
+          path.startsWith('/enterprise') ||
+          path.startsWith('/web/');
 
       // Dynamic /messages/:id segments are public — same as /messages root.
+      // NOTE: /web/* is intentionally excluded — all web shell routes require auth.
       final isPublicRoute = publicRoutes.contains(path) ||
-          path.startsWith('/web/') ||
           path.startsWith('/messages/');
 
-      // ── Guard: unauthenticated user → /welcome ───────────────────────────
+      // ── Guard: unauthenticated user → login ──────────────────────────────
+      // /web/* routes redirect directly to /login (deep-link friendly).
+      // All other protected routes redirect to /welcome (onboarding flow).
       if (!isAuth && (isProtectedPath || !isPublicRoute)) {
-        return '/welcome';
+        return path.startsWith('/web/') ? '/login' : '/welcome';
       }
 
       // ── Authenticated user on auth/onboarding screens → role dashboard ───
@@ -276,15 +279,20 @@ final routerProvider = Provider<GoRouter>((ref) {
         // ── Cross-role protection (admin exempt — View As feature) ──────────
         final cachedRole = ref.read(cachedRoleProvider);
         if (cachedRole != null && cachedRole != 'admin' && isProtectedPath) {
-          if (cachedRole == 'candidate' && !path.startsWith('/candidate')) {
+          if (cachedRole == 'candidate' &&
+              !path.startsWith('/candidate') &&
+              !path.startsWith('/web/candidate')) {
             return '/candidate';
           }
           if (cachedRole == 'employer' &&
               !path.startsWith('/employer') &&
-              !path.startsWith('/enterprise')) {
+              !path.startsWith('/enterprise') &&
+              !path.startsWith('/web/employer')) {
             return '/employer';
           }
-          if (cachedRole == 'recruiter' && !path.startsWith('/recruiter')) {
+          if (cachedRole == 'recruiter' &&
+              !path.startsWith('/recruiter') &&
+              !path.startsWith('/web/recruiter')) {
             return '/recruiter';
           }
         }

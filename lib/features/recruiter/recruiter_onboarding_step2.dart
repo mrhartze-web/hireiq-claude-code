@@ -31,7 +31,7 @@ class RecruiterOnboardingStep2 extends ConsumerWidget {
           children: [
             // Progress
             LinearProgressIndicator(
-              value: 0.66,
+              value: 0.75,
               backgroundColor: HireIQTheme.borderLight,
               valueColor: const AlwaysStoppedAnimation<Color>(
                   HireIQTheme.primaryTeal),
@@ -41,7 +41,7 @@ class RecruiterOnboardingStep2 extends ConsumerWidget {
             Align(
               alignment: Alignment.centerRight,
               child: Text(
-                'Step 2 of 3',
+                'Step 3 of 4',
                 style: GoogleFonts.inter(
                   color: HireIQTheme.textMuted,
                   fontSize: 12,

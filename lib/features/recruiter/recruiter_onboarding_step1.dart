@@ -90,7 +90,7 @@ class _RecruiterOnboardingStep1State
             Align(
               alignment: Alignment.centerRight,
               child: Text(
-                'Step 1 of 3',
+                'Step 1 of 4',
                 style: GoogleFonts.inter(
                   color: HireIQTheme.textMuted,
                   fontSize: 12,
@@ -425,7 +425,7 @@ class _RecruiterOnboardingStep1State
                   ),
                 ),
                 onPressed: () =>
-                    context.go('/recruiter/onboarding/step-2'),
+                    context.go('/recruiter/onboarding/phone-verify'),
                 child: Text(
                   'Continue',
                   style: GoogleFonts.inter(
