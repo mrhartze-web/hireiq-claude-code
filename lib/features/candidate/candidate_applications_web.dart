@@ -69,13 +69,13 @@ class _State extends ConsumerState<CandidateApplicationsWeb>
           const SizedBox(height: 24),
           // Stats
           Row(children: [
-            _AStat('Total', '${_apps.length}', HireIQTheme.primaryNavy),
+            _AppStatCard(label: 'Total', value: '${_apps.length}', color: HireIQTheme.primaryNavy),
             const SizedBox(width: 12),
-            _AStat('In Progress', '${_apps.where((a) => a.status != 'Offered' && a.status != 'Rejected').length}', HireIQTheme.primaryTeal),
+            _AppStatCard(label: 'In Progress', value: '${_apps.where((a) => a.status != 'Offered' && a.status != 'Rejected').length}', color: HireIQTheme.primaryTeal),
             const SizedBox(width: 12),
-            _AStat('Offers', '${_apps.where((a) => a.status == 'Offered').length}', HireIQTheme.success),
+            _AppStatCard(label: 'Offers', value: '${_apps.where((a) => a.status == 'Offered').length}', color: HireIQTheme.success),
             const SizedBox(width: 12),
-            _AStat('Avg MatchIQ', '${(_apps.map((a) => a.matchiq).reduce((a, b) => a + b) / _apps.length).round()}%', HireIQTheme.amber),
+            _AppStatCard(label: 'Avg MatchIQ', value: '${(_apps.map((a) => a.matchiq).reduce((a, b) => a + b) / _apps.length).round()}%', color: HireIQTheme.amber),
           ]),
           const SizedBox(height: 24),
           // Tab Bar
@@ -96,14 +96,14 @@ class _State extends ConsumerState<CandidateApplicationsWeb>
               // Header row
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                decoration: BoxDecoration(color: HireIQTheme.background, borderRadius: const BorderRadius.vertical(top: Radius.circular(HireIQTheme.radiusLg))),
-                child: Row(children: [
-                  _TH('Job Title', 3),
-                  _TH('Company', 2),
-                  _TH('Applied Date', 2),
-                  _TH('Status', 2),
-                  _TH('MatchIQ'),
-                  _TH(''),
+                decoration: const BoxDecoration(color: HireIQTheme.background, borderRadius: BorderRadius.vertical(top: Radius.circular(HireIQTheme.radiusLg))),
+                child: const Row(children: [
+                  _TableHeader('Job Title', 3),
+                  _TableHeader('Company', 2),
+                  _TableHeader('Applied Date', 2),
+                  _TableHeader('Status', 2),
+                  _TableHeader('MatchIQ'),
+                  _TableHeader(''),
                 ]),
               ),
               const Divider(height: 1, color: HireIQTheme.borderLight),
@@ -151,5 +151,46 @@ class _App {
   final int matchiq;
 }
 
-Widget _AStat(String l, String v, Color c) => Expanded(child: Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: HireIQTheme.surfaceWhite, borderRadius: BorderRadius.circular(HireIQTheme.radiusLg), border: Border.all(color: HireIQTheme.borderLight)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(v, style: GoogleFonts.inter(fontSize: 24, fontWeight: FontWeight.w800, color: c)), Text(l, style: GoogleFonts.inter(fontSize: 12, color: HireIQTheme.textMuted))])));
-Widget _TH(String t, [int flex = 1]) => Expanded(flex: flex, child: Text(t, style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w700, color: HireIQTheme.textMuted)));
+class _AppStatCard extends StatelessWidget {
+  const _AppStatCard({required this.label, required this.value, required this.color});
+
+  final String label;
+  final String value;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: HireIQTheme.surfaceWhite,
+          borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
+          border: Border.all(color: HireIQTheme.borderLight),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(value, style: GoogleFonts.inter(fontSize: 24, fontWeight: FontWeight.w800, color: color)),
+            Text(label, style: GoogleFonts.inter(fontSize: 12, color: HireIQTheme.textMuted)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _TableHeader extends StatelessWidget {
+  const _TableHeader(this.label, [this.flex = 1]);
+
+  final String label;
+  final int flex;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      flex: flex,
+      child: Text(label, style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w700, color: HireIQTheme.textMuted)),
+    );
+  }
+}

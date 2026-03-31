@@ -26,29 +26,29 @@ class _State extends ConsumerState<EmployerPostJobWeb> {
             Text('Post a New Job', style: GoogleFonts.inter(fontSize: 30, fontWeight: FontWeight.w800, color: HireIQTheme.primaryNavy)),
             Text('Create a compelling job listing with AI assistance', style: GoogleFonts.inter(fontSize: 15, color: HireIQTheme.textMuted)),
             const SizedBox(height: 28),
-            _PostCard('Basic Details', Column(children: [
-              _PF('Job Title'),
+            _PostCard(title: 'Basic Details', child: Column(children: [
+              const _PostField(label: 'Job Title'),
               const SizedBox(height: 14),
-              _PF('Department'),
+              const _PostField(label: 'Department'),
               const SizedBox(height: 14),
               Row(children: [
-                Expanded(child: DropdownButtonFormField<String>(value: _type, items: ['Full-time', 'Part-time', 'Contract', 'Freelance'].map((v) => DropdownMenuItem(value: v, child: Text(v, style: GoogleFonts.inter(fontSize: 13)))).toList(), onChanged: (v) => setState(() => _type = v!), decoration: InputDecoration(labelText: 'Job Type', border: OutlineInputBorder(borderRadius: BorderRadius.circular(HireIQTheme.radiusMd))))),
+                Expanded(child: DropdownButtonFormField<String>(initialValue: _type, items: ['Full-time', 'Part-time', 'Contract', 'Freelance'].map((v) => DropdownMenuItem(value: v, child: Text(v, style: GoogleFonts.inter(fontSize: 13)))).toList(), onChanged: (v) => setState(() => _type = v!), decoration: InputDecoration(labelText: 'Job Type', border: OutlineInputBorder(borderRadius: BorderRadius.circular(HireIQTheme.radiusMd))))),
                 const SizedBox(width: 16),
-                Expanded(child: DropdownButtonFormField<String>(value: _arrangement, items: ['Remote', 'Hybrid', 'On-site'].map((v) => DropdownMenuItem(value: v, child: Text(v, style: GoogleFonts.inter(fontSize: 13)))).toList(), onChanged: (v) => setState(() => _arrangement = v!), decoration: InputDecoration(labelText: 'Work Arrangement', border: OutlineInputBorder(borderRadius: BorderRadius.circular(HireIQTheme.radiusMd))))),
+                Expanded(child: DropdownButtonFormField<String>(initialValue: _arrangement, items: ['Remote', 'Hybrid', 'On-site'].map((v) => DropdownMenuItem(value: v, child: Text(v, style: GoogleFonts.inter(fontSize: 13)))).toList(), onChanged: (v) => setState(() => _arrangement = v!), decoration: InputDecoration(labelText: 'Work Arrangement', border: OutlineInputBorder(borderRadius: BorderRadius.circular(HireIQTheme.radiusMd))))),
               ]),
             ])),
             const SizedBox(height: 20),
-            _PostCard('Compensation', Column(children: [
-              Row(children: [
-                Expanded(child: _PF('Min Salary (R/month)')),
-                const SizedBox(width: 16),
-                Expanded(child: _PF('Max Salary (R/month)')),
+            _PostCard(title: 'Compensation', child: Column(children: [
+              const Row(children: [
+                Expanded(child: _PostField(label: 'Min Salary (R/month)')),
+                SizedBox(width: 16),
+                Expanded(child: _PostField(label: 'Max Salary (R/month)')),
               ]),
               const SizedBox(height: 14),
               Text('Display salary range to candidates', style: GoogleFonts.inter(fontSize: 13, color: HireIQTheme.textMuted)),
             ])),
             const SizedBox(height: 20),
-            _PostCard('Job Description & Requirements', Column(children: [
+            _PostCard(title: 'Job Description & Requirements', child: Column(children: [
               TextField(maxLines: 6, decoration: InputDecoration(hintText: 'Describe the role, responsibilities, and impact...', border: OutlineInputBorder(borderRadius: BorderRadius.circular(HireIQTheme.radiusMd)), contentPadding: const EdgeInsets.all(14))),
               const SizedBox(height: 14),
               TextField(maxLines: 4, decoration: InputDecoration(hintText: 'List key requirements and must-haves...', border: OutlineInputBorder(borderRadius: BorderRadius.circular(HireIQTheme.radiusMd)), contentPadding: const EdgeInsets.all(14))),
@@ -88,5 +88,47 @@ class _State extends ConsumerState<EmployerPostJobWeb> {
   }
 }
 
-Widget _PF(String l) => TextField(decoration: InputDecoration(labelText: l, labelStyle: GoogleFonts.inter(fontSize: 13, color: HireIQTheme.textMuted), border: OutlineInputBorder(borderRadius: BorderRadius.circular(HireIQTheme.radiusMd)), contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14)));
-Widget _PostCard(String title, Widget child) => Container(padding: const EdgeInsets.all(24), decoration: BoxDecoration(color: HireIQTheme.surfaceWhite, borderRadius: BorderRadius.circular(HireIQTheme.radiusLg), border: Border.all(color: HireIQTheme.borderLight)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w700, color: HireIQTheme.primaryNavy)), const SizedBox(height: 16), child]));
+class _PostField extends StatelessWidget {
+  const _PostField({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: GoogleFonts.inter(fontSize: 13, color: HireIQTheme.textMuted),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(HireIQTheme.radiusMd)),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+      ),
+    );
+  }
+}
+
+class _PostCard extends StatelessWidget {
+  const _PostCard({required this.title, required this.child});
+
+  final String title;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: HireIQTheme.surfaceWhite,
+        borderRadius: BorderRadius.circular(HireIQTheme.radiusLg),
+        border: Border.all(color: HireIQTheme.borderLight),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w700, color: HireIQTheme.primaryNavy)),
+          const SizedBox(height: 16),
+          child,
+        ],
+      ),
+    );
+  }
+}

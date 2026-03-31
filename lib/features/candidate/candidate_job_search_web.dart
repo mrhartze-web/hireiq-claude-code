@@ -101,9 +101,9 @@ class _State extends ConsumerState<CandidateJobSearchWeb> {
               Text(job.title, style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w800, color: HireIQTheme.primaryNavy)),
               Text(job.company, style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: HireIQTheme.primaryTeal)),
               const SizedBox(height: 8),
-              _JMI(Icons.location_on_rounded, job.location),
-              _JMI(Icons.attach_money_rounded, job.salary),
-              _JMI(Icons.work_outline_rounded, job.type),
+              _JobMetaItem(icon: Icons.location_on_rounded, text: job.location),
+              _JobMetaItem(icon: Icons.attach_money_rounded, text: job.salary),
+              _JobMetaItem(icon: Icons.work_outline_rounded, text: job.type),
               const Divider(color: HireIQTheme.borderLight, height: 20),
               Center(child: SizedBox(width: 80, height: 80, child: Stack(alignment: Alignment.center, children: [
                 CircularProgressIndicator(value: job.matchiq / 100, strokeWidth: 9, backgroundColor: HireIQTheme.borderLight, valueColor: const AlwaysStoppedAnimation<Color>(HireIQTheme.primaryTeal)),
@@ -133,4 +133,23 @@ class _Job {
   final int matchiq;
 }
 
-Widget _JMI(IconData icon, String text) => Padding(padding: const EdgeInsets.only(bottom: 5), child: Row(children: [Icon(icon, size: 13, color: HireIQTheme.textMuted), const SizedBox(width: 6), Text(text, style: GoogleFonts.inter(fontSize: 12, color: HireIQTheme.textMuted))]));
+class _JobMetaItem extends StatelessWidget {
+  const _JobMetaItem({required this.icon, required this.text});
+
+  final IconData icon;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 5),
+      child: Row(
+        children: [
+          Icon(icon, size: 13, color: HireIQTheme.textMuted),
+          const SizedBox(width: 6),
+          Text(text, style: GoogleFonts.inter(fontSize: 12, color: HireIQTheme.textMuted)),
+        ],
+      ),
+    );
+  }
+}
